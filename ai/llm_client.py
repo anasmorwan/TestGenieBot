@@ -1,4 +1,13 @@
 # llm_client.py
-def ask_ai(prompt):
-    # مؤقت: هنا استدعاء API للـ OpenAI أو أي نموذج
-    return "نموذج إجابة AI"
+from openai import OpenAI
+
+client = OpenAI()
+
+def generate_ai(prompt):
+
+    response = client.responses.create(
+        model="gpt-5-mini",
+        input=prompt
+    )
+
+    return response.output_text
