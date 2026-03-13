@@ -6,10 +6,18 @@ class QuizQuestion:
         self.correct_index = correct_index
         self.explanation = explanation
 
-    def to_dict(self):
-        return {
-            "question": self.question,
-            "options": self.options,
-            "correct_index": self.correct_index,
-            "explanation": self.explanation
-        }
+    @classmethod
+    def from_raw(cls, q):
+
+        if isinstance(q, dict):
+            return cls(
+                q.get("question"),
+                q.get("options"),
+                q.get("correct_index"),
+                q.get("explanation", "")
+            )
+
+        if isinstance(q, (list, tuple)):
+            return cls(q[0], q[1], q[2], q[3] if len(q) > 3 else "")
+
+        return None
