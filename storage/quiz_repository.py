@@ -1,6 +1,40 @@
-import uuid
-import sqlite3
+# storage/quiz_repository.py
 
+import json
+import uuid
+from datetime import datetime
+from storage.sqlite_db import get_connection
+
+
+def generate_quiz_code():
+
+    return "QC_" + uuid.uuid4().hex[:6]
+
+
+def store_quiz(user_id, quizzes):
+
+    conn = get_connection()
+    c = conn.cursor()
+
+    code = generate_quiz_code()
+
+    c.execute("""
+    INSERT INTO user_quizzes
+    (user_id, quiz_data, quiz_code, created_at)
+    VALUES (?, ?, ?, ?)
+    """, (
+        user_id,
+        json.dumps(quizzes),
+        code,
+        datetime.now().isoformat()
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return code
+
+"""
 def generate_unique_quiz_code():
     while True:
         code = f"QC_{uuid.uuid4().hex[:6]}"
@@ -11,7 +45,7 @@ def generate_unique_quiz_code():
             conn.close()
             return code
         conn.close()
-
+"""
 def log_quiz_share(quiz_code, shared_by_user_id, shared_by_name):
     conn = sqlite3.connect("quiz_users.db")
     c = conn.cursor()
@@ -28,7 +62,7 @@ def log_quiz_share(quiz_code, shared_by_user_id, shared_by_name):
 
 
 
-
+"""
 def store_quiz(user_id, quizzes):
 
     conn = sqlite3.connect("quiz_users.db")
@@ -45,3 +79,4 @@ def store_quiz(user_id, quizzes):
     conn.close()
 
     return quiz_code
+"""
