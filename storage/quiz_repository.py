@@ -1,5 +1,5 @@
 import uuid
-from sqlite import sqlite
+import sqlite3
 
 def generate_unique_quiz_code():
     while True:
