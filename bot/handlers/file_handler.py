@@ -1,4 +1,4 @@
-from utils.content_parser import extract_text_from_file
+from utils.content_parser import extract_text_from_file, is_file_size_allowed
 from services.quiz_service import generate_quizzes_from_text
 from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
@@ -11,6 +11,7 @@ def register(bot):
         user_id = msg.from_user.id
         chat_id = msg.chat.id
         message_id = msg.message.id
+        
 
         # 1 استخراج النص
         content = extract_text_from_file(user_id, bot, msg, path, chat_id, message_id)
