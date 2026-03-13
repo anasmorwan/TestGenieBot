@@ -32,7 +32,17 @@ def init_db():
         is_active BOOLEAN DEFAULT 1
     )
     """)
-
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS quiz_attempts (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+quiz_code TEXT,
+user_id INTEGER,
+score INTEGER,
+total INTEGER,
+timestamp TEXT
+)
+""")
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS quiz_shares (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
