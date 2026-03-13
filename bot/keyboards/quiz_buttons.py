@@ -2,7 +2,7 @@
 
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-def quiz_keyboard():
+def quiz_keyboard(quiz_code):
     keyboard = InlineKeyboardMarkup(row_width=1)
     
     buttons = [ 
