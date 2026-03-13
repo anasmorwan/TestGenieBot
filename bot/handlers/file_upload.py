@@ -1,7 +1,5 @@
-from services.content_parser import save_file, extract_text_from_file
-from services.quiz_service import generate_quizzes_from_text
+from services.content_parser import save_file
 from bot.bot_instance import bot
-from services.poll_service import send_quiz_poll
 from services.content_parser import is_file_size_allowed
 
 def handle_file_upload(msg):
@@ -21,12 +19,3 @@ def handle_file_upload(msg):
     file_data = bot.download_file(file_info.file_path)
 
     path = save_file(uid, file_name, file_data)
-
-    content = extract_text_from_file(path)
-
-    quizzes = generate_quizzes_from_text(content, uid)
-    
-    bot.send_message(chat_id, f"تم توليد {len(quizzes)} سؤال")
-
-    send_quiz_poll(chat_id, quizzes)
-
