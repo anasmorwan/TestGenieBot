@@ -8,10 +8,13 @@ def register(bot):
     def handle_callbacks(call):
 
         data = call.data
+        quiz_code = data.split(":")[1]
         chat_id = call.message.chat.id
 
-        if data == "start_quiz":
-            quiz_manager.start_quiz(chat_id, bot)
+        if data.startswith("start_quiz"):
+            quiz_manager.start_quiz(chat_id, quiz_code, bot)
 
         elif data == "post_quiz":
             bot.send_message(chat_id, "ميزة نشر الاختبار قريباً")
+
+
