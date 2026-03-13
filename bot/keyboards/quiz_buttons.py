@@ -7,7 +7,7 @@ def quiz_keyboard():
     
     buttons = [ 
     InlineKeyboardButton("📝 إبدأ", callback_data=f"start_quiz:{quiz_code}"),
-    InlineKeyboardButton("​🚀 نشر في القناة", callback_data="post_quiz"),
+    InlineKeyboardButton("​🚀 نشر في القناة", callback_data="post_quiz")
         ]
     keyboard.add(*buttons)
     
