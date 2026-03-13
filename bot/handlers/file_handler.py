@@ -1,8 +1,8 @@
-from utils.content_parser import parse_file_content
+from utils.content_parser import extract_text_from_file
 from services.quiz_service import generate_quizzes_from_text
 from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
-
+from bot.bot_insistance import bot
 
 def register(bot):
 
@@ -10,9 +10,10 @@ def register(bot):
     def handle_file_upload(msg):
         user_id = msg.from_user.id
         chat_id = msg.chat.id
+        message_id = msg.message.id
 
         # 1 استخراج النص
-        content = parse_file_content(bot, msg)
+        content = extract_text_from_file(user_id, bot, msg, path, chat_id, message_id)
         if not content:
             bot.send_message(chat_id, "لم أستطع قراءة الملف.")
             return
