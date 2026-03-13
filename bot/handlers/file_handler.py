@@ -20,6 +20,10 @@ def register(bot):
         try:
             if path:
                 content = extract_text_from_file(user_id, bot, msg, path, chat_id, message_id)
+            else:
+                print("Erorr during file upload", flush=True)
+
+            
             if not content:
                 bot.send_message(chat_id, "لم أستطع قراءة الملف.")
                 return
