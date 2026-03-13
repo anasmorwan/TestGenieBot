@@ -8,23 +8,33 @@ def register(bot):
 
     @bot.message_handler(content_types=["document"])
     def handle_file_upload(msg):
+        user_id = msg.from_user.id
+        chat_id = msg.chat.id
 
         # 1 استخراج النص
         content = parse_file_content(bot, msg)
-
         if not content:
-            bot.send_message(msg.chat.id, "لم أستطع قراءة الملف.")
+            bot.send_message(chat_id, "لم أستطع قراءة الملف.")
             return
 
-        # 2 توليد الأسئلة
-        quizzes = generate_quizzes_from_text(content, msg.from_user.id)
+        # 1b استخراج user_instruction من caption إذا وجد
+        user_instruction = getattr(msg, "caption", None)
+        if user_instruction:
+            user_instruction = user_instruction.strip()
+
+        # 2 توليد الأسئلة مع تمرير التعليمات (اختياري)
+        quizzes = generate_quizzes_from_text(
+            content=content,
+            user_id=user_id,
+            user_instruction=user_instruction
+        )
 
         if not quizzes:
-            bot.send_message(msg.chat.id, "فشل توليد الاختبار.")
+            bot.send_message(chat_id, "فشل توليد الاختبار.")
             return
 
         # 3 تخزين الاختبار
-        quiz_code = store_quiz(msg.from_user.id, quizzes)
+        quiz_code = store_quiz(user_id, quizzes)
 
         # 4 بدء الاختبار
-        quiz_manager.start_quiz(msg.chat.id, quiz_code, bot)
+        quiz_manager.start_quiz(chat_id, quiz_code, bot)
