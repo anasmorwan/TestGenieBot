@@ -1,7 +1,7 @@
 from bot.bot_instance import bot
 
 
-def send_question(bot, chat_id, question):
+def send_quiz_poll(bot, chat_id, question):
 
     poll = bot.send_poll(
         chat_id=chat_id,
@@ -15,3 +15,4 @@ def send_question(bot, chat_id, question):
     )
 
     return poll.message_id
+
