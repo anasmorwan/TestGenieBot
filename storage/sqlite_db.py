@@ -33,16 +33,7 @@ def init_db():
     )
     """)
     
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS quiz_attempts (
-id INTEGER PRIMARY KEY AUTOINCREMENT,
-quiz_code TEXT,
-user_id INTEGER,
-score INTEGER,
-total INTEGER,
-timestamp TEXT
-)
-""")
+
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS quiz_shares (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,3 +54,18 @@ timestamp TEXT
 
     conn.commit()
     conn.close()
+
+
+
+"""
+    cursor.execute(
+    CREATE TABLE IF NOT EXISTS quiz_attempts (
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+quiz_code TEXT,
+user_id INTEGER,
+score INTEGER,
+total INTEGER,
+timestamp TEXT
+)
+)
+"""
