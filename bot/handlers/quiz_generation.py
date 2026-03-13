@@ -1,6 +1,7 @@
 from services.content_parser import save_file, extract_text_from_file
 from services.quiz_service import generate_quizzes_from_text
 from bot.bot_instance import bot
+from services.poll_service import send_quiz_poll
 
 
 def handle_file_upload(msg):
@@ -24,5 +25,7 @@ def handle_file_upload(msg):
     content = extract_text_from_file(path)
 
     quizzes = generate_quizzes_from_text(content, uid)
+    
+    send_quiz_poll(chat_id, quizzes)
 
     bot.send_message(chat_id, f"تم توليد {len(quizzes)} سؤال")
