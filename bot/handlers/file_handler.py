@@ -3,16 +3,18 @@ from services.quiz_service import generate_quizzes_from_text
 from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
 from bot_instance import bot
+from bot.handlers.file_upload import handle_file_upload
 
 def register(bot):
 
     @bot.message_handler(content_types=["document"])
-    def handle_file_upload(msg):
+    def handle_file(msg):
         user_id = msg.from_user.id
         chat_id = msg.chat.id
         message_id = msg.message.id
-        
 
+        handle_file_upload(msg)
+        
         # 1 استخراج النص
         content = extract_text_from_file(user_id, bot, msg, path, chat_id, message_id)
         if not content:
