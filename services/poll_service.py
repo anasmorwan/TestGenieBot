@@ -1,15 +1,15 @@
 from bot.bot_instance import bot
 
 
-def send_question(chat_id, quiz):
+def send_question(bot, chat_id, question):
 
     poll = bot.send_poll(
         chat_id=chat_id,
-        question=quiz["question"],
-        options=quiz["options"],
+        question=question.question,
+        options=question.options,
         type="quiz",
-        correct_option_id=quiz["correct_index"],
-        explanation=quiz.get("explanation", ""),
+        correct_option_id=question.correct_index,
+        explanation=question.explanation,
         is_anonymous=False,
         open_period=30
     )
