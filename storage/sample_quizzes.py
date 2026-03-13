@@ -2,8 +2,8 @@ from storage.sqlite_db import get_connection
 import json
 from datetime import datetime
 
-def insert_sample_quiz_if_not_exists(db_path='quiz_users.db'):
-    conn = sqlite3.connect(db_path, check_same_thread=False)
+def insert_sample_quiz_if_not_exists():
+    conn = get_connection()
     cursor = conn.cursor()
         
     """
