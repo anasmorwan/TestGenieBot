@@ -1,0 +1,166 @@
+
+
+
+testgenie/
+│
+├── bot/
+│   ├── handlers/
+│   │   ├── start.py
+│   │   ├── menu.py
+│   │   ├── quiz_generation.py
+│   │   ├── games.py
+│   │   └── account.py
+│   │
+│   ├── keyboards/
+│   │   ├── main_menu.py
+│   │   └── quiz_buttons.py
+│   │
+│   └── bot_instance.py
+│
+├── services/
+│   ├── quiz_service.py
+│   ├── content_parser.py
+│   └── poll_service.py
+│
+├── ai/
+│   ├── llm_client.py
+│   └── prompts.py
+│
+├── models/
+│   ├── quiz.py
+│   └── user.py
+│
+├── storage/
+│   ├── database.py
+│   └── session_store.py
+│
+├── utils/
+│   ├── json_utils.py
+│   └── text_cleaner.py
+│
+├── config.py
+└── main.py
+
+
+
+
+
+testgenie/
+│
+├── bot/
+│   ├── handlers/
+│   │   ├── start.py
+│   │   ├── menu.py
+│   │   └── quiz_generation.py
+│   │
+│   ├── keyboards/
+│   │   ├── main_menu.py
+│   │   └── quiz_buttons.py
+│   │
+│   └── bot_instance.py
+│
+├── services/
+│   ├── quiz_service.py       # logic لإنشاء الاختبارات
+│   ├── content_parser.py     # استخراج النصوص من الملفات
+│   ├── poll_service.py       # إنشاء Telegram polls
+│   └── subscription_service.py  # إدارة الاشتراكات
+│
+├── ai/
+│   ├── llm_client.py         # التعامل مع نموذج OpenAI
+│   └── prompts.py            # كل البرومبتات مقسمة حسب اللغة/الغرض
+│
+├── models/
+│   ├── quiz.py               # QuizQuestion class
+│   └── user.py               # User model
+│
+├── storage/
+│   ├── database.py           # اتصال DB
+│   └── session_store.py      # تخزين مؤقت لحالات المستخدم
+│
+├── utils/
+│   ├── json_utils.py         # parse/clean JSON
+│   └── text_cleaner.py       # تنظيف النصوص من PDF/TXT
+│
+├── config.py
+└── main.py
+
+
+
+
+
+
+[User يرسل رسالة في Telegram] 
+             |
+             v
+       -------------------
+       | bot_instance.py |
+       -------------------
+             |
+             v
+   --------------------------
+   | handlers/start.py       | ← إذا كان /start
+   --------------------------
+   | - يقرأ باراميتر start
+   | - يحدد حالة المستخدم أو يعرض القائمة
+             |
+             v
+   --------------------------
+   | handlers/menu.py        | ← Main Menu
+   --------------------------
+   | - يعرض أزرار القوائم
+   | - يرسل callback للخيارات (go_generate, quick_quiz, حسابي)
+             |
+             v
+   --------------------------
+   | handlers/quiz_generation.py
+   --------------------------
+   | - يقرأ الملف المرسل أو النص
+   | - يتحقق من نوع الملف وحجمه
+   | - يحفظ الملف مؤقتًا
+   | - يستدعي content_parser.py
+             |
+             v
+   --------------------------
+   | services/content_parser.py
+   --------------------------
+   | - استخراج نص صافي من PDF/DOCX/TXT
+   | - تنظيف النصوص
+   | - إعادة النص الجاهز للـ AI
+             |
+             v
+   --------------------------
+   | services/quiz_service.py
+   --------------------------
+   | - استدعاء llm_client.py مع prompts.py
+   | - توليد أسئلة Quiz (QuizQuestion من models/quiz.py)
+   | - حفظ الاختبار في قاعدة البيانات (storage/database.py)
+             |
+             v
+   --------------------------
+   | ai/llm_client.py
+   --------------------------
+   | - إرسال النص + البرومبت للذكاء الاصطناعي
+   | - استلام JSON للأسئلة
+             |
+   --------------------------
+   | ai/prompts.py
+   --------------------------
+   | - يحتوي البرومبتات (EN/AR)
+   | - يمكن إضافة user_instruction من الكابشن
+             |
+             v
+   --------------------------
+   | utils/json_utils.py
+   --------------------------
+   | - تنظيف JSON الناتج من AI
+   | - التحقق من صحة الإجابات والأزرار
+             |
+             v
+   --------------------------
+   | services/poll_service.py
+   --------------------------
+   | - تحويل الأسئلة إلى Telegram Polls
+   | - إنشاء InlineKeyboardButtons إذا لزم
+             |
+             v
+[User يرى الاختبار النهائي Poll في تيليغرام]
