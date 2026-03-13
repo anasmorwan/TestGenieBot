@@ -26,6 +26,7 @@ def handle_file_upload(msg):
 
     quizzes = generate_quizzes_from_text(content, uid)
     
+    bot.send_message(chat_id, f"تم توليد {len(quizzes)} سؤال")
+
     send_quiz_poll(chat_id, quizzes)
 
-    bot.send_message(chat_id, f"تم توليد {len(quizzes)} سؤال")
