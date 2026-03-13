@@ -1,3 +1,6 @@
+import uuid
+from sqlite import sqlite
+
 def generate_unique_quiz_code():
     while True:
         code = f"QC_{uuid.uuid4().hex[:6]}"
