@@ -27,7 +27,8 @@ class QuizManager:
         if not questions:
             return False
 
-        self.sessions[chat_id] = {
+        with self.lock:
+            self.sessions[chat_id] = {
             "questions": questions,
             "index": 0,
             "score": 0,
