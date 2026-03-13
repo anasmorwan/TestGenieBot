@@ -1,5 +1,14 @@
 # quiz_service.py
-def generate_quizzes_from_text(content, user_id, num_questions=5):
-    # مؤقت: هنا سيأتي استدعاء AI
-    quizzes = [{"question": f"سؤال {i+1}", "options": ["A","B","C","D"], "correct_index": 0} for i in range(num_questions)]
+from ai.llm_client import generate_ai
+from ai.prompts import build_quiz_prompt
+
+
+def generate_quizzes_from_text(content, user_id, num_quizzes=5):
+
+    prompt = build_quiz_prompt(content, num_quizzes)
+
+    response = generate_ai(prompt)
+
+    quizzes = parse_quiz_json(response)
+
     return quizzes
