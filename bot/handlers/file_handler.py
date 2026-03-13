@@ -53,7 +53,8 @@ def register(bot):
             # 3 تخزين الاختبار
             quiz_code = store_quiz(user_id, quizzes)
             quiz_len = len(quizzes)
-            bot.send_message(chat_id, text=get_message("QUIZ_CREATED", count=quiz_len), reply_markup=quiz_keyboard(), parse_mode=HTML)
+  
+            bot.send_message(chat_id, text=get_message("QUIZ_CREATED", count=quiz_len), reply_markup=quiz_keyboard(quiz_code), parse_mode=HTML)
 
             # 4 بدء الاختبار
             # quiz_manager.start_quiz(chat_id, quiz_code, bot)
