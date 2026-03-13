@@ -2,7 +2,7 @@ from services.content_parser import save_file, extract_text_from_file
 from services.quiz_service import generate_quizzes_from_text
 from bot.bot_instance import bot
 from services.poll_service import send_quiz_poll
-
+from services.content_parser import is_file_size_allowed
 
 def handle_file_upload(msg):
 
