@@ -3,7 +3,6 @@ from utils.content_parser import extract_text_from_file, is_file_size_allowed
 from services.quiz_service import generate_quizzes_from_text
 from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
-from bot_instance import bot
 from bot.handlers.file_upload import handle_file_upload
 # from services.poll_service import send_quiz_message
 from bot.keyboards.quiz_buttons import quiz_keyboard
