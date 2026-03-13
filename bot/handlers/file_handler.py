@@ -7,6 +7,11 @@ from bot_instance import bot
 from bot.handlers.file_upload import handle_file_upload
 # from services.poll_service import send_quiz_message
 from bot.keyboards.quiz_buttons import quiz_keyboard
+from services.messages import get_message
+
+
+
+
 def register(bot):
 
     @bot.message_handler(content_types=["document"])
@@ -47,7 +52,7 @@ def register(bot):
 
             # 3 تخزين الاختبار
             quiz_code = store_quiz(user_id, quizzes)
-            bot.send_message(chat_id, text=quiz_message, reply_markup=quiz_keyboard, parse_mode=HTML)
+            bot.send_message(chat_id, text=get_message("QUIZ_MESSAGE"), reply_markup=quiz_keyboard, parse_mode=HTML)
 
             # 4 بدء الاختبار
             # quiz_manager.start_quiz(chat_id, quiz_code, bot)
