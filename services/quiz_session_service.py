@@ -35,11 +35,13 @@ class QuizManager:
             "quiz_code": quiz_code
         }
 
-        self.send_current_question(chat_id, bot)
+        
+        with self.lock:
+            self.send_current_question(chat_id, bot)
 
         return True
 
-    def load_quiz(self, quiz_code):
+    def load_quiwith self.lock: with self.lock:z(self, quiz_code):
 
         conn = sqlite3.connect("quiz_users.db")
         c = conn.cursor()
@@ -58,8 +60,9 @@ class QuizManager:
         return json.loads(row[0])
 
     def send_current_question(self, chat_id, bot):
+        with self.lock:
+            state = self.sessions.get(chat_id)
 
-        state = self.sessions.get(chat_id)
         if not state:
             return
 
@@ -71,7 +74,8 @@ class QuizManager:
 
         chat_id = poll_answer.user.id
 
-        state = self.sessions.get(chat_id)
+        with self.lock:
+            state = self.sessions.get(chat_id)
         if not state:
             return
 
@@ -88,8 +92,9 @@ class QuizManager:
             self.send_current_question(chat_id, bot)
 
     def finish_quiz(self, chat_id, bot):
-
-        state = self.sessions.pop(chat_id, None)
+        
+        with self.lock:
+            state = self.sessions.pop(chat_id, None)
         if not state:
             return
 
