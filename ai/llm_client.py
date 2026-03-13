@@ -136,36 +136,3 @@ def generate_smart_response(prompt: str) -> str:
 
 
 
-def build_quiz_prompt(content, num_questions, user_instruction=None):
-
-    user_part = f"User instruction:\n{user_instruction}" if user_instruction else ""
-
-    prompt = f"""
-{SYSTEM_ROLE}
-
-{QUIZ_RULES}
-
-{LANGUAGE_RULE}
-
-Generate {num_questions} quiz questions.
-
-{user_part}
-
-{QUIZ_FORMAT}
-
-Content:
-{content}
-"""
-
-    return prompt
-
-
-def generate_quizzes_from_text(content: str, user_id: int, num_quizzes: int = 5, user_instruction):
-    
-    prompt = build_quiz_prompt(content, num_quizzes, user_instruction)
-    
-    response = generate_smart_response(prompt)
-    return response
- 
-
-
