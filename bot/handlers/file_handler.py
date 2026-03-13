@@ -5,7 +5,8 @@ from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
 from bot_instance import bot
 from bot.handlers.file_upload import handle_file_upload
-
+from services.poll_service import send_quiz_message
+from bot.keyboards.manu import quiz_msg_keyboard
 def register(bot):
 
     @bot.message_handler(content_types=["document"])
@@ -46,9 +47,10 @@ def register(bot):
 
             # 3 تخزين الاختبار
             quiz_code = store_quiz(user_id, quizzes)
+            bot.send_message(chat_id, text=quiz_message, reply_markup=quiz_msg_keyboard, parse_mode=HTML)
 
             # 4 بدء الاختبار
-            quiz_manager.start_quiz(chat_id, quiz_code, bot)
+            # quiz_manager.start_quiz(chat_id, quiz_code, bot)
             
         finally:
         # 3. الحذف يتم هنا لضمان تنفيذه سواء نجحت العملية أو فشلت
