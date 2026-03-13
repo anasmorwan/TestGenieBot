@@ -1,6 +1,6 @@
 # main.py
 from bot.bot_instance import bot
-
+from bot.bot_instance import set_webhook
 
 
 import bot.handlers.start  # يستورد /start handler
@@ -14,7 +14,7 @@ from storage.sqlite_db import init_db
 text_handler.register(bot)
 file_handler.register(bot)
 
-bot.infinity_polling()
+set_webhook()
 
 
 init_db()
