@@ -17,4 +17,12 @@ def register(bot):
         elif data == "post_quiz":
             bot.send_message(chat_id, "ميزة نشر الاختبار قريباً")
 
+        elif data == "go_generate":
+
+
+        elif data.startswith("quick_quiz"):
+            quiz_manager.start_quiz(chat_id, quiz_code, bot)
+
+        elif data == "go_account_settings":
+            
 
