@@ -3,12 +3,14 @@ import json
 from datetime import datetime
 from models.quiz import QuizQuestion
 from services.poll_service import send_question
-
+import threading
 
 class QuizManager:
 
     def __init__(self):
         self.sessions = {}
+        self.lock = threading.Lock()
+
 
     def start_quiz(self, chat_id, quiz_code, bot):
 
