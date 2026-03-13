@@ -1,33 +1,23 @@
-import os
+from services.content_parser import save_file, extract_text_from_file
+from services.quiz_service import generate_quizzes_from_text
+from bot.bot_instance import bot
 
-MAX_FILE_SIZE = 5 * 1024 * 1024
 
+def handle_file_upload(msg):
 
-def is_file_size_allowed(bot, file_id):
+    uid = msg.from_user.id
+    chat_id = msg.chat.id
+
+    file_name = msg.document.file_name
+    file_id = msg.document.file_id
 
     file_info = bot.get_file(file_id)
-    return file_info.file_size <= MAX_FILE_SIZE
+    file_data = bot.download_file(file_info.file_path)
 
+    path = save_file(uid, file_name, file_data)
 
-def save_file(uid, file_name, file_data):
+    content = extract_text_from_file(path)
 
-    os.makedirs("downloads", exist_ok=True)
+    quizzes = generate_quizzes_from_text(content, uid)
 
-    path = os.path.join("downloads", file_name)
-
-    with open(path, "wb") as f:
-        f.write(file_data)
-
-    return path
-
-
-def is_text_empty(text):
-
-    return not text.strip()
-
-
-def extract_text_from_file(path):
-
-    # هنا منطق قراءة PDF / TXT
-    with open(path, "r", encoding="utf8") as f:
-        return f.read()
+    bot.send_message(chat_id, f"تم توليد {len(quizzes)} سؤال!")
