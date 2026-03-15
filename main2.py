@@ -10,6 +10,10 @@ from storage.sqlite_db import init_db
 import bot.handlers.callback_handler
 import bot.handlers.payment_handler
 
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+COHERE_API_KEY = os.getenv("COHERE_API_KEY")
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 text_handler.register(bot)
 file_handler.register(bot)
