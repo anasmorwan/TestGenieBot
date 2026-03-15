@@ -13,7 +13,8 @@ def register(bot):
         if not text.strip():
             bot.send_message(chat_id, "⚠️ الرجاء إرسال نص لتوليد الاختبار.")
             return
-
+            
+        waiting_msg = bot.send_message(chat_id, "Generating quiz…")
         # توليد الأسئلة
         quizzes = generate_quizzes_from_text(text, user_id)
 
