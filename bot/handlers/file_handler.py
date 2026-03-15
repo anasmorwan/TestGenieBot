@@ -6,7 +6,7 @@ from services.quiz_session_service import quiz_manager
 from services.file_upload import handle_file_upload
 # from services.poll_service import send_quiz_message
 from bot.keyboards.quiz_buttons import quiz_keyboard
-from services.messages import get_message
+from storage.messages import get_message
 
 
 
