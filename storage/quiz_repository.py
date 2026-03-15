@@ -47,7 +47,7 @@ def generate_unique_quiz_code():
         conn.close()
 """
 def log_quiz_share(quiz_code, shared_by_user_id, shared_by_name):
-    conn = sqlite3.connect("quiz_users.db")
+    conn = get_connection()
     c = conn.cursor()
 
     shared_at = datetime.now().isoformat()  
