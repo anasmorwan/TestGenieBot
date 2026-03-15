@@ -16,10 +16,7 @@ def unified_start_handler(message):
     uid = message.from_user.id
     
     
-    if not can_generate(uid):
-        add_external_user(uid)
     
-
     if len(args) > 1:
         param = args[1] if len(args) > 1 else None
 
