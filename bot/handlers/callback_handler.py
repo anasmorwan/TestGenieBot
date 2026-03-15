@@ -1,5 +1,5 @@
 # bot/handlers/callback_handler.py
-
+from telebot.types import LabeledPrice
 from services.quiz_session_service import quiz_manager
 from storage.session_store import user_states
 
@@ -18,8 +18,19 @@ def register(bot):
             quiz_manager.start_quiz(chat_id, quiz_code, bot)
 
         elif data == "post_quiz":
-            bot.send_message(chat_id, "ميزة نشر الاختبار قريباً")
-
+            # مثال: إرسال عرض لشراء ميزات إضافية بنجوم تيليغرام
+            prices = [LabeledPrice(label="الاشتراك المميز", amount=50)] # 50 نجمة
+            
+            bot.send_invoice(
+                chat_id=chat_id,
+                title="تطوير الحساب (Premium)",
+                description="احصل على ميزات غير محدودة في إنشاء الاختبارات",
+                invoice_payload="user_premium_subscription", # معرف داخلي تطلبه لاحقاً للتأكد
+                provider_token="", # اتركها فارغة لنجوم تيليغرام
+                currency="XTR",    # رمز نجوم تيليغرام
+                prices=prices,
+                start_parameter="premium-upgrade"
+            )
         elif data == "go_generate":
             user_states[user_id] = "awating_test"
             
@@ -30,4 +41,3 @@ def register(bot):
 
         elif data == "go_account_settings":
             
-
