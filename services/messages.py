@@ -1,5 +1,6 @@
 MESSAGES = {
     "ar": {
+        "Generating quiz": "جاري توليد الإختبار…",
         "FILE_READ_ERROR": "لم أستطع قراءة الملف.",
         "QUIZ_FAILED": "فشل توليد الاختبار.",
         "FILE_TOO_LARGE": "الملف كبير جداً (الحد 5MB)",
@@ -7,6 +8,7 @@ MESSAGES = {
     },
 
     "en": {
+        "Generating quiz": "Generating quiz…",
         "FILE_READ_ERROR": "I couldn't read the file.",
         "QUIZ_FAILED": "Quiz generation failed.",
         "FILE_TOO_LARGE": "File is too large (limit 5MB)",
