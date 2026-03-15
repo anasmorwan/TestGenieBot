@@ -13,7 +13,7 @@ import bot.handlers.callback_handler
 
 text_handler.register(bot)
 file_handler.register(bot)
-callback_handler.register (bot)
+callback_handler.register(bot)
 
 set_webhook()
 
