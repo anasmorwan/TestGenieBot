@@ -19,7 +19,7 @@ def register(bot):
 
         elif data == "post_quiz":
             # مثال: إرسال عرض لشراء ميزات إضافية بنجوم تيليغرام
-            prices = [LabeledPrice(label="الاشتراك المميز", amount=50)] # 50 نجمة
+            prices = [LabeledPrice(label="الاشتراك المميز", amount=250)] # 250 نجمة
             
             bot.send_invoice(
                 chat_id=chat_id,
