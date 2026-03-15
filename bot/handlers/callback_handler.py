@@ -1,7 +1,7 @@
 # bot/handlers/callback_handler.py
 
 from services.quiz_session_service import quiz_manager
-from storage.session_store import user_state
+from storage.session_store import user_states
 
 def register(bot):
 
@@ -21,7 +21,7 @@ def register(bot):
             bot.send_message(chat_id, "ميزة نشر الاختبار قريباً")
 
         elif data == "go_generate":
-            user_state[user_id] = "awating_test"
+            user_states[user_id] = "awating_test"
             
 
 
