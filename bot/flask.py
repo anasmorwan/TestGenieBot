@@ -1,4 +1,6 @@
 from flask import Flask  # ✅ استيراد الكلاس Flask بحرف كبير
+from bot.bot_instance import BOT_TOKEN, bot
+import request
 
 # واجهة Flask للفحص
 app = Flask(__name__)  # ✅ استخدام Flask بحرف كبير
