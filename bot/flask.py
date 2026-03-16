@@ -2,7 +2,7 @@ import flask
 # واجهة Flask للفحص
 app = Flask(__name__)
 
-def register()
+def register():
     @app.route('/')
     def home():
         return "البوت يعمل الآن"
