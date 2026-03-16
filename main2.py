@@ -1,40 +1,28 @@
-# main.py
+# main.py (مهم: وضع طباعات للتتبع)
 import os
-
 from bot.bot_instance import bot, set_webhook
-from bot.handlers import start
-from bot.handlers import text_handler
-from bot.handlers import file_handler
-from bot.handlers import callback_handler
-from bot.handlers import pre_checkout_query_handler
-from bot.handlers import payment_handler
+from bot.handlers import start, text_handler, file_handler, callback_handler, pre_checkout_query_handler, payment_handler
 from storage.sqlite_db import init_db
 from bot import flask
 
-
-# تحميل مفاتيح API
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-COHERE_API_KEY = os.getenv("COHERE_API_KEY")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-
+print("main starting...", flush=True)
 
 # تسجيل الهاندلرز
-start.register(bot)
-text_handler.register(bot)
-file_handler.register(bot)
-callback_handler.register(bot)
-pre_checkout_query_handler.register_payment(bot)
-payment_handler.register(bot)
+start.register(bot); print("start.register done", flush=True)
+text_handler.register(bot); print("text_handler.register done", flush=True)
+file_handler.register(bot); print("file_handler.register done", flush=True)
+callback_handler.register(bot); print("callback_handler.register done", flush=True)
+pre_checkout_query_handler.register_payment(bot); print("pre_checkout_query_handler.register done", flush=True)
+payment_handler.register(bot); print("payment_handler.register done", flush=True)
 
-# تسجيل Flask
-flask.register()
+# سجل الويب هوك داخلياً
+flask.register(); print("flask.register done", flush=True)
 
-# تهيئة قاعدة البيانات
-init_db()
+init_db(); print("init_db done", flush=True)
 
-
-set_webhook()
+# ضع webhook ثم شغّل Flask
+set_webhook(); print("set_webhook done", flush=True)
 
 port = int(os.environ.get("PORT", 10000))
+print(f"Starting Flask on port {port}", flush=True)
 flask.app.run(host="0.0.0.0", port=port)
