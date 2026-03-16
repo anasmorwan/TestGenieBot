@@ -1,5 +1,6 @@
 from bot.bot_instance import bot
-
+# قائمة الملفات لكل مستخدم (تغييرها إلى dict)
+user_files = {}
 
 MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
 
