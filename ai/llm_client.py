@@ -1,4 +1,5 @@
 # llm_client.py
+import os
 from openai import OpenAI
 import google.generativeai as genai
 import requests
