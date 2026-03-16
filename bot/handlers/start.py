@@ -26,7 +26,7 @@ def unified_start_handler(message):
             
             bot.send_message(
                 chat_id=chat_id,
-                "📝 دعنا نبدأ بإنشاء **ملف بطاقاتك الأول**!\n"
+                text="📝 دعنا نبدأ بإنشاء **ملف بطاقاتك الأول**!\n"
                 "📂 أرسل ملف **PDF** أو **DOCX** أو **PPTX**، أو حتى نصًا مباشرًا 📜.\n"
                 "سيتم توليد ملف **أنكي** مخصص لك تلقائيًا 🎯",
                 parse_mode="Markdown"
