@@ -40,7 +40,7 @@ def register(bot):
             quiz_manager.start_quiz(chat_id, quiz_code, bot)
 
         elif data == "go_account_settings":
-            keyboard = account_keyboard
+            keyboard = account_keyboard()
             
 
             text = (
