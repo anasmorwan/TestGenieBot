@@ -24,7 +24,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 gemini_model = None
 if GEMINI_API_KEY:
     try:
-        gemini_model = genai.Client(api_key=API_KEY)
+        gemini_model = genai.Client(api_key=GEMINI_API_KEY)
         logging.info("✅ 1. Gemini configured successfully")
     except Exception as e:
         logging.warning(f"⚠️ Could not configure Gemini: {e}")
