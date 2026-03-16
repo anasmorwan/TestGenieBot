@@ -32,7 +32,7 @@ def is_text_empty(text):
 
 def save_file(uid, file_name, file_data):
     os.makedirs("downloads", exist_ok=True)
-    path = os.path.join("downloads", file_name)
+    path = os.path.join("downloads", f"{uid}_{file_name}")
     with open(path, "wb") as f:
         f.write(file_data)
     user_files[uid] = path
