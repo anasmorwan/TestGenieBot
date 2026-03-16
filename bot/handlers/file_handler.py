@@ -1,5 +1,5 @@
 import os # لا تنسى استيراد مكتبة نظام التشغيل
-from services.content_parser import extract_text_from_file, is_file_size_allowed
+# from services.content_parser import extract_text_from_file
 from services.quiz_service import generate_quizzes_from_text
 from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
