@@ -4,7 +4,7 @@ from services.quiz_session_service import quiz_manager
 from storage.session_store import user_states
 from bot.keyboards.account_keyboard import account_keyboard
 from storage.messages import get_message
-from bot.keyboard.payment_keyboard import payment_keyboard
+from bot.keyboards.payment_keyboard import payment_keyboard
 
 def register(bot):
 
