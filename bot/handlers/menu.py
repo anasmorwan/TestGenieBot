@@ -7,7 +7,7 @@ from bot.keyboards.main_menu import main_menu_keyboard
 
 def send_main_menu(chat_id, message_id=None):
     BOT_USERNAME = bot.get_me().username
-    keyboard = main_menu_keyboard
+    keyboard = main_menu_keyboard()
     text = (
         "👋 مرحباً بك في TestGenie\n\n"
         "حوّل ملفاتك إلى اختبارات تفاعلية خلال 10 ثوانٍ.\n\n"
@@ -19,7 +19,7 @@ def send_main_menu(chat_id, message_id=None):
 
     if message_id:
         bot.edit_message_text(
-            text,
+            text=text,
             chat_id=chat_id,
             message_id=message_id,
             reply_markup=keyboard,
@@ -27,8 +27,8 @@ def send_main_menu(chat_id, message_id=None):
         )
     else:
         bot.send_message(
-            chat_id,
-            text,
+            chat_id=chat_id,
+            text=text,
             reply_markup=keyboard,
             parse_mode="HTML"
         )
