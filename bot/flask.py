@@ -1,15 +1,15 @@
-from flask import Flask  # ✅ استيراد الكلاس Flask بحرف كبير
+from flask import Flask, request
 from bot.bot_instance import BOT_TOKEN, bot
-import requests
+import telebot
 
-# واجهة Flask للفحص
-app = Flask(__name__)  # ✅ استخدام Flask بحرف كبير
+app = Flask(__name__)
 
 def register():
-    @app.route('/')
+
+    @app.route("/")
     def home():
         return "البوت يعمل الآن"
-    
+
     @app.route(f"/{BOT_TOKEN}", methods=["POST"])
     def webhook():
         json_str = request.get_data().decode("UTF-8")
