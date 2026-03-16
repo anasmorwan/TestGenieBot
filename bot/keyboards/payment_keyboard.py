@@ -6,4 +6,5 @@ def payment_keyboard()
         [InlineKeyboardButton("💳 شراء الاشتراك", callback_data="buy_subscription")],
         [InlineKeyboardButton("🔙 رجوع", callback_data="go_account_settings")]
     ])
+    return keyboard
 
