@@ -2,7 +2,7 @@ import sqlite3
 import json
 from datetime import datetime
 from models.quiz import QuizQuestion
-from services.poll_service import send_question
+from services.poll_service import send_quiz_poll
 import threading
 
 class QuizManager:
