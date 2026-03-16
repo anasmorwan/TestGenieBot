@@ -12,5 +12,5 @@ flask
 pypdf
 python-pptx
 PyMuPDF
-google-generativeai
+google.genai
 cohere
