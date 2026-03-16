@@ -1,17 +1,8 @@
-
-    
-    
 # text_extraction.py
-
 import os
 from pptx import Presentation
 import docx
 import fitz                     # PyMuPDF
-
-
-# قائمة الملفات لكل مستخدم (تغييرها إلى dict)
-user_files = {}
-
 
 
 # دوال مساعدة
