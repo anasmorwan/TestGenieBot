@@ -1,9 +1,10 @@
 import os
 import telebot
-from dotenv import load_dotenv
 import logging
+from dotenv import load_dotenv
 
 load_dotenv()
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
@@ -13,7 +14,7 @@ def set_webhook():
     bot.remove_webhook()
     bot.set_webhook(url=f"{WEBHOOK_URL}/{BOT_TOKEN}")
     logging.info(f"🌍 Webhook set at {WEBHOOK_URL}/{BOT_TOKEN}")
-
+    
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 10000))  # Render يستخدم 10000
     app.run(host='0.0.0.0', port=port)
