@@ -10,6 +10,8 @@ from bot.handlers import file_handler
 from storage.sqlite_db import init_db
 from bot.handlers import callback_handler
 from bot.handlers import payment_handler
+from bot import flask 
+
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -21,6 +23,10 @@ file_handler.register(bot)
 callback_handler.register(bot)
 pre_checkout_query_handler.register_payment(bot)
 payment_handler.register(bot)
+flask.register()
+
+
+if __name__ == __main__:
 set_webhook()
 
 
