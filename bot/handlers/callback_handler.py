@@ -68,6 +68,14 @@ def register(bot):
                 bot.edit_message_text(chat_id=chat_id, text=text, message_id=message_id, reply_markup=keyboard)
 
             
+            elif data == "upgrade_account":
+                
+
+                    # إرسال الرسالة
+                    bot.send_message(chat_id, upgrade_text, reply_markup=keyboard)
+
+
+            
         except Exception as e:
             print("CALLBACK ERROR:", e, flush=True)
 
