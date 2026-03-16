@@ -4,7 +4,7 @@ from services.quiz_session_service import quiz_manager
 from storage.session_store import user_states
 from bot.keyboards.account_keyboard import account_keyboard
 from storage.messages import get_message
-from bot.keyboards.payment_keyboard import payment_keyboard
+from bot.keyboards.upgrade_keyboard import upgrade_keyboard
 
 def register(bot):
 
@@ -70,7 +70,7 @@ def register(bot):
             
             elif data == "upgrade_account":
                 bot.answer_callback_query(call.id)
-                upgrade_keyboard = payment_keyboard()
+                upgrade_keyboard = upgrade_keyboard()
                  
             
                 # إرسال الرسالة
