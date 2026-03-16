@@ -71,10 +71,10 @@ def register(bot):
             elif data == "upgrade_account":
                 bot.answer_callback_query(call.id)
                 upgrade_keyboard =
-                upgrade_text = get_message(UPGRADE_MAIN)
+                 
             
                 # إرسال الرسالة
-                bot.send_message(chat_id, text=upgrade_text, reply_markup=upgrade_keyboard)
+                bot.send_message(chat_id, text=get_message("UPGRADE_MAIN"), reply_markup=upgrade_keyboard)
 
 
             
