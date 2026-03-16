@@ -3,7 +3,7 @@
 
 from bot.bot_instance import bot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from bot.keyboards import main_menu_keyboard 
+from bot.keyboards.main_manu import main_menu_keyboard 
 
 def send_main_menu(chat_id, message_id=None):
     BOT_USERNAME = bot.get_me().username
