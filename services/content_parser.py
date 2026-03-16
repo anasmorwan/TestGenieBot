@@ -1,9 +1,4 @@
-# content_parser.py
-def extract_text(file_path):
-    # مؤقت: هنا ضع كود استخراج النصوص من PDF/DOCX/TXT
-    return "محتوى الملف كنص"
-    
-    
+
     
     
 # text_extraction.py
@@ -18,25 +13,13 @@ import fitz                     # PyMuPDF
 user_files = {}
 
 
-MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
-
-def is_file_size_allowed(bot, file_id):
-    file_info = bot.get_file(file_id)
-    return file_info.file_size <= MAX_FILE_SIZE
-
-
 
 # دوال مساعدة
 def is_text_empty(text):
     return not text.strip()
 
-def save_file(uid, file_name, file_data):
-    os.makedirs("downloads", exist_ok=True)
-    path = os.path.join("downloads", f"{uid}_{file_name}")
-    with open(path, "wb") as f:
-        f.write(file_data)
-    user_files[uid] = path
-    return path
+
+
 
 # الدالة الرئيسية
 def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
