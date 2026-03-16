@@ -41,23 +41,24 @@ class QuizManager:
 
         return True
 
-    def load_quiwith self.lock: with self.lock:z(self, quiz_code):
+        def load_quiz(self, quiz_code):
+            with self.lock:
+                conn = sqlite3.connect("quiz_users.db")
+                c = conn.cursor()
 
-        conn = sqlite3.connect("quiz_users.db")
-        c = conn.cursor()
+                c.execute(
+                    "SELECT quiz_data FROM user_quizzes WHERE quiz_code=?",
+                    (quiz_code,)
+                )
 
-        c.execute(
-            "SELECT quiz_data FROM user_quizzes WHERE quiz_code=?",
-            (quiz_code,)
-        )
+                row = c.fetchone()
+                conn.close()
 
-        row = c.fetchone()
-        conn.close()
+                if not row:
+                    return None
 
-        if not row:
-            return None
-
-        return json.loads(row[0])
+                return json.loads(row[0])
+    
 
     def send_current_question(self, chat_id, bot):
         with self.lock:
