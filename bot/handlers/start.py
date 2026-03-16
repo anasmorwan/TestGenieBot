@@ -1,17 +1,20 @@
 
 # تم النقل
 # start.py
-from bot.bot_instance import bot
+# bot/handlers/start.py
 from bot.handlers.menu import send_main_menu
 from storage.session_store import user_states
+
 
 def register(bot):
     print("start handler registered", flush=True)
     
     @bot.message_handler(commands=['start'])
     def unified_start_handler(message):
+        print("/start received:", message.from_user.id, flush=True)
         # ✅ تجاهل الرسائل في المجموعات
         if message.chat.type != "private":
+            print("ignored non-private start", flush=True)
             return
 
         chat_id = message.chat.id
