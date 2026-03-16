@@ -15,6 +15,7 @@ def register(bot):
             data = call.data
             chat_id = call.message.chat.id
             user_id = call.from_user.id
+            message_id = call.message.message_id
             print("callback:", data, flush=True)
 
 
@@ -64,7 +65,7 @@ def register(bot):
                 )
 
                 bot.answer_callback_query(call.id)
-                bot.send_message(chat_id, text, reply_markup=keyboard)
+                bot.edit_message_text(chat_id=chat_id, text=text, message_id=message_id, reply_markup=keyboard)
 
             
         except Exception as e:
