@@ -6,6 +6,7 @@ from bot.handlers.menu import send_main_menu
 from storage.session_store import user_states
 
 def register(bot):
+    print("start handler registered", flush=True)
     
     @bot.message_handler(commands=['start'])
     def unified_start_handler(message):
