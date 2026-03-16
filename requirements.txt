@@ -12,3 +12,4 @@ flask
 pypdf
 python-pptx
 PyMuPDF
+google-generativeai
