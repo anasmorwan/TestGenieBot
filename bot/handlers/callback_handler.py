@@ -54,4 +54,4 @@ def register(bot):
                 )
 
             
-           bot.send_message(chat_id, text, reply_markup=keyboard)
+            bot.send_message(chat_id, text, reply_markup=keyboard)
