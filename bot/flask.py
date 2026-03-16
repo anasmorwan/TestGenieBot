@@ -1,6 +1,7 @@
-import flask
+from flask import Flask
+
 # واجهة Flask للفحص
-app = Flask(__name__)
+app = flask(__name__)
 
 def register():
     @app.route('/')
