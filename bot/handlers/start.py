@@ -8,7 +8,26 @@ from storage.session_store import user_states
 
 def register(bot):
     print("start handler registered", flush=True)
-    
+    @bot.message_handler(commands=['start'])
+    def unified_start_handler(message):
+
+        print("/start received:", message.from_user.id, flush=True)
+
+        try:
+            chat_id = message.chat.id
+
+            print("calling menu...", flush=True)
+
+            send_main_menu(chat_id)
+
+            print("menu sent successfully", flush=True)
+
+        except Exception as e:
+            print("ERROR IN START HANDLER:", e, flush=True)
+
+
+        
+        """
     @bot.message_handler(commands=['start'])
     def unified_start_handler(message):
         print("/start received:", message.from_user.id, flush=True)
@@ -57,3 +76,4 @@ def register(bot):
         # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
         send_main_menu(chat_id)
 
+"""
