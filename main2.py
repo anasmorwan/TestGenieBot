@@ -3,13 +3,13 @@ import os
 from bot.bot_instance import bot
 from bot.bot_instance import set_webhook
 
-import bot.handlers.pre_checkout_query_handler
-import bot.handlers.start  # يستورد /start handler
-import bot.handlers.text_handler
-import bot.handlers.file_handler
+from bot.handlers import pre_checkout_query_handler
+from bot.handlers import start  # يستورد /start handler
+from bot.handlers import text_handler
+from bot.handlers import file_handler
 from storage.sqlite_db import init_db
-import bot.handlers.callback_handler
-import bot.handlers.payment_handler
+from bot.handlers import callback_handler
+from bot.handlers import payment_handler
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
