@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import flask
 
 # واجهة Flask للفحص
 app = flask(__name__)
