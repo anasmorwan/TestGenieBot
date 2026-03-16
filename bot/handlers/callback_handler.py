@@ -2,7 +2,7 @@
 from telebot.types import LabeledPrice
 from services.quiz_session_service import quiz_manager
 from storage.session_store import user_states
-
+from bot.keyboards.account_keyboard import account_keyboard
 def register(bot):
 
     @bot.callback_query_handler(func=lambda call: True)
@@ -40,6 +40,7 @@ def register(bot):
             quiz_manager.start_quiz(chat_id, quiz_code, bot)
 
         elif data == "go_account_settings":
+            keyboard = "account_keyboard"
             
 
             text = (
@@ -50,7 +51,7 @@ def register(bot):
                 "• معالجة أسرع للملفات\n"
                 "• تجربة تعلم أفضل\n\n"
                 "اختر ما تريد:"
-                    )
+                )
 
             
-           bot.send_message(chat_id, text, reply_markup=markup)
+           bot.send_message(chat_id, text, reply_markup=keyboard)
