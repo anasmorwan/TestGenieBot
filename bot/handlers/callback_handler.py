@@ -3,7 +3,7 @@ from telebot.types import LabeledPrice
 from services.quiz_session_service import quiz_manager
 from storage.session_store import user_states
 from bot.keyboards.account_keyboard import account_keyboard
-
+from storage.messages import get_message
 
 
 def register(bot):
@@ -69,10 +69,12 @@ def register(bot):
 
             
             elif data == "upgrade_account":
-                
-
-                    # إرسال الرسالة
-                    bot.send_message(chat_id, upgrade_text, reply_markup=keyboard)
+                bot.answer_callback_query(call.id)
+                upgrade_keyboard =
+                upgrade_text = get_message(UPGRADE_MAIN)
+            
+                # إرسال الرسالة
+                bot.send_message(chat_id, text=upgrade_text, reply_markup=upgrade_keyboard)
 
 
             
