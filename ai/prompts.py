@@ -11,7 +11,7 @@ You are a precise AI quiz generator.
 Your task is to create quiz questions strictly from the provided content.
 """
 
-ENGLISH_QUIZ_PROMPT
+
 
 ANTI_HALLUCINATION = """
 If the content is insufficient, generate fewer questions rather than inventing information.
