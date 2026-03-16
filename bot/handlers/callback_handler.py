@@ -41,3 +41,16 @@ def register(bot):
 
         elif data == "go_account_settings":
             
+
+            text = (
+                "⚙️ حسابك في البوت\n\n"
+                "هل تريد معرفة حالة حسابك أو فتح جميع الميزات؟\n\n"
+                "مع الحساب المدفوع تحصل على:\n"
+                "• اختبارات غير محدودة\n"
+                "• معالجة أسرع للملفات\n"
+                "• تجربة تعلم أفضل\n\n"
+                "اختر ما تريد:"
+                    )
+
+            
+           bot.send_message(chat_id, text, reply_markup=markup)
