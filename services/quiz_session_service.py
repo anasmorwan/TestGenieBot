@@ -69,7 +69,7 @@ class QuizManager:
 
         q = state["questions"][state["index"]]
 
-        send_question(bot, chat_id, q)
+        send_quiz_poll(bot, chat_id, q)
 
     def handle_answer(self, poll_answer, bot):
 
