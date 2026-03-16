@@ -1,4 +1,5 @@
 # main.py
+import os
 from bot.bot_instance import bot
 from bot.bot_instance import set_webhook
 
