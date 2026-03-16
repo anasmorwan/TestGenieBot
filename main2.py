@@ -33,9 +33,7 @@ flask.register()
 init_db()
 
 
-if __name__ == "__main__":
-    set_webhook()
-    port = int(os.environ.get('PORT', 10000))  # Render يستخدم 10000
-    flask.app.run(host='0.0.0.0', port=port)
+set_webhook()
 
-
+port = int(os.environ.get("PORT", 10000))
+flask.app.run(host="0.0.0.0", port=port)
