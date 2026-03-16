@@ -1,7 +1,7 @@
 # llm_client.py
 import os
 from openai import OpenAI
-import google.generativeai as genai
+from google import genai
 import requests
 import cohere
 from groq import Groq
@@ -20,14 +20,11 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 
 
-
-
 # 1. إعداد Google Gemini
 gemini_model = None
 if GEMINI_API_KEY:
     try:
-        genai.configure(api_key=GEMINI_API_KEY)
-        gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+        client = genai.Client(api_key=API_KEY)
         logging.info("✅ 1. Gemini configured successfully")
     except Exception as e:
         logging.warning(f"⚠️ Could not configure Gemini: {e}")
@@ -82,7 +79,7 @@ def generate_smart_response(prompt: str) -> str:
         try:
             logging.info("Attempting request with: 4. Google Gemini...")
             request_options = {"timeout": timeout_seconds}
-            response = gemini_model.generate_content(prompt, request_options=request_options, temperature=0.8)
+            response = gemini_model.client.models.generate_content(model="gemini-1.5-flash", contents=prompt)
             if response.text:
                 logging.info("✅ Success with Gemini.")
                 return response.text
