@@ -106,3 +106,6 @@ class QuizManager:
             chat_id,
             f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
         )
+
+
+quiz_manager = QuizManager()
