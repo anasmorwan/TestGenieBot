@@ -1,0 +1,14 @@
+pyTelegramBotAPI
+openai
+pymongo
+python-dotenv
+requests
+tqdm
+PyPDF2
+python-docx
+groq
+python-dotenv
+flask
+pypdf
+python-pptx
+PyMuPDF
