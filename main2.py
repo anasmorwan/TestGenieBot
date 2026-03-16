@@ -20,6 +20,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 
 # تسجيل الهاندلرز
+start.register(bot)
 text_handler.register(bot)
 file_handler.register(bot)
 callback_handler.register(bot)
