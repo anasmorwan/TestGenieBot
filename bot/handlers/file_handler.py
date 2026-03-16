@@ -18,7 +18,7 @@ def register(bot):
 
         user_id = msg.from_user.id
         chat_id = msg.chat.id
-        message_id = msg.message.id
+        message_id = msg.message_id
 
         path = handle_file_upload(msg)
         content = None
