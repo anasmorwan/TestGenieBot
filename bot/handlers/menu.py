@@ -14,7 +14,7 @@ def send_main_menu(chat_id, message_id=None):
         "📄 أرسل:\n"
         "PDF • DOCX • نص\n\n"
         "وسيحوّله البوت إلى اختبار تلقائياً.\n\n"
-        "👇 أو اختر:""
+        "👇 أو اختر:"
     )
 
     if message_id:
