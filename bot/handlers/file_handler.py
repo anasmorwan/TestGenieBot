@@ -15,30 +15,36 @@ def register(bot):
 
     @bot.message_handler(content_types=["document"])
     def handle_file(msg):
+
         user_id = msg.from_user.id
         chat_id = msg.chat.id
         message_id = msg.message.id
 
         path = handle_file_upload(msg)
-        
-        # 1 استخراج النص
-        try:
-            if path:
-                content = extract_text_from_file(user_id, bot, msg, path, chat_id, message_id)
-            else:
-                print("Erorr during file upload", flush=True)
+        content = None
 
-            
+        try:
+
+            if path:
+                content = extract_text_from_file(
+                    user_id,
+                    bot,
+                    msg,
+                    path,
+                    chat_id,
+                    message_id
+                )
+            else:
+                print("Error during file upload", flush=True)
+
             if not content:
                 bot.send_message(chat_id, "لم أستطع قراءة الملف.")
                 return
 
-            # 1b استخراج user_instruction من caption إذا وجد
             user_instruction = getattr(msg, "caption", None)
             if user_instruction:
                 user_instruction = user_instruction.strip()
 
-            # 2 توليد الأسئلة مع تمرير التعليمات (اختياري)
             quizzes = generate_quizzes_from_text(
                 content=content,
                 user_id=user_id,
@@ -49,18 +55,17 @@ def register(bot):
                 bot.send_message(chat_id, "فشل توليد الاختبار.")
                 return
 
-            # 3 تخزين الاختبار
             quiz_code = store_quiz(user_id, quizzes)
             quiz_len = len(quizzes)
-  
-            bot.send_message(chat_id, text=get_message("QUIZ_CREATED", count=quiz_len), reply_markup=quiz_keyboard(quiz_code), parse_mode=HTML)
 
-            # 4 بدء الاختبار
-            # quiz_manager.start_quiz(chat_id, quiz_code, bot)
-            
+            bot.send_message(
+                chat_id,
+                text=get_message("QUIZ_CREATED", count=quiz_len),
+                reply_markup=quiz_keyboard(quiz_code),
+                parse_mode=HTML
+            )
+
         finally:
-        # 3. الحذف يتم هنا لضمان تنفيذه سواء نجحت العملية أو فشلت
-        if os.path.exists(path):
-            os.remove(path)
-            print(f"تم حذف الملف المؤقت: {path}")
-
+            if path and os.path.exists(path):
+                os.remove(path)
+                print(f"تم حذف الملف المؤقت: {path}")
