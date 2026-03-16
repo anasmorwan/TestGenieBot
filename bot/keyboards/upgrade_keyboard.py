@@ -1,6 +1,6 @@
 from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-def upgrade_keyboard()
+def upgrade_keyboard():
     # إعداد لوحة الأزرار
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("💳 شراء الاشتراك", callback_data="buy_subscription")],
