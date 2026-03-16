@@ -6,6 +6,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.keyboards.main_menu import main_menu_keyboard
 
 def send_main_menu(chat_id, message_id=None):
+    BOT_USERNAME = bot.get_me().username
     keyboard = main_menu_keyboard()
     text = (
         "👋 مرحباً بك في TestGenie\n\n"
