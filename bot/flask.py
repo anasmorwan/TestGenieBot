@@ -1,7 +1,7 @@
-from flask import flask
+from flask import Flask  # ✅ استيراد الكلاس Flask بحرف كبير
 
 # واجهة Flask للفحص
-app = flask(__name__)
+app = Flask(__name__)  # ✅ استخدام Flask بحرف كبير
 
 def register():
     @app.route('/')
