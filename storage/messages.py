@@ -51,4 +51,7 @@ MESSAGES = {
 
 def get_message(key, lang="ar", **kwargs):
     text = MESSAGES.get(lang, {}).get(key, key)
-    return text.format(**kwargs)
+    try:
+        return text.format(**kwargs)
+    except KeyError:
+        return text
