@@ -51,23 +51,25 @@ def register(bot):
                 
 
                 bot.answer_callback_query(call.id)
-                bot.edit_message_text(chat_id=chat_id, text=get_message("ACCOUNT_STATUS", status), message_id=message_id, reply_markup=keyboard, parse_mode="HTML")
-
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("ACCOUNT_STATUS", account_status=status), reply_markup=keyboard, parse_mode="HTML"
+                )
             
             elif data == "upgrade_account":
                 bot.answer_callback_query(call.id)
                 keyboard = upgrade_keyboard()
-                 
-            
-                # إرسال الرسالة
-                bot.edit_message_text(chat_id, text=get_message("UPGRADE_MAIN"), reply_markup=keyboard, parse_mode="HTML")
-                
+                bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=get_message("UPGRADE_MAIN"),
+                reply_markup=keyboard,
+                parse_mode="HTML"
+                )
             elif data == "post_quiz":
                 bot.answer_callback_query(call.id)
                 keyboard = upgrade_keyboard()
                  
                 # إرسال الرسالة
-                bot.send_message(chat_id, text=get_message("UPGRADE_1"), reply_markup=keyboard, parse_mode="HTML")
+                bot.send_message(chat_id=chat_id, text=get_message("UPGRADE_1"), reply_markup=keyboard, parse_mode="HTML")
                 
             elif data == "main_menu":
                 send_main_menu(chat_id, message_id)
@@ -77,6 +79,7 @@ def register(bot):
 
                 prices = [LabeledPrice(label="الاشتراك المميز", amount=250)]
 
+         
                 bot.send_invoice(
                     chat_id=chat_id,
                     title="تطوير الحساب (Premium)",
