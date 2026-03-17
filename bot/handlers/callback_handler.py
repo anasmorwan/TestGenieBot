@@ -44,13 +44,14 @@ def register(bot):
                 quiz_manager.start_quiz(chat_id, quiz_code, bot)
 
             elif data == "go_account_settings":
+                status = "free"
                 print("opening account menu", flush=True)
                 keyboard = account_keyboard()
 
                 
 
                 bot.answer_callback_query(call.id)
-                bot.edit_message_text(chat_id=chat_id, text=text, message_id=message_id, reply_markup=keyboard, parse_mode="HTML")
+                bot.edit_message_text(chat_id=chat_id, text=get_message("ACCOUNT_STATUS", status), message_id=message_id, reply_markup=keyboard, parse_mode="HTML")
 
             
             elif data == "upgrade_account":
