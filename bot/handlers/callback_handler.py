@@ -8,7 +8,7 @@ from bot.keyboards.upgrade_keyboard import upgrade_keyboard
 from bot.handlers.menu import send_main_menu
 from bot.keyboards.upgrade_options import upgrade_options_keyboard
 from bot.keyboards.pay_local import local_upgrade_options_keyboard
-
+from bot.keyboards.premium_info_keyboard import premium_info_keyboard
 def register(bot):
 
     @bot.callback_query_handler(func=lambda call: True)
@@ -92,8 +92,22 @@ def register(bot):
                 )
                 
             elif data == "pay_local":
+                bot.answer_callback_query(call.id)
                 keyboard = local_upgrade_options_keyboard()
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("PAY_LOCAL"), reply_markup=keyboard, parse_mode="Markdown")
+
+
+            elif data == "premiun_info":
+                bot.answer_callback_query(call.id)
+                keyboard = premium_info_keyboard()
+                bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    text=get_message("PREMIUM_INFO"),
+                    reply_markup=keybord,
+                    parse_mode="HTML"
+                )
+                
 
                 
 
