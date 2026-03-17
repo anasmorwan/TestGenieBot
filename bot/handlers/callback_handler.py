@@ -57,18 +57,18 @@ def register(bot):
                 print("opening account menu", flush=True)
                 keyboard = account_keyboard()
 
-                text = (
-                    "⚙️ حسابك في البوت\n\n"
-                    "هل تريد معرفة حالة حسابك أو فتح جميع الميزات؟\n\n"
-                    "مع الحساب المدفوع تحصل على:\n"
-                    "• اختبارات أكثر\n"
-                    "• معالجة أسرع للملفات\n"
-                    "• تجربة تعلم أفضل\n\n"
-                    "اختر ما تريد:"
-                )
+                text = ("<b>⚙️ حسابك في TestGenie</b>\n\n"
+                    "حسابك الحالي: مجاني\n\n"
+                    "يمكنك:\n"
+                    "• إنشاء عدد محدود من الاختبارات يومياً\n\n"
+                    "<b>🚀 مع TestGenie Pro ستحصل على:</b>\n"
+                    "• اختبارات بدون قيود\n"
+                    "• سرعة معالجة أعلى\n"
+                    "• دعم ملفات أكبر\n\n"
+                    "اختر ما تريد:")
 
                 bot.answer_callback_query(call.id)
-                bot.edit_message_text(chat_id=chat_id, text=text, message_id=message_id, reply_markup=keyboard)
+                bot.edit_message_text(chat_id=chat_id, text=text, message_id=message_id, reply_markup=keyboard, parse_mode="HTML")
 
             
             elif data == "upgrade_account":
