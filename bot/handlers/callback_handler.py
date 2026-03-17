@@ -6,6 +6,9 @@ from bot.keyboards.account_keyboard import account_keyboard
 from storage.messages import get_message
 from bot.keyboards.upgrade_keyboard import upgrade_keyboard
 from bot.handlers.menu import send_main_menu
+
+
+
 def register(bot):
 
     @bot.callback_query_handler(func=lambda call: True)
