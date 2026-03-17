@@ -94,7 +94,7 @@ def register(bot):
             elif data == "pay_local":
                 bot.answer_callback_query(call.id)
                 keyboard = local_upgrade_options_keyboard()
-                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("PAY_LOCAL"), reply_markup=keyboard, parse_mode="Markdown")
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("PAY_LOCAL"), reply_markup=keyboard, parse_mode="HTML")
 
 
             elif data == "premium_info":
