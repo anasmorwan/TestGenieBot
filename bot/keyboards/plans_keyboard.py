@@ -4,8 +4,8 @@ def upgrade_options_keyboard():
 
     upgrade_options_keyboard = InlineKeyboardMarkup(row_width=1)
     upgrade_options_keyboard.add(
-        InlineKeyboardButton("🟢 خطة Pro", callback_data="pay"),
-        InlineKeyboardButton("🔵 خطة Pro+", callback_data="pay_local"),
+        InlineKeyboardButton("🟢 خطة Pro", callback_data="buy_subscription"),
+        InlineKeyboardButton("🔵 خطة Pro+", callback_data="buy_subscription"),
         InlineKeyboardButton("📩 تواصل معي", url="https://t.me/anasM2002"),
         InlineKeyboardButton("🔙 رجوع", callback_data="go_account_settings")
     )
