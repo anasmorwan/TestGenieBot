@@ -7,7 +7,7 @@ from storage.messages import get_message
 from bot.keyboards.upgrade_keyboard import upgrade_keyboard
 from bot.handlers.menu import send_main_menu
 from bot.keyboards.upgrade_options import upgrade_options_keyboard
-from bot.keyboads.pay_local import local_upgrade_options_keyboard
+from bot.keyboards.pay_local import local_upgrade_options_keyboard
 
 def register(bot):
 
