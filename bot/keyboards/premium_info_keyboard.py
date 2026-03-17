@@ -1,6 +1,6 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-def upgrade_keyboard():
+def premium_info_keyboard():
     # إعداد لوحة الأزرار
     keyboard = keyboard = InlineKeyboardMarkup(row_width=1)
     buttons = [
