@@ -45,7 +45,7 @@ def register(bot):
             if user_instruction:
                 user_instruction = user_instruction.strip()
 
-            bot.send_message(chat_id, text=get_message(file_quiz))
+            waiting_msg = bot.send_message(chat_id, text=get_message(file_quiz))
 
             quizzes = generate_quizzes_from_text(
                 content=content,
@@ -54,7 +54,7 @@ def register(bot):
             )
 
             if not quizzes:
-                bot.send_message(chat_id, "فشل توليد الاختبار.")
+                bot.edit_message(chat_id=chat_id, message_id=waiting_msg.message_id, text="فشل توليد الاختبار.")
                 return
 
             quiz_code = store_quiz(user_id, quizzes)
