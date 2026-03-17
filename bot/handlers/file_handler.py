@@ -45,6 +45,8 @@ def register(bot):
             if user_instruction:
                 user_instruction = user_instruction.strip()
 
+            bot.send_message(chat_id, text)
+
             quizzes = generate_quizzes_from_text(
                 content=content,
                 user_id=user_id,
