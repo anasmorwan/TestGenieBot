@@ -74,7 +74,7 @@ def register(bot):
                  
             
                 # إرسال الرسالة
-                bot.send_message(chat_id, text=get_message("UPGRADE_MAIN"), reply_markup=upgrade_keyboard)
+                bot.send_message(chat_id, text=get_message("UPGRADE_MAIN"), reply_markup=upgrade_keyboard, parse_mode="HTML")
 
 
             
