@@ -21,6 +21,7 @@ def register(bot):
         message_id = msg.message_id
 
         path = handle_file_upload(msg)
+        waiting_msg = bot.send_message(chat_id, text=get_message("file_quiz"))
         content = None
 
         try:
@@ -45,8 +46,7 @@ def register(bot):
             if user_instruction:
                 user_instruction = user_instruction.strip()
 
-            waiting_msg = bot.send_message(chat_id, text=get_message(file_quiz))
-
+            
             quizzes = generate_quizzes_from_text(
                 content=content,
                 user_id=user_id,
