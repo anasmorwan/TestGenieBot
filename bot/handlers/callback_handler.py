@@ -82,6 +82,7 @@ def register(bot):
                  
                 # إرسال الرسالة
                 bot.send_message(chat_id, text=get_message("UPGRADE_1"), reply_markup=keyboard, parse_mode="HTML")
+                
             elif data == "main_menu":
                 send_main_menu(chat_id, message_id)
                 
