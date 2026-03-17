@@ -75,6 +75,16 @@ def register(bot):
             
                 # إرسال الرسالة
                 bot.send_message(chat_id, text=get_message("UPGRADE_MAIN"), reply_markup=keyboard, parse_mode="HTML")
+                
+            elif data == "post_quiz":
+                bot.answer_callback_query(call.id)
+                keyboard = upgrade_keyboard()
+                 
+            
+                # إرسال الرسالة
+                bot.send_message(chat_id, text=get_message("UPGRADE_1"), reply_markup=keyboard, parse_mode="HTML")
+
+
 
 
             
