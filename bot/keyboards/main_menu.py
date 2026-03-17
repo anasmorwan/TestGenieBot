@@ -4,7 +4,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 def main_menu_keyboard(bot_username):
     keyboard = InlineKeyboardMarkup(row_width=1)
     buttons = [
-        InlineKeyboardButton("👉 📄 ابدأ بإرسال ملف", callback_data="go_generate"),
+        InlineKeyboardButton("👈 📄 ابدأ بإرسال ملف", callback_data="go_generate"),
         InlineKeyboardButton("⚡ سؤال سريع", callback_data="quick_quiz"),
         InlineKeyboardButton("⚙️ حسابي", callback_data="go_account_settings"),
     ]
