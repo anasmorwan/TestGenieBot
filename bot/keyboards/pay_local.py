@@ -1,6 +1,6 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-def upgrade_options_keyboard():
+def local_upgrade_options_keyboard():
 
     reply_markup = InlineKeyboardMarkup(row_width=1)
   
