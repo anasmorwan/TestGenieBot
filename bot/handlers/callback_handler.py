@@ -104,7 +104,7 @@ def register(bot):
                     chat_id=chat_id,
                     message_id=message_id,
                     text=get_message("PREMIUM_INFO"),
-                    reply_markup=keybord,
+                    reply_markup=keyboard,
                     parse_mode="HTML"
                 )
                 
