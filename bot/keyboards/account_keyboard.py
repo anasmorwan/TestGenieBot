@@ -9,6 +9,6 @@ def account_keyboard():
     btn_back = InlineKeyboardButton("🏠 العودة للقائمة الرئيسية", callback_data="main_menu")
 
 
-    markup.add(btn_status, btn_upgrade)
+    markup.add(btn_status, btn_upgrade, btn_back)
     return markup
 
