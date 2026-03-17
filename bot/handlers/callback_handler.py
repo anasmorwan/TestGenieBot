@@ -56,7 +56,7 @@ def register(bot):
             
             elif data == "upgrade_account":
                 bot.answer_callback_query(call.id)
-                keyboard = upgrade_options_keyboard()
+                keyboard = upgrade_keyboard()
                 bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
