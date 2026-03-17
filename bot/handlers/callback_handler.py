@@ -7,7 +7,7 @@ from storage.messages import get_message
 from bot.keyboards.upgrade_keyboard import upgrade_keyboard
 from bot.handlers.menu import send_main_menu
 from bot.keyboards.upgrade_options import upgrade_options_keyboard
-
+from bot.keyboads.pay_local import pay_local_keyboard
 
 def register(bot):
 
@@ -73,7 +73,7 @@ def register(bot):
                 send_main_menu(chat_id, message_id)
 
 
-            elif data == " starts_payments":
+            elif data == "pay_stars":
 
                 prices = [LabeledPrice(label="الاشتراك المميز", amount=250)]
 
@@ -87,6 +87,9 @@ def register(bot):
                     prices=prices,
                     start_parameter="premium-upgrade"
                 )
+                
+            elif data == "pay_local":
+                keyboard = pay_local_keyboard()
 
                 
 
