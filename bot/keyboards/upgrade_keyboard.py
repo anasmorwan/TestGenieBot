@@ -6,7 +6,7 @@ def upgrade_keyboard():
     buttons = [
         InlineKeyboardButton("💳 تفعيل TestGenie Pro", callback_data="buy_subscription"),
         InlineKeyboardButton("🔍 معرفة المميزات", callback_data="premium_info"),
-        InlineKeyboardButton("🔙 رجوع", callback_data="go_account_settings")
+        InlineKeyboardButton("🏠 العودة للقائمة الرئيسية", callback_data="go_account_settings")
     ]
     keyboard.add(*buttons)
     return keyboard
