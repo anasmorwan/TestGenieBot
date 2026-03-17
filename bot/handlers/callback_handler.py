@@ -27,7 +27,7 @@ def register(bot):
             if data.startswith("start_quiz"):
                 quiz_manager.start_quiz(chat_id, quiz_code, bot)
 
-            elif data == "post_quiz":
+            elif data == "buy_subscription":
                 print("opening post_quiz menu", flush=True)
                 prices = [LabeledPrice(label="الاشتراك المميز", amount=250)]
 
