@@ -33,7 +33,7 @@ def register(bot):
             elif data == "buy_subscription":
                 keyboard = upgrade_options_keyboard()
                 print("opening post_quiz menu", flush=True)
-                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"))
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"), reply_markup=keyboard, parse_mode="HTML")
                 
             elif data == "go_generate":
                 user_states[user_id] = "awating_test"
