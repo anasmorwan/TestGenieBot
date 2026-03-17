@@ -97,7 +97,7 @@ def register(bot):
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("PAY_LOCAL"), reply_markup=keyboard, parse_mode="Markdown")
 
 
-            elif data == "premiun_info":
+            elif data == "premium_info":
                 bot.answer_callback_query(call.id)
                 keyboard = premium_info_keyboard()
                 bot.edit_message_text(
