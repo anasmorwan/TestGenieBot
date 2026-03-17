@@ -82,7 +82,7 @@ def register(bot):
                 bot.edit_message_text(
                     chat_id=chat_id,
                     message_id=message_id,
-                    text=get_mesaage("PLANS"),
+                    text=get_message("PLANS"),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
