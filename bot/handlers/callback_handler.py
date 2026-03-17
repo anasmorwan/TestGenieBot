@@ -9,7 +9,7 @@ from bot.handlers.menu import send_main_menu
 from bot.keyboards.upgrade_options import upgrade_options_keyboard
 from bot.keyboards.pay_local import local_upgrade_options_keyboard
 from bot.keyboards.premium_info_keyboard import premium_info_keyboard
-from bot.keyboards.paid_plans import paid_plans_keyboard
+from bot.keyboards.plans_keyboard import paid_plans_keyboard
 
 def register(bot):
 
