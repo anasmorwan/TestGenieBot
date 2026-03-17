@@ -7,6 +7,6 @@ def upgrade_options_keyboard():
         InlineKeyboardButton("🟢 خطة Pro", callback_data="buy_subscription"),
         InlineKeyboardButton("🔵 خطة Pro+", callback_data="buy_subscription"),
         InlineKeyboardButton("📩 تواصل معي", url="https://t.me/anasM2002"),
-        InlineKeyboardButton("🔙 رجوع", callback_data="go_account_settings")
+        InlineKeyboardButton("🏠 العودة للقائمة الرئيسية", callback_data="main_menu")
     )
     return upgrade_options_keyboard
