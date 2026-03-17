@@ -24,12 +24,12 @@ def send_main_menu(chat_id, message_id=None):
             chat_id=chat_id,
             message_id=message_id,
             reply_markup=keyboard,
-            parse_mode=Markdown
+            parse_mode="Markdown"
         )
     else:
         bot.send_message(
             chat_id=chat_id,
             text=text,
             reply_markup=keyboard,
-            parse_mode=Markdown
+            parse_mode="Markdown"
         )
