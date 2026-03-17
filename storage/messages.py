@@ -1,10 +1,11 @@
 MESSAGES = {
     "ar": {
-        "Generating quiz": "جاري توليد الإختبار…",
+        "file_quiz": "جاري تحويل ملفك إلى إختبار...هذا قد يسترق بعض ثوانٍ ⌛…",
         "FILE_READ_ERROR": "لم أستطع قراءة الملف.",
         "QUIZ_FAILED": "فشل توليد الاختبار.",
         "FILE_TOO_LARGE": "الملف كبير جداً (الحد 5MB)",
         "QUIZ_CREATED": "تم توليد {count} سؤال!",
+        
 
         # نصوص الترقية
         "UPGRADE_MAIN": (
