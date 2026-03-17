@@ -7,6 +7,6 @@ def upgrade_options_keyboard():
         InlineKeyboardButton("🌟 الدفع بالنجوم", callback_data="pay_stars"),
         InlineKeyboardButton("🏦 الدفع المحلي (السودان)", callback_data="pay_local"),
         InlineKeyboardButton("📩 تواصل معي للدفع", url="https://t.me/anasM2002"),
-        InlineKeyboardButton("🔙 رجوع", callback_data="upgrade_back")
+        InlineKeyboardButton("🔙 رجوع", callback_data="go_account_settings")
     )
     return upgrade_options_keyboard
