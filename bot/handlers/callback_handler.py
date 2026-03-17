@@ -5,7 +5,7 @@ from storage.session_store import user_states
 from bot.keyboards.account_keyboard import account_keyboard
 from storage.messages import get_message
 from bot.keyboards.upgrade_keyboard import upgrade_keyboard
-
+from bot.handlers.menu import send_main_menu
 def register(bot):
 
     @bot.callback_query_handler(func=lambda call: True)
@@ -80,9 +80,11 @@ def register(bot):
                 bot.answer_callback_query(call.id)
                 keyboard = upgrade_keyboard()
                  
-            
                 # إرسال الرسالة
                 bot.send_message(chat_id, text=get_message("UPGRADE_1"), reply_markup=keyboard, parse_mode="HTML")
+            elif data == "main_menu":
+                send_main_menu(chat_id, message_id)
+                
 
 
 
