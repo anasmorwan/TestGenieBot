@@ -6,6 +6,6 @@ def upgrade_options_keyboard():
   
     reply_markup.add(
         InlineKeyboardButton("💬 تواصل معنا", url="https://t.me/anasM2002"),
-        InlineKeyboardButton("🔙 رجوع", callback_data="upgrade_back")
+        InlineKeyboardButton("🔙 رجوع", callback_data="go_account_settings")
     )
     return reply_markup
