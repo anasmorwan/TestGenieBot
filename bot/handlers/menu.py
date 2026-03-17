@@ -9,7 +9,8 @@ def send_main_menu(chat_id, message_id=None):
     bot_username = bot.get_me().username
     keyboard = main_menu_keyboard(bot_username)
     text = (
-        "*👋 مرحباً بك في TestGenie"\n\n"
+        "*👋 مرحباً بك في TestGenie*"
+        "\n\n"
         "حوّل ملفاتك إلى اختبارات تفاعلية خلال 10 ثوانٍ.\n\n"
         "📄 أرسل:\n"
         "PDF • DOCX • نص\n\n"
