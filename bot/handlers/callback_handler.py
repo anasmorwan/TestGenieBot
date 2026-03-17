@@ -9,6 +9,8 @@ from bot.handlers.menu import send_main_menu
 from bot.keyboards.upgrade_options import upgrade_options_keyboard
 from bot.keyboards.pay_local import local_upgrade_options_keyboard
 from bot.keyboards.premium_info_keyboard import premium_info_keyboard
+from bot.keyboards.paid_plans import paid_plans_keyboard
+
 def register(bot):
 
     @bot.callback_query_handler(func=lambda call: True)
@@ -73,6 +75,17 @@ def register(bot):
                 
             elif data == "main_menu":
                 send_main_menu(chat_id, message_id)
+
+            elif data == "plans":
+                keyboard = paid_plans_keyboard()
+                bot.answer_callback_query(call.id)
+                bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    text=get_mesaage("PLANS"),
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
 
 
             elif data == "pay_stars":
