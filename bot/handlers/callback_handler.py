@@ -6,7 +6,7 @@ from bot.keyboards.account_keyboard import account_keyboard
 from storage.messages import get_message
 from bot.keyboards.upgrade_keyboard import upgrade_keyboard
 from bot.handlers.menu import send_main_menu
-
+from bot.keyboards.upgrade_options import upgrade_options_keyboard
 
 
 def register(bot):
@@ -31,20 +31,10 @@ def register(bot):
                 quiz_manager.start_quiz(chat_id, quiz_code, bot)
 
             elif data == "buy_subscription":
+                keyboard = upgrade_options_keyboard()
                 print("opening post_quiz menu", flush=True)
-                prices = [LabeledPrice(label="الاشتراك المميز", amount=250)]
-
-                bot.send_invoice(
-                    chat_id=chat_id,
-                    title="تطوير الحساب (Premium)",
-                    description="احصل على ميزات غير محدودة في إنشاء الاختبارات",
-                    invoice_payload="user_premium_subscription",
-                    provider_token="",
-                    currency="XTR",
-                    prices=prices,
-                    start_parameter="premium-upgrade"
-                )
-
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"))
+                
             elif data == "go_generate":
                 user_states[user_id] = "awating_test"
                 bot.answer_callback_query(call.id)
@@ -88,6 +78,23 @@ def register(bot):
                 
             elif data == "main_menu":
                 send_main_menu(chat_id, message_id)
+
+
+            elif data == " starts_payments":
+
+                prices = [LabeledPrice(label="الاشتراك المميز", amount=250)]
+
+                bot.send_invoice(
+                    chat_id=chat_id,
+                    title="تطوير الحساب (Premium)",
+                    description="احصل على ميزات غير محدودة في إنشاء الاختبارات",
+                    invoice_payload="user_premium_subscription",
+                    provider_token="",
+                    currency="XTR",
+                    prices=prices,
+                    start_parameter="premium-upgrade"
+                )
+
                 
 
 
