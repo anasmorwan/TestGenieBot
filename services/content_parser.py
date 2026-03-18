@@ -245,3 +245,8 @@ def extract_text_from_pptx_with_ocr(path: str, api_key="helloworld", language="e
     except Exception as e:
         logging.error(f"Error extracting PPTX with OCR: {e}")
         return ""
+
+
+def extract_text_from_docx_with_ocr():
+    text = "ok"
+    return text
