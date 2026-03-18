@@ -7,5 +7,6 @@ def how_it_works_keyboatd():
     web_app=WebAppInfo(url="https://example.com/page.html") 
     )
     keyboard.add(web_app_button)
-    keyboard.add(InlineKeyboardButton("
+    btn_back = InlineKeyboardButton("🏠 العودة للقائمة الرئيسية", callback_data="main_menu")
+    keyboard.add(btn_back)
     return keyboard
