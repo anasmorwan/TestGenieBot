@@ -39,7 +39,8 @@ def register(bot):
             if data.startswith("start_quiz"):
                 parts = data.split(":")
                 quiz_code = parts[1] if len(parts) > 1 else None
-                quiz_manager.start_quiz(chat_id, quiz_code, bot)
+                result = quiz_manager.start_quiz(chat_id, quiz_code, bot)
+                print("START QUIZ RESULT:", result)
     
             elif data == "buy_subscription":
                 keyboard = upgrade_options_keyboard()
