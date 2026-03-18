@@ -93,8 +93,8 @@ class QuizManager:
 
         chat_id = poll_answer.user.id
 
-        with self.lock:
-            state = self.sessions.get(chat_id)
+        
+        state = self.sessions.get(chat_id)
         if not state:
             return
 
@@ -112,8 +112,8 @@ class QuizManager:
 
     def finish_quiz(self, chat_id, bot):
         
-        with self.lock:
-            state = self.sessions.pop(chat_id, None)
+        
+        state = self.sessions.pop(chat_id, None)
         if not state:
             return
 
