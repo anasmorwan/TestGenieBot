@@ -47,8 +47,8 @@ class QuizManager:
         }
 
         
-        with self.lock:
-            self.send_current_question(chat_id, bot)
+        
+        self.send_current_question(chat_id, bot)
 
         return True
 
