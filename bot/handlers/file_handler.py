@@ -20,8 +20,15 @@ def register(bot):
         chat_id = msg.chat.id
         message_id = msg.message_id
 
-        path = handle_file_upload(msg)
-        waiting_msg = bot.send_message(chat_id, text=get_message("file_quiz"))
+        
+        try:
+            waiting_msg = bot.send_message(chat_id=chat_ud, text=get_message("FILE_QUIZ"))
+            path = handle_file_upload(msg)
+
+        except Exception as e:
+            print("FILE UPLOAD ERROR:", e, flush=True)
+
+        
         content = None
 
         try:
