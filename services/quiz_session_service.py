@@ -1,4 +1,5 @@
 import sqlite3
+from storage.sqlite_db import get_connection
 import json
 from datetime import datetime
 from models.quiz import QuizQuestion
@@ -43,7 +44,7 @@ class QuizManager:
 
     def load_quiz(self, quiz_code):
         with self.lock:
-            conn = sqlite3.connect("quiz_users.db")
+            conn = get_connection()
             c = conn.cursor()
 
             c.execute(
