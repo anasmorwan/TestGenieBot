@@ -14,21 +14,30 @@ class QuizManager:
 
 
     def start_quiz(self, chat_id, quiz_code, bot):
-
+        print("QUIZ CODE:", quiz_code, flush=True)
         quiz_data = self.load_quiz(quiz_code)
+        print("LOADED QUIZ:", quiz_data, flush=True)
         if not quiz_data:
+            print("❌ No quiz data", flush=True)
             return False
 
     
         questions = []
         for q in quiz_data:
             obj = QuizQuestion.from_raw(q)
+            print("RAW:", q, flush=True)
+            print("PARSED:", obj, flush=True)
             if obj:
                 questions.append(obj)
 
-        if not questions:
-            return False
+        
+        print("TOTAL QUESTIONS:", len(questions))
 
+        if not questions:
+            print("❌ No questions", flush=True)
+            return False
+        
+        
         with self.lock:
             self.sessions[chat_id] = {
             "questions": questions,
