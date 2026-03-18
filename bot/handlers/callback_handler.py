@@ -30,8 +30,10 @@ def register(bot):
                 quiz_code = data.split(":")[1]
 
             if data.startswith("start_quiz"):
+                parts = data.split(":")
+                quiz_code = parts[1] if len(parts) > 1 else None
                 quiz_manager.start_quiz(chat_id, quiz_code, bot)
-
+    
             elif data == "buy_subscription":
                 keyboard = upgrade_options_keyboard()
                 print("opening post_quiz menu", flush=True)
