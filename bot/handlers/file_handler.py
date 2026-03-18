@@ -77,7 +77,7 @@ def register(bot):
             
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
-
+            bot.send_message(chat_id, f"❌ Error: {str(e)}")
         finally:
             if path and os.path.exists(path):
                 os.remove(path)
