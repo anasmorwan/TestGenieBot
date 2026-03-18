@@ -9,7 +9,9 @@ api_key = "12k2as"
 def is_text_empty(text):
     return not text.strip()
 
-
+def can_generate(uid):
+    return True
+    
 
 
 # الدالة الرئيسية
