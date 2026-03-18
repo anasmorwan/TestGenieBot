@@ -10,6 +10,7 @@ from bot.keyboards.upgrade_options import upgrade_options_keyboard
 from bot.keyboards.pay_local import local_upgrade_options_keyboard
 from bot.keyboards.premium_info_keyboard import premium_info_keyboard
 from bot.keyboards.plans_keyboard import paid_plans_keyboard
+from bot.keyboards.how_it_works_keyboard import how_it_works_keyboard
 
 def register(bot):
 
@@ -22,6 +23,12 @@ def register(bot):
             user_id = call.from_user.id
             message_id = call.message.message_id
             print("callback:", data, flush=True)
+
+
+            if data == "how_it_works":
+                bot.answer_callback_query(call.id)
+                keyboard = how_it_works_keyboard()
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("HOW_IT_WORKD"), reply_markup=keyboard)
 
 
             # استخراج quiz_code فقط إذا كان موجود
