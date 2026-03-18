@@ -1,3 +1,5 @@
+import re
+
 def extract_json_from_string(text: str) -> str:
     """
     Extracts a JSON string from a text that might contain markdown code blocks or other text.
