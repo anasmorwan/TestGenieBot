@@ -42,6 +42,9 @@ def register(bot):
                     chat_id,
                     message_id
                 )
+                if not content:
+                    bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
+                    return
             else:
                 print("Error during file upload", flush=True)
 
@@ -61,7 +64,7 @@ def register(bot):
             )
 
             if not quizzes:
-                bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="فشل توليد الاختبار.")
+                bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
                 return
 
             quiz_code = store_quiz(user_id, quizzes)
