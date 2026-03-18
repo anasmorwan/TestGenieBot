@@ -54,6 +54,11 @@ def register(bot):
 
             elif data.startswith("quick_quiz"):
                 quiz_manager.start_quiz(chat_id, quiz_code, bot)
+                bot.send_message(chat_id, "📄 أرسل نص الآن لإنشاء الاختبار")
+
+            elif data == "input_text":
+                bot.answer_callback_query(call.id)
+                
 
             elif data == "go_account_settings":
                 status = "free"
