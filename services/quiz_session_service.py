@@ -9,11 +9,12 @@ import threading
 
  
 class QuizManager:
-
     def __init__(self):
         self.sessions = {}
         self.lock = threading.Lock()
-
+        
+        # ✅ هذا هو الناقص
+        self.poll_map = {}
 
     def start_quiz(self, chat_id, quiz_code, bot):
         print("QUIZ CODE:", quiz_code, flush=True)
