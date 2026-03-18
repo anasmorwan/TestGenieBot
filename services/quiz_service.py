@@ -9,7 +9,13 @@ def generate_quizzes_from_text(content, user_id, user_instruction=None, num_quiz
     prompt = build_quiz_prompt(content, num_quizzes, user_instruction=None)
 
     response = generate_smart_response(prompt)
+    print("RAW RESPONSE:\n", response[:1000])
 
     quizzes = extract_json_from_string(response)
+
+    if not isinstance(quizzes, list):
+        return []
+
+    quizzes = quizzes[:num_quizzes]
 
     return quizzes
