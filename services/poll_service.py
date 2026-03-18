@@ -1,6 +1,6 @@
 
 
-def send_quiz_poll(bot, chat_id, question):
+def send_quiz_poll(bot, chat_id, question, quiz_manager):
     try:
         if question.correct_index >= len(question.options):
             print("Invalid correct index")
