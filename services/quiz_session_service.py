@@ -92,18 +92,14 @@ class QuizManager:
 
         self.send_quiz_poll(bot, chat_id, q)
 
-    def handle_answer(self, poll_answer, bot):
-
-        chat_id = poll_answer.user.id
-
-        
+    def handle_answer(self, chat_id, selected_option, bot):
         state = self.sessions.get(chat_id)
         if not state:
             return
 
         q = state["questions"][state["index"]]
 
-        if poll_answer.option_ids[0] == q.correct_index:
+        if selected_option == q.correct_index:
             state["score"] += 1
 
         state["index"] += 1
@@ -112,7 +108,7 @@ class QuizManager:
             self.finish_quiz(chat_id, bot)
         else:
             self.send_current_question(chat_id, bot)
-
+         
     def finish_quiz(self, chat_id, bot):
         
         
