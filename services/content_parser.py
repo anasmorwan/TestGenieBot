@@ -3,7 +3,7 @@ import os
 from pptx import Presentation
 import docx
 import fitz                     # PyMuPDF
-
+api_key = "12k2as"
 
 # دوال مساعدة
 def is_text_empty(text):
