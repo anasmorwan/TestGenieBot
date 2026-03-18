@@ -65,16 +65,25 @@ def generate_smart_response(prompt: str) -> str:
     timeout_seconds = 45
 
 
-    #  1️⃣ Cohere
+    # 1️⃣ Cohere
     if cohere_client:
         try:
-            logging.info("Attempting request with: 5. Cohere...")
-            response = cohere_client.chat(model='command-r', message=prompt, temperature=0.8)
-            logging.info("✅ Success with Cohere.")
-            return response.text
+            logging.info("Attempting request with: 4. Cohere...")
+
+            response = cohere_client.chat(
+                model="command-a-03-2025",
+                message=prompt,
+                temperature=0.7
+            )
+
+            if response and response.text:
+                logging.info("✅ Success with Cohere.")
+                return response.text.strip()
+
+            logging.warning("❌ Cohere returned empty response. Trying fallback...")
+
         except Exception as e:
             logging.warning(f"❌ Cohere failed: {e}")
-
 
 
     # 2️⃣ Google Gemini
