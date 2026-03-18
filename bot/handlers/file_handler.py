@@ -67,8 +67,9 @@ def register(bot):
             quiz_code = store_quiz(user_id, quizzes)
             quiz_len = len(quizzes)
 
-            bot.send_message(
-                chat_id,
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=waiting_msg.message_id,
                 text=get_message("QUIZ_CREATED", count=quiz_len),
                 reply_markup=quiz_keyboard(quiz_code),
                 parse_mode="HTML"
