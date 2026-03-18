@@ -1,3 +1,4 @@
+import os
 from bot.bot_instance import bot
 # قائمة الملفات لكل مستخدم (تغييرها إلى dict)
 user_files = {}
