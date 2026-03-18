@@ -17,7 +17,7 @@ def main_menu_keyboard(bot_username):
         # الصف الثالث: الحساب والترقية
         [
             InlineKeyboardButton("👤 حسابي", callback_data="go_account_settings"),
-            InlineKeyboardButton("🚀 TestGenie Pro", callback_data="upgrade_pro")
+            InlineKeyboardButton("🚀 TestGenie Pro", callback_data="upgrade_account")
         ]
     ]
 
