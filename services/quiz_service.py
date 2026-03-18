@@ -13,6 +13,8 @@ def generate_quizzes_from_text(content, user_id, user_instruction=None, num_quiz
 
     quizzes = extract_json_from_string(response)
 
+    print("PARSED QUIZZES:", type(quizzes), len(quizzes) if isinstance(quizzes, list) else "invalid")
+    
     if not isinstance(quizzes, list):
         return []
 
