@@ -28,7 +28,7 @@ def register(bot):
             if data == "how_it_works":
                 bot.answer_callback_query(call.id)
                 keyboard = how_it_works_keyboard()
-                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("HOW_IT_WORKD"), reply_markup=keyboard, parse_mode="HTML")
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("HOW_IT_WORKS"), reply_markup=keyboard, parse_mode="HTML")
 
 
             # استخراج quiz_code فقط إذا كان موجود
