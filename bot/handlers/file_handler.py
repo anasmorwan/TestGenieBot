@@ -66,6 +66,9 @@ def register(bot):
                 reply_markup=quiz_keyboard(quiz_code),
                 parse_mode=HTML
             )
+            
+        except Exception as e:
+            print("File handler ERROR:", e, flush=True)
 
         finally:
             if path and os.path.exists(path):
