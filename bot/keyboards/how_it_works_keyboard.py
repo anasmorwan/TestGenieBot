@@ -1,6 +1,6 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
-def how_it_works_keyboatd():
+def how_it_works_keyboard():
     keyboard = InlineKeyboardMarkup(row_width=1)
 
     web_app_button = InlineKeyboardButton(
