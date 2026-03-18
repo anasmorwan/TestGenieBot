@@ -71,7 +71,7 @@ def register(bot):
                 chat_id,
                 text=get_message("QUIZ_CREATED", count=quiz_len),
                 reply_markup=quiz_keyboard(quiz_code),
-                parse_mode=HTML
+                parse_mode="HTML"
             )
             
         except Exception as e:
