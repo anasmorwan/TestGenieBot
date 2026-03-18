@@ -3,31 +3,36 @@ import json
 
 def extract_json_from_string(text: str):
     """
-    تحاول استخراج JSON من نص يحتوي على كود Markdown أو نصوص أخرى.
-    ترجع قائمة فارغة إذا فشل التحويل، مع طباعة الأخطاء للمتابعة.
+    محاولة استخراج JSON من نص مع إصلاح الأخطاء الشائعة.
     """
-    # أولًا، البحث عن ```json ... ```
+
+    def clean_json_string(s: str) -> str:
+        # استبدال علامات اقتباس ذكية بعادية
+        s = s.replace("“", '"').replace("”", '"')
+        s = s.replace("‘", "'").replace("’", "'")
+        # إزالة أي أحرف غير صالحة شائعة في استجابات الذكاء الاصطناعي
+        s = re.sub(r"[^\x20-\x7E\n\t\r{}[\],:\"']+", "", s)
+        # إزالة الفواصل الزائدة قبل } أو ]
+        s = re.sub(r",(\s*[}\]])", r"\1", s)
+        return s
+
+    # البحث عن JSON داخل ```json ... ```
     match = re.search(r'```json\s*([\s\S]*?)\s*```', text)
     if match:
-        json_text = match.group(1).strip()
+        cleaned = clean_json_string(match.group(1))
         try:
-            return json.loads(json_text)
-        except json.JSONDecodeError as e:
-            print("JSON decode error in ```json block:", e)
+            return json.loads(cleaned)
         except Exception as e:
-            print("Unexpected error parsing JSON block:", e)
+            print("⚠️ Failed to parse JSON inside ```json:", e, cleaned[:200])
 
-    # ثانيًا، البحث عن أول كائن JSON أو مصفوفة []
-    braces = re.search(r'(.*|\{.*\})', text, re.DOTALL)
-    if braces:
-        json_text = braces.group(1).strip()
+    # البحث عن أول JSON array أو object
+    match = re.search(r'[{][\s\S]*[}]', text)
+    if match:
+        cleaned = clean_json_string(match.group(0))
         try:
-            return json.loads(json_text)
-        except json.JSONDecodeError as e:
-            print("JSON decode error in braces/brackets:", e)
+            return json.loads(cleaned)
         except Exception as e:
-            print("Unexpected error parsing braces/brackets JSON:", e)
+            print("⚠️ Failed to parse JSON from text:", e, cleaned[:200])
 
-    # أخيرًا، أي فشل → رجع قائمة فارغة
-    print("No valid JSON found, returning empty list.")
+    # إذا فشل كل شيء، إرجاع قائمة فارغة
     return []
