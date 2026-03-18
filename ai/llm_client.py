@@ -170,5 +170,5 @@ def generate_smart_response(prompt: str) -> str:
 
 
     # 🚫 All models failed
-    logging.error("❌ All API providers failed. Returning empty string.")
+    raise Exception("All AI providers failed")
     return ""
