@@ -14,4 +14,4 @@ def register(bot):
         selected_option = poll_answer.option_ids[0] if poll_answer.option_ids else None
 
         # 👇 هنا تنادي الانتقال للسؤال التالي
-        quiz_manager.handle_answer(user_id, selected_option, bot)
+        quiz_manager.handle_answer(chat_id, selected_option, bot)
