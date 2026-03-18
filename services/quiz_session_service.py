@@ -19,6 +19,7 @@ class QuizManager:
         if not quiz_data:
             return False
 
+    
         questions = []
         for q in quiz_data:
             obj = QuizQuestion.from_raw(q)
@@ -66,9 +67,16 @@ class QuizManager:
             state = self.sessions.get(chat_id)
 
         if not state:
+            print("No quiz session found for chat:", chat_id)
             return
 
+        if state["index"] >= len(state["questions"]):
+            print("Index out of range for chat:", chat_id)
+            return
+
+
         q = state["questions"][state["index"]]
+        print(f"Sending question {state['index']+1} to chat {chat_id}")
 
         send_quiz_poll(bot, chat_id, q)
 
