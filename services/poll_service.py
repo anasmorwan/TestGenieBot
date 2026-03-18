@@ -15,6 +15,10 @@ def send_quiz_poll(bot, chat_id, question):
             is_anonymous=False,
             open_period=30
         )
+        
+
+        # خزّن الربط
+        self.poll_map[poll.poll.id] = chat_id
         return poll.message_id
 
     except Exception as e:
