@@ -1,9 +1,10 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo
 
 def how_it_works_keyboatd():
-    keyboard = InlineKeyboardMarkup()
+    keyboard = InlineKeyboardMarkup(row_width=1)
+
     web_app_button = InlineKeyboardButton(
-    text="📖 قراءة فورية",
+    text="⚡ قراءة فورية",
     web_app=WebAppInfo(url="https://example.com/page.html") 
     )
     keyboard.add(web_app_button)
