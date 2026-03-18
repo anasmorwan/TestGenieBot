@@ -1,4 +1,3 @@
-from bot.bot_instance import bot
 
 
 def send_quiz_poll(bot, chat_id, question):
