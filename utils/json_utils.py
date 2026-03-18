@@ -36,3 +36,34 @@ def extract_json_from_string(text: str):
 
     # إذا فشل كل شيء، إرجاع قائمة فارغة
     return []
+
+
+
+
+def extract_json_objects_safely(text: str):
+    """
+    يحاول استخراج جميع كائنات JSON داخل نص، ويتجاهل أي كائن تالف.
+    يعيد قائمة بالكائنات الصالحة فقط.
+    """
+    objects = []
+
+    # إزالة أي تنسيقات markdown ```json ... ```
+    text = re.sub(r'```json\s*([\s\S]*?)\s*```', r'\1', text)
+
+    # البحث عن جميع الكائنات {...} أو المصفوفات [...] بالترتيب
+    pattern = re.compile(r'{.*?}|\[.*?\]', re.DOTALL)
+    for match in pattern.finditer(text):
+        candidate = match.group()
+        try:
+            obj = json.loads(candidate)
+            if isinstance(obj, dict):
+                objects.append(obj)
+            elif isinstance(obj, list):
+                # إذا كانت مصفوفة داخلية، نضيف كل عنصر على حدة
+                for item in obj:
+                    if isinstance(item, dict):
+                        objects.append(item)
+        except json.JSONDecodeError:
+            continue  # تجاهل أي JSON غير صالح
+
+    return objects
