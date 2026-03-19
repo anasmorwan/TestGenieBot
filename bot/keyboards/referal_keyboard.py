@@ -1,14 +1,15 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def referal_keyboard():
-    InlineKeyboardButton(
+    referal_btns = InlineKeyboardMarkup(row_width=1)
+    referal_btns.add(
     text="👥 دعوة صديق",
     url=f"https://t.me/share/url?url=https://t.me/YourBot?start={ref_code}&text=🔥 جرب هذا البوت! يحول أي ملف لاختبار تفاعلي خلال ثواني"
     )
-    InlineKeyboardButton(
+    referal_btns.add(
     text="📋 نسخ رابط الدعوة",
     callback_data="copy_invite"
     )
-    return referal_btn
+    return referal_btns
     
    
