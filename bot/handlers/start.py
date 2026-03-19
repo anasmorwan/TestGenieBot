@@ -8,42 +8,9 @@ from storage.session_store import user_states
 from services.referral import save_referral
 
 
-@bot.message_handler(commands=['start'])
-def start_handler(message):
-    user_id = message.from_user.id
-    args = message.text.split()
-
-    if len(args) > 1 and args[1].startswith("ref_"):
-        referrer_id = int(args[1].replace("ref_", ""))
-
-        # منع self-referral
-        if referrer_id != user_id:
-            save_referral(referrer_id, user_id)
 
 
 def register(bot):
-"""
-    print("start handler registered", flush=True)
-    @bot.message_handler(commands=['start'])
-    def unified_start_handler(message):
-
-        print("/start received:", message.from_user.id, flush=True)
-
-        try:
-            chat_id = message.chat.id
-
-            print("calling menu...", flush=True)
-
-            send_main_menu(chat_id)
-
-            print("menu sent successfully", flush=True)
-
-        except Exception as e:
-            print("ERROR IN START HANDLER:", e, flush=True)
-    
-"""
-
-
     
     @bot.message_handler(commands=['start'])
     def unified_start_handler(message):
@@ -59,9 +26,9 @@ def register(bot):
         args = message.text.split(maxsplit=1)
         uid = message.from_user.id
 
-    
-    
-    
+
+
+        
         if len(args) > 1:
             param = args[1] if len(args) > 1 else None
 
@@ -109,3 +76,28 @@ def register(bot):
 
         # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
         send_main_menu(chat_id)
+
+
+
+
+
+"""
+    print("start handler registered", flush=True)
+    @bot.message_handler(commands=['start'])
+    def unified_start_handler(message):
+
+        print("/start received:", message.from_user.id, flush=True)
+
+        try:
+            chat_id = message.chat.id
+
+            print("calling menu...", flush=True)
+
+            send_main_menu(chat_id)
+
+            print("menu sent successfully", flush=True)
+
+        except Exception as e:
+            print("ERROR IN START HANDLER:", e, flush=True)
+    
+"""
