@@ -76,7 +76,7 @@ def reward_referral_if_needed(user_id):
     conn.close()
 
 
-def show_referral_message():
+def show_referral_message(bot, chat_id):
     keyboard = referral_keyboard()
     bot.send_message(
     chat_id=chat_id, 
