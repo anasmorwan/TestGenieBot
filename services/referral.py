@@ -23,6 +23,17 @@ def save_referral(referrer_id, referred_id):
         VALUES (?, ?)
     """, (referrer_id, referred_id))
 
+    conn.commit()
+    conn.close()
+
+
+
+
+    
+def give_reward(referrer_id):
+    conn = get_connection()
+    c = conn.cursor()
+
     # أعطِ المكافأة
     c.execute("""
         UPDATE users 
@@ -32,3 +43,6 @@ def save_referral(referrer_id, referred_id):
 
     conn.commit()
     conn.close()
+
+
+    
