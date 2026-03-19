@@ -29,8 +29,8 @@ def init_db():
         referred_id INTEGER,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         rewarded INTEGER DEFAULT 0
-)
-""")
+    )
+    """)
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_quizzes (
