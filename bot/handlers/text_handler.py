@@ -3,6 +3,8 @@ from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
 from storage.messages import get_message
 from services.refferal import show_referral_message
+from services.refferal import show_referral_message, reward_referral_if_needed
+from services.usage import consume_quiz, can_generate
 
 
 def register(bot):
@@ -16,6 +18,11 @@ def register(bot):
         
         if not can generate(user_id):
             show_referral_message()
+
+        # 👇 استهلك محاولة
+        consume_quiz(user_id)
+        # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
+        reward_referral_if_needed(user_id)
 
 
         if not text.strip():
