@@ -1,4 +1,4 @@
-from sqlite.py import get_connection
+from storage.sqlite_db import get_connection
 
 
 def get_referral_link(user_id):
