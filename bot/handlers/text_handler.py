@@ -5,9 +5,19 @@ from storage.messages import get_message
 from services.refferal import show_referral_message
 from services.refferal import show_referral_message, reward_referral_if_needed
 from services.usage import consume_quiz, can_generate
+from bot.keyboards.referral_keyboard import referral_keyboard
 
 
 def register(bot):
+
+    def show_referral_message(bot, chat_id):
+        keyboard = referral_keyboard()
+        bot.send_message(
+        chat_id=chat_id, 
+        text=get_mesaage("REFFERAL_1"),
+        reply_markup=keyboard,
+        parse_mode="HTML"
+    )
     
     @bot.message_handler(content_types=["text"])
     def handle_text_message(msg):
