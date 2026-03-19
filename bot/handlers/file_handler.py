@@ -33,8 +33,13 @@ def register(bot):
         message_id = msg.message_id
 
 
-        if not can_generate(user_id):
-            show_referral_message(bot, chat_id)
+        allowed, reason = can_generate(user_id)
+
+
+        
+        if not allowed:
+            if reason == "limit_reached":
+                show_referral_message(bot, chat_id)
 
         # 👇 استهلك محاولة
         consume_quiz(user_id)
