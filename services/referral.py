@@ -1,6 +1,5 @@
 from storage.sqlite_db import get_connection
-from storage.mesaages import get_message
-from bot.keyboards.referral_keyboard import referral_keyboard
+
 
 
 
@@ -74,13 +73,3 @@ def reward_referral_if_needed(user_id):
 
     conn.commit()
     conn.close()
-
-
-def show_referral_message(bot, chat_id):
-    keyboard = referral_keyboard()
-    bot.send_message(
-    chat_id=chat_id, 
-    text=get_mesaage("REFFERAL_1"),
-    reply_markup=keyboard,
-    parse_mode="HTML"
-    )
