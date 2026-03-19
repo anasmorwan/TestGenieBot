@@ -34,14 +34,12 @@ def register(bot):
 
         try:
 
-            allowed, reason = can_generate(user_id)
+            allowed, info = can_generate(user_id)
 
-
-        
             if not allowed:
-                if reason == "limit_reached":
-                    show_referral_message(bot, chat_id)
-
+                show_referral_message(bot, chat_id)
+                return  # ❗ هذا هو المفتاح
+                
             # 👇 استهلك محاولة
             consume_quiz(user_id)
             # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
