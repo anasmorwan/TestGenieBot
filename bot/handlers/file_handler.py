@@ -33,7 +33,7 @@ def register(bot):
         message_id = msg.message_id
 
 
-        if not can generate(user_id):
+        if not can_generate(user_id):
             show_referral_message(bot, chat_id)
 
         # 👇 استهلك محاولة
