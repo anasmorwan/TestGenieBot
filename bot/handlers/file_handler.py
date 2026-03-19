@@ -7,7 +7,7 @@ from services.file_upload import handle_file_upload
 # from services.poll_service import send_quiz_message
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.messages import get_message
-from services.refferal import show_referral_message, reward_referral_if_needed
+from services.referral import show_referral_message, reward_referral_if_needed
 from services.usage import consume_quiz, can_generate
 from bot.keyboards.referral_keyboard import referral_keyboard
 
