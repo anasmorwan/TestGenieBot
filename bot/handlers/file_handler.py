@@ -32,19 +32,24 @@ def register(bot):
         chat_id = msg.chat.id
         message_id = msg.message_id
 
+        try:
 
-        allowed, reason = can_generate(user_id)
+            allowed, reason = can_generate(user_id)
 
 
         
-        if not allowed:
-            if reason == "limit_reached":
-                show_referral_message(bot, chat_id)
+            if not allowed:
+                if reason == "limit_reached":
+                    show_referral_message(bot, chat_id)
 
-        # 👇 استهلك محاولة
-        consume_quiz(user_id)
-        # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
-        reward_referral_if_needed(user_id)
+            # 👇 استهلك محاولة
+            consume_quiz(user_id)
+            # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
+            reward_referral_if_needed(user_id)
+
+        except Exception as e:
+            print("File handler ERROR:", e, flush=True)
+            bot.send_message(chat_id, f"❌ Error: {str(e)}")
 
         
         try:
