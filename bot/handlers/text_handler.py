@@ -2,6 +2,9 @@ from services.quiz_service import generate_quizzes_from_text
 from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
 from storage.messages import get_message
+from services.refferal import show_referral_message
+
+
 def register(bot):
     
     @bot.message_handler(content_types=["text"])
@@ -9,6 +12,11 @@ def register(bot):
         user_id = msg.from_user.id
         chat_id = msg.chat.id
         text = msg.text
+
+        
+        if not can generate(user_id):
+            show_referral_message()
+
 
         if not text.strip():
             bot.send_message(chat_id, "⚠️ الرجاء إرسال نص لتوليد الاختبار.")
