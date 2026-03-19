@@ -2,10 +2,10 @@ from services.quiz_service import generate_quizzes_from_text
 from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
 from storage.messages import get_message
-from services.refferal import show_referral_message
 from services.referral import show_referral_message, reward_referral_if_needed
 from services.usage import consume_quiz, can_generate
 from bot.keyboards.referral_keyboard import referral_keyboard
+
 
 
 def register(bot):
@@ -25,9 +25,14 @@ def register(bot):
         chat_id = msg.chat.id
         text = msg.text
 
+
+        allowed, reason = can_generate(user_id)
+
+
         
-        if not can_generate(user_id):
-            show_referral_message(bot, chat_id)
+        if not allowed:
+            if reason == "limit_reached":
+                show_referral_message(bot, chat_id)
 
         # 👇 استهلك محاولة
         consume_quiz(user_id)
