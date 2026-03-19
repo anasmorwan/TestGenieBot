@@ -4,9 +4,24 @@
 # bot/handlers/start.py
 from bot.handlers.menu import send_main_menu
 from storage.session_store import user_states
+from services.referral import save_referral
+
+
+@bot.message_handler(commands=['start'])
+def start_handler(message):
+    user_id = message.from_user.id
+    args = message.text.split()
+
+    if len(args) > 1 and args[1].startswith("ref_"):
+        referrer_id = int(args[1].replace("ref_", ""))
+
+        # منع self-referral
+        if referrer_id != user_id:
+            save_referral(referrer_id, user_id)
 
 
 def register(bot):
+    """
     print("start handler registered", flush=True)
     @bot.message_handler(commands=['start'])
     def unified_start_handler(message):
@@ -27,7 +42,7 @@ def register(bot):
 
 
         
-        """
+    """
     @bot.message_handler(commands=['start'])
     def unified_start_handler(message):
         print("/start received:", message.from_user.id, flush=True)
@@ -59,6 +74,15 @@ def register(bot):
 
                 return
 
+        
+            if param.startswith("ref_"):
+                referrer_id = int(args[1].replace("ref_", ""))
+
+                # منع self-referral
+                if referrer_id != uid:
+                    save_referral(referrer_id, uid)
+
+
             # ✅ معالجة روابط المشاركة مثل: ?start=quiz_ab12cd
             quiz_code = param[5:] if param.startswith("quiz_") else param
 
@@ -69,11 +93,9 @@ def register(bot):
                 bot.edit_message_text(
                     chat_id=chat_id,
                     message_id=loading_msg.message_id,
-                    text="❌ لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
+                    text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
                 )
             return
 
         # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
         send_main_menu(chat_id)
-
-"""
