@@ -21,6 +21,16 @@ def init_db():
         last_reset TEXT
     )
     """)
+    
+    cursor.execute("""
+    CREATE TABLE referrals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        referrer_id INTEGER,
+        referred_id INTEGER,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        rewarded INTEGER DEFAULT 0
+)
+""")
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_quizzes (
