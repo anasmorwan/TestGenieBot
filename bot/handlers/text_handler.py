@@ -40,7 +40,7 @@ def register(bot):
             # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
             reward_referral_if_needed(user_id)
 
-       except Exception as e:
+        except Exception as e:
             print("File handler ERROR:", e, flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}") 
 
