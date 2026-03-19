@@ -22,7 +22,7 @@ def start_handler(message):
 
 
 def register(bot):
-    """
+"""
     print("start handler registered", flush=True)
     @bot.message_handler(commands=['start'])
     def unified_start_handler(message):
@@ -40,12 +40,15 @@ def register(bot):
 
         except Exception as e:
             print("ERROR IN START HANDLER:", e, flush=True)
+    
+"""
 
 
-        
-    """
+    
     @bot.message_handler(commands=['start'])
     def unified_start_handler(message):
+        conn = get_connection()
+        c = conn.cursor()
         print("/start received:", message.from_user.id, flush=True)
         # ✅ تجاهل الرسائل في المجموعات
         if message.chat.type != "private":
@@ -55,6 +58,7 @@ def register(bot):
         chat_id = message.chat.id
         args = message.text.split(maxsplit=1)
         uid = message.from_user.id
+
     
     
     
@@ -78,10 +82,15 @@ def register(bot):
         
             if param.startswith("ref_"):
                 referrer_id = int(args[1].replace("ref_", ""))
+                c.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
+                exists = c.fetchone()
+
+                if not exists:
+                    invited_by = None
 
                 # منع self-referral
                 if referrer_id != uid:
-                    save_referral(referrer_id, uid)
+                    save_referral(referrer_id, invited_by)
 
 
             # ✅ معالجة روابط المشاركة مثل: ?start=quiz_ab12cd
