@@ -1,6 +1,6 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-def referal_keyboard():
+def referral_keyboard():
     referal_btns = InlineKeyboardMarkup(row_width=1)
     
     referal_btns.add(
