@@ -16,8 +16,8 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 
 def register(bot):
     
-    def show_referral_message(bot, chat_id):
-        keyboard = referral_keyboard()
+    def show_referral_message(bot, chat_id, user_id):
+        keyboard = referral_keyboard(user_id)
         bot.send_message(
         chat_id=chat_id, 
         text=get_mesaage("REFERRAL_1"),
@@ -37,7 +37,7 @@ def register(bot):
             allowed, info = can_generate(user_id)
 
             if not allowed:
-                show_referral_message(bot, chat_id)
+                show_referral_message(bot, chat_id, user_id)
                 return  # ❗ هذا هو المفتاح
                 
             # 👇 استهلك محاولة
