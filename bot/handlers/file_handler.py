@@ -7,7 +7,7 @@ from services.file_upload import handle_file_upload
 # from services.poll_service import send_quiz_message
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.messages import get_message
-
+from services.refferal import show_referral_message
 
 
 
@@ -19,6 +19,10 @@ def register(bot):
         user_id = msg.from_user.id
         chat_id = msg.chat.id
         message_id = msg.message_id
+
+
+        if not can generate(user_id):
+            show_referral_message()
 
         
         try:
