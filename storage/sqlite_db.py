@@ -63,7 +63,9 @@ def init_db():
     """)
     
     ALTER TABLE users ADD COLUMN free_quizzes INTEGER DEFAULT 3;
-
+    ALTER TABLE users ADD COLUMN invited_by INTEGER;
+    ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+    
     conn.commit()
     conn.close()
 
@@ -81,4 +83,3 @@ timestamp TEXT
 )
 )
 """
-
