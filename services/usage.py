@@ -1,6 +1,20 @@
 from storage.sqlite_db import get_connection
 
+def get_subscription(user_id):
+    conn = get_connection()
+    c = conn.cursor()
 
+    c.execute("""
+        SELECT plan, expires_at FROM subscriptions WHERE user_id=?
+    """, (user_id,))
+    
+    row = c.fetchone()
+    conn.close()
+
+    if not row:
+        return {"plan": "free", "expires_at": None}
+
+    return {"plan": row[0], "expires_at": row[1]}
 
 # def consume_quiz(user_id):
 #    conn = get_connection()
