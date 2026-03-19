@@ -30,19 +30,44 @@ def save_referral(referrer_id, referred_id):
 
 
     
-def give_reward(referrer_id):
+def reward_referral_if_needed(user_id):
     conn = get_connection()
     c = conn.cursor()
 
-    # أعطِ المكافأة
+    # هل لديه دعوة؟
+    c.execute("""
+        SELECT invited_by FROM users WHERE user_id=?
+    """, (user_id,))
+    row = c.fetchone()
+
+    if not row or not row[0]:
+        conn.close()
+        return
+
+    referrer_id = row[0]
+
+    # هل تم إعطاء المكافأة مسبقاً؟
+    c.execute("""
+        SELECT 1 FROM referrals 
+        WHERE referred_id=? AND rewarded=1
+    """, (user_id,))
+
+    if c.fetchone():
+        conn.close()
+        return
+
+    # ✅ أعطِ المكافأة
     c.execute("""
         UPDATE users 
         SET free_quizzes = free_quizzes + 3
         WHERE user_id=?
     """, (referrer_id,))
 
+    # سجل العملية
+    c.execute("""
+        INSERT INTO referrals (referrer_id, referred_id, rewarded)
+        VALUES (?, ?, 1)
+    """, (referrer_id, user_id))
+
     conn.commit()
     conn.close()
-
-
-    
