@@ -156,7 +156,7 @@ def get_remaining(user_id):
 
 
 
-def add_new_user(uid):
+def add_new_user(user_id):
     conn = get_connection()
     c = conn.cursor()
 
