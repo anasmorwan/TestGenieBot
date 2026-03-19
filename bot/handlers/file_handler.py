@@ -20,7 +20,7 @@ def register(bot):
         keyboard = referral_keyboard(user_id)
         bot.send_message(
         chat_id=chat_id, 
-        text=get_mesaage("REFERRAL_1"),
+        text=get_message("REFERRAL_1"),
         reply_markup=keyboard,
         parse_mode="HTML"
     )
