@@ -61,10 +61,13 @@ def init_db():
         created_at TEXT NOT NULL
     )
     """)
+
+    # أضف العمود الجديد في أمر منفصل
+    cursor.execute("ALTER TABLE users ADD COLUMN free_quizzes INTEGER DEFAULT 3;")
+    cursor.execute("ALTER TABLE users ADD COLUMN invited_by INTEGER;")
+    cursor.execute("ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
+
     
-    ALTER TABLE users ADD COLUMN free_quizzes INTEGER DEFAULT 3;
-    ALTER TABLE users ADD COLUMN invited_by INTEGER;
-    ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
     
     conn.commit()
     conn.close()
