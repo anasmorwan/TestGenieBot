@@ -5,8 +5,10 @@ def get_subscription(user_id):
     c = conn.cursor()
 
     c.execute("""
-        SELECT plan, expires_at FROM subscriptions WHERE user_id=?
-    """, (user_id,))
+    SELECT plan, expires_at, daily_quiz_limit 
+    FROM subscriptions 
+    WHERE user_id=?
+""", (user_id,))
     
     row = c.fetchone()
     conn.close()
@@ -14,7 +16,11 @@ def get_subscription(user_id):
     if not row:
         return {"plan": "free", "expires_at": None}
 
-    return {"plan": row[0], "expires_at": row[1]}
+    return {
+    "plan": row[0],
+    "expires_at": row[1],
+    "daily_quiz_limit": row[2]
+    }
 
 # def consume_quiz(user_id):
 #    conn = get_connection()
