@@ -76,6 +76,9 @@ def init_db():
     cursor.execute("ALTER TABLE users ADD COLUMN invited_by INTEGER;")
     cursor.execute("ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
 
+
+    cursor.execute("ALTER TABLE subscriptions ADD COLUMN daily_quiz_limit INTEGER DEFAULT 3;")
+    cursor.execute("ALTER TABLE subscriptions ADD COLUMN daily_ocr_limit INTEGER DEFAULT 1;)
     
     
     conn.commit()
