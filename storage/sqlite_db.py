@@ -21,6 +21,15 @@ def init_db():
         last_reset TEXT
     )
     """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS subscriptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER UNIQUE,
+        plan TEXT DEFAULT 'free',
+        expires_at TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
     
     cursor.execute("""
     CREATE TABLE referrals (
