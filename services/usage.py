@@ -161,11 +161,11 @@ def add_new_user(uid):
     c = conn.cursor()
 
     c.execute("""
-        INSERT INTO users (user_id, used_today, last_reset)
-        VALUES (?, 0, ?)
-        """, (user_id, datetime.utcnow().isoformat()))
-        conn.commit()
-        used_today = 0
+    INSERT INTO users (user_id, used_today, last_reset)
+    VALUES (?, 0, ?)
+    """, (user_id, datetime.utcnow().isoformat()))
+    conn.commit()
+    used_today = 0
 
     return used_today
 
