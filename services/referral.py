@@ -1,5 +1,8 @@
 from storage.sqlite_db import get_connection
 from storage.mesaages import get_message
+from bot.keyboards.referral_keyboard import referral_keyboard
+
+
 
 def get_referral_link(user_id):
     return f"https://t.me/YourBot?start=ref_{user_id}"
@@ -74,7 +77,7 @@ def reward_referral_if_needed(user_id):
 
 
 def show_referral_message():
-    keyboard = 
+    keyboard = referral_keyboard()
     bot.send_message(
     chat_id=chat_id, 
     text=get_mesaage("REFFERAL_1"),
