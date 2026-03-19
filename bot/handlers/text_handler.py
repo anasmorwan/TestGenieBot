@@ -26,7 +26,7 @@ def register(bot):
         text = msg.text
 
         
-        if not can generate(user_id):
+        if not can_generate(user_id):
             show_referral_message(bot, chat_id)
 
         # 👇 استهلك محاولة
