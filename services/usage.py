@@ -16,14 +16,15 @@ def consume_quiz(user_id):
     conn.commit()
     conn.close()
 """
+
 def consume_quiz(user_id):
     conn = get_connection()
     c = conn.cursor()
 
     c.execute("""
-        UPDATE users
-        SET used_today = used_today + 1
-        WHERE user_id=?
+    UPDATE users
+    SET used_today = used_today + 1
+    WHERE user_id=?
     """, (user_id,))
 
     conn.commit()
@@ -54,7 +55,7 @@ def can_generate(user_id):
     c = conn.cursor()
 
     c.execute("""
-        SELECT used_today FROM users WHERE user_id=?
+    SELECT used_today FROM users WHERE user_id=?
     """, (user_id,))
     
     row = c.fetchone()
@@ -118,7 +119,7 @@ def get_remaining(user_id):
     c = conn.cursor()
 
     c.execute("""
-        SELECT daily_limit, used_today FROM users WHERE user_id=?
+    SELECT daily_limit, used_today FROM users WHERE user_id=?
     """, (user_id,))
     
     row = c.fetchone()
