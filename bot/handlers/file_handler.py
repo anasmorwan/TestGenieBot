@@ -7,8 +7,8 @@ from services.file_upload import handle_file_upload
 # from services.poll_service import send_quiz_message
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.messages import get_message
-from services.refferal import show_referral_message
-
+from services.refferal import show_referral_message, reward_referral_if_needed
+from services.usage import consume_quiz, can_generate
 
 
 def register(bot):
@@ -23,6 +23,11 @@ def register(bot):
 
         if not can generate(user_id):
             show_referral_message()
+
+        # 👇 استهلك محاولة
+        consume_quiz(user_id)
+        # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
+        reward_referral_if_needed(user_id)
 
         
         try:
