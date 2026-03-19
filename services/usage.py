@@ -14,7 +14,7 @@ def get_subscription(user_id):
     conn.close()
 
     if not row:
-        return {"plan": "free", "expires_at": None}
+        return {"plan": "free", "expires_at": None, "daily_quiz_limit": 3}
 
     return {
     "plan": row[0],
@@ -68,8 +68,6 @@ def consume_quiz(user_id):
 def can_generate(user_id):
     sub = get_subscription(user_id)
 
-    reset_daily_if_needed(user_id)
-
     conn = get_connection()
     c = conn.cursor()
 
@@ -78,13 +76,20 @@ def can_generate(user_id):
     """, (user_id,))
     
     row = c.fetchone()
+
+    # ✅ إذا مستخدم جديد → أنشئه
+    if not row:
+        used_today = add_new_user(user_id)
+    else:
+        used_today = row[0]
+
     conn.close()
 
-    if not row:
-        return False, "no_user"
+    # 👇 بعد التأكد من وجود المستخدم
+    reset_daily_if_needed(user_id)
 
-    used_today = row[0]
-    limit = sub.get("daily_quiz_limit", 3)
+    # 👇 تحديد الحد
+    limit = get_daily_limit(user_id)
 
     if used_today < limit:
         return True, {
@@ -94,9 +99,9 @@ def can_generate(user_id):
 
     return False, {
         "remaining": 0,
-        "limit": limit
+        "limit": limit,
+        "reason": "limit_reached"
     }
-
 
 
 from datetime import datetime
@@ -148,3 +153,31 @@ def get_remaining(user_id):
         return 0
 
     return max(0, row[0] - row[1])
+
+
+
+def add_new_user(uid):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("""
+        INSERT INTO users (user_id, used_today, last_reset)
+        VALUES (?, 0, ?)
+        """, (user_id, datetime.utcnow().isoformat()))
+        conn.commit()
+        used_today = 0
+
+    return used_today
+
+
+def get_daily_limit(user_id):
+    sub = get_subscription(user_id)
+
+    plan = sub["plan"]
+
+    if plan == "pro+":
+        return 50
+    elif plan == "pro":
+        return 25
+    else:
+        return 3
