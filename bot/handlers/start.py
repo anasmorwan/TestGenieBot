@@ -6,7 +6,7 @@ from services.quiz_session_service import quiz_manager
 from bot.handlers.menu import send_main_menu
 from storage.session_store import user_states
 from services.referral import save_referral
-
+from storage.sqlite_db import get_connection
 
 
 
