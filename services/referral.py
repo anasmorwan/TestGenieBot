@@ -71,3 +71,6 @@ def reward_referral_if_needed(user_id):
 
     conn.commit()
     conn.close()
+
+
+def show_referral_message()
