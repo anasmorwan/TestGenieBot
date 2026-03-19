@@ -11,7 +11,7 @@ from bot.keyboards.pay_local import local_upgrade_options_keyboard
 from bot.keyboards.premium_info_keyboard import premium_info_keyboard
 from bot.keyboards.plans_keyboard import paid_plans_keyboard
 from bot.keyboards.how_it_works_keyboard import how_it_works_keyboard
-from bot.keyboards.referal_keyboard import referal_keyboard
+from bot.keyboards.referral_keyboard import referral_keyboard
 
 
 def register(bot):
