@@ -22,7 +22,7 @@ def register(bot):
 
 
         if not can generate(user_id):
-            show_referral_message()
+            show_referral_message(bot)
 
         # 👇 استهلك محاولة
         consume_quiz(user_id)
