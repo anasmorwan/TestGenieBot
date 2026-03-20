@@ -11,38 +11,48 @@ from google.oauth2 import service_account
 from storage.sqlite_db import get_connection
 
 
-def get_gdrive_service():
-    # 1. جلب النص المشفر من متغيرات بيئة ريندر
+
+
+# 1. استخراج البيانات من متغير البيئة وتحويلها لقاموس (Dictionary)
+def load_credentials():
     encoded_creds = os.environ.get('GDRIVE_CREDENTIALS_BASE64')
-    
     if not encoded_creds:
-        raise ValueError("خطأ: لم يتم العثور على متغير البيئة GDRIVE_CREDENTIALS_BASE64")
-
-    # 2. فك تشفير Base64 وتحويله إلى نص JSON
-    decoded_creds = base64.b64decode(encoded_creds).decode('utf-8')
+        print("❌ Error: GDRIVE_CREDENTIALS_BASE64 not found in environment variables")
+        return None
     
-    # 3. تحويل نص الـ JSON إلى قاموس (Dictionary) بايثون
-    credentials_dict = json.loads(decoded_creds)
+    # فك التشفير
+    decoded_json = base64.b64decode(encoded_creds).decode('utf-8')
+    # تحويل النص إلى قاموس بايثون
+    return json.loads(decoded_json)
 
-    return credentials_dict
 
 
 DB_PATH = "quiz_users.db"
 
 # ⚙️ CONFIG
-SERVICE_ACCOUNT_FILE = get_gdrive_service()
+# 2. إعداد المتغيرات الأساسية
+CREDENTIALS_DICT = load_credentials()
+
+
 FOLDER_ID = "1iNbwM1kx9sBZKw4ve3PEiZ2W2VZ1JChq"
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_ID"))
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
-
 # =========================
 # 🔹 Google Drive Client
 # =========================
+# 3. دالة بناء الخدمة (التعديل المهم هنا)
 def get_drive_service():
-    creds = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+    if not CREDENTIALS_DICT:
+        raise Exception("Credentials data is missing!")
+
+    # ✅ التغيير هنا: استخدمنا from_service_account_info
+    # لأننا نمرر "قاموس البيانات" مباشرة وليس "مسار ملف"
+    creds = service_account.Credentials.from_service_account_info(
+        CREDENTIALS_DICT, 
+        scopes=SCOPES
+    )
     return build('drive', 'v3', credentials=creds)
 
 
@@ -280,3 +290,6 @@ def restore_if_needed():
         download_latest_backup()
     else:
         print("✅ Local DB exists, skipping restore")
+
+
+
