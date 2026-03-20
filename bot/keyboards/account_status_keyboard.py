@@ -1,8 +1,9 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-def account_status_keyboard():
+def account_status_keyboard(user_id):
     markup = InlineKeyboardMarkup(row_width=1)
+    ref_code = user_id
 
 
     btn_upgrade = InlineKeyboardButton("🚀 ترقية الحساب", callback_data="upgrade_account")
