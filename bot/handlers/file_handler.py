@@ -10,8 +10,8 @@ from storage.messages import get_message
 from services.referral import reward_referral_if_needed
 from services.usage import consume_quiz, can_generate, check_subscription_valid
 from bot.keyboards.referral_keyboard import referral_keyboard
-
-
+from services.backup_service import safe_backup
+from services.backup_service import smart_restore, is_db_valid
 
 
 def register(bot):
