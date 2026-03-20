@@ -51,20 +51,31 @@ def register(bot):
         if not text.strip():
             bot.send_message(chat_id, "⚠️ الرجاء إرسال نص لتوليد الاختبار.")
             return
+
+        try:
             
-        waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
-        # توليد الأسئلة
-        quizzes = generate_quizzes_from_text(text, user_id)
+            waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
+            # توليد الأسئلة
+            quizzes = generate_quizzes_from_text(text, user_id)
 
-        if not quizzes or len(quizzes) == 0:
-            bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
-            return
+            if not quizzes or len(quizzes) == 0:
+                bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
+                return
 
-        # تخزين الاختبار
-        quiz_code = store_quiz(user_id, quizzes)
-        backup_all()
+            # تخزين الاختبار
+            quiz_code = store_quiz(user_id, quizzes)
+            backup_all()
 
-        # بدء الاختبار مباشرة
-        quiz_manager.start_quiz(chat_id, quiz_code, bot)
 
+            bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=waiting_msg.message_id,
+                    text=get_message("QUIZ_CREATED", count=quiz_len),
+                    reply_markup=quiz_keyboard(quiz_code),
+                    parse_mode="HTML"
+                )
+            
+        except Exception as e:
+            print("File handler ERROR:", e, flush=True)
+            bot.send_message(chat_id, f"❌ Error: {str(e)}")
     
