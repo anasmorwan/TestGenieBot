@@ -184,7 +184,7 @@ powerfull_prompt2 = (
 
 
 import json
-from utilsjson_utils import parse_llm_json
+from utils.json_utils import parse_llm_json
 
 from ai.llm_client import generate_smart_response
 
