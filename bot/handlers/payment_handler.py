@@ -1,5 +1,5 @@
 # bot/handlers/payment_handler.py
-
+from services.usage import activate_subscription
 def register(bot):
 
     @bot.message_handler(content_types=['successful_payment'])
