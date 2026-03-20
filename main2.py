@@ -33,13 +33,24 @@ flask.register(); print("flask.register done", flush=True)
 # ضع webhook ثم شغّل Flask
 set_webhook(); print("set_webhook done", flush=True)
 
-restore_if_needed()
+# 1. التأكد من وجود ملف قاعدة البيانات أو استعادته فوراً
+# لكي يبدأ التطبيق وهو يمتلك "بيانات قديمة" بالفعل
+restore_if_needed() 
+
+# 2. التحقق من سلامة الملف المستورد
 if not is_db_valid():
-  smart_restore()
+    print("قاعدة البيانات تالفة أو غير موجودة، محاولة استعادة ذكية...")
+    smart_restore()
 
-init_db(); print("init_db done", flush=True)
+# 3. تشغيل التهيئة (بشرط استخدام IF NOT EXISTS)
+# وظيفة هذه الخطوة هي "التكملة" فقط؛ إذا كان الملف المستورد قديماً 
+# ونقصته جداول جديدة قمت بإضافتها في التحديث الأخير، ستقوم init_db بإنشائها
+init_db() 
+print("✅ قاعدة البيانات جاهزة ومحدثة", flush=True)
 
+# 4. بدء النسخ الاحتياطي التلقائي بعد استقرار الحالة
 start_auto_backup()
+
 
 
 port = int(os.environ.get("PORT", 10000))
