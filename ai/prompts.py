@@ -66,20 +66,6 @@ Return improved version only.
 
 
 prompt4 = """
-You are a strict exam reviewer.
-
-Review the following MCQs:
-
-Check:
-- Is the correct answer واضح؟
-- Are distractors strong?
-- Is the question testing understanding?
-- Is there ambiguity?
-
-Fix and improve weak questions.
-
-Return improved version only.
-""" = """
 You are an intelligent tutor.
 
 Based on:
