@@ -167,7 +167,7 @@ IMPORTANT:
 
 
 
-port json
+import json
 from utilsjson_utils import parse_llm_json
 
 from ai.llm_client import generate_smart_response
