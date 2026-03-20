@@ -66,6 +66,7 @@ def register(bot):
                     
                 except Exception as e:
                     print("ERROR IN START HANDLER:", e, flush=True)
+                    bot.send_message(chat_id, f"REFERRAL ERROR, str(e)")
     
                     return
 
