@@ -145,7 +145,6 @@ powerfull_prompt2 = (
     "Generate a set of multiple-choice questions based ONLY on the provided content.\n\n"
     "CONTENT:\n\n"
     "INSTRUCTIONS:\n\n"
-    f"1. Generate exactly {num_questions} questions.\n\n"
     "2. Each question must:\n"
     "- Test understanding, not memorization\n"
     "- Be clear, specific, and unambiguous\n"
