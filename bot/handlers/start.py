@@ -46,21 +46,26 @@ def register(bot):
 
                 return
 
-        
-            if param.startswith("ref_"):
-                referrer_id = int(args[1].replace("ref_", ""))
-                c.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
-                exists = c.fetchone()
+            try:
 
-                if not exists:
-                    invited_by = None
+                if param.startswith("ref_"):
+                    referrer_id = int(args[1].replace("ref_", ""))
+                    c.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
+                    exists = c.fetchone()
 
-                # منع self-referral
-                if referrer_id != uid:
-                    save_referral(referrer_id, invited_by)
+                    if not exists:
+                        invited_by = None
 
-                # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
-                send_main_menu(chat_id)
+                    # منع self-referral
+                    if referrer_id != uid:
+                        save_referral(referrer_id, invited_by)
+
+                    # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
+                    send_main_menu(chat_id)
+                    
+            except Exception as e:
+                print("ERROR IN START HANDLER:", e, flush=True)
+    
                 return
 
 
