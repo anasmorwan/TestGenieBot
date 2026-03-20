@@ -6,6 +6,8 @@ from storage.sqlite_db import init_db
 from bot.handlers import poll_answer_handler
 from bot import flask
 from services.backup_service import restore_if_needed, start_auto_backup
+from services.backup_service import is_db_valid, smart_restore
+
 
 
 
@@ -32,6 +34,8 @@ flask.register(); print("flask.register done", flush=True)
 set_webhook(); print("set_webhook done", flush=True)
 
 restore_if_needed()
+if not is_db_valid():
+  smart_restore()
 
 init_db(); print("init_db done", flush=True)
 
