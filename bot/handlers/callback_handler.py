@@ -14,7 +14,7 @@ from bot.keyboards.how_it_works_keyboard import how_it_works_keyboard
 from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.account_status_keyboard import account_status_keyboard
 
-from services.usage import get_subscription_full, get_usage
+from services.usage import get_subscription_full, get_usage, build_status_message
 from services.referral import get_referral_count
 
 
