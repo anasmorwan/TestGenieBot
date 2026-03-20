@@ -71,7 +71,7 @@ def register(bot):
                 bot.edit_message_text(
                 chat_id=chat_id, 
                 message_id=message_id, 
-                text=get_message("REFERRAL_LINK", uid=user_id, username=bot_username), 
+                text=get_message("REFERRAL_LINK", username=bot_username, uid=user_id), 
                 parse_mode="HTML")
 
 
