@@ -220,6 +220,7 @@ def safe_backup(bot, retries=3):
 # =========================
 def backup_all():
     upload_to_drive()
+    cleanup_old_backups()
     
 
 # =========================
