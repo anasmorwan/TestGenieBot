@@ -8,7 +8,7 @@ from services.file_upload import handle_file_upload
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.messages import get_message
 from services.referral import reward_referral_if_needed
-from services.usage import consume_quiz, can_generate
+from services.usage import consume_quiz, can_generate, check_subscription_valid
 from bot.keyboards.referral_keyboard import referral_keyboard
 
 
