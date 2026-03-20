@@ -51,7 +51,7 @@ def register(bot):
             if param.startswith("ref_"):
                 try:
                     referrer_id = int(args[1].replace("ref_", ""))
-                    c.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
+                    c.execute("SELECT user_id FROM users WHERE user_id=?", (uid,))
                     exists = c.fetchone()
 
                     if not exists:
