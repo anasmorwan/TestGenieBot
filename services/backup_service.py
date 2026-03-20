@@ -72,6 +72,35 @@ def upload_to_drive():
         print("❌ Drive upload failed:", e)
 
 
+
+# =========================
+# 🔹 cleanup_old_backups
+# =========================
+def cleanup_old_backups(max_files=10):
+    try:
+        service = get_drive_service()
+
+        results = service.files().list(
+            q=f"'{FOLDER_ID}' in parents",
+            orderBy="createdTime desc",
+            fields="files(id, name)"
+        ).execute()
+
+        files = results.get('files', [])
+
+        if len(files) <= max_files:
+            return
+
+        old_files = files[max_files:]
+
+        for f in old_files:
+            service.files().delete(fileId=f['id']).execute()
+            print("🗑️ Deleted:", f['name'])
+
+    except Exception as e:
+        print("Cleanup failed:", e)
+
+
 # =========================
 # 🔹 Download Latest Backup
 # =========================
@@ -107,6 +136,48 @@ def download_latest_backup():
 
     except Exception as e:
         print("❌ Download failed:", e)
+
+
+
+
+# =========================
+# 🔹 smart_restore
+# =========================
+def smart_restore():
+    try:
+        service = get_drive_service()
+
+        results = service.files().list(
+            q=f"'{FOLDER_ID}' in parents",
+            orderBy="createdTime desc",
+            fields="files(id, name)"
+        ).execute()
+
+        files = results.get('files', [])
+
+        for f in files[:5]:  # جرب آخر 5 نسخ
+            try:
+                request = service.files().get_media(fileId=f['id'])
+
+                with open(DB_PATH, 'wb') as file:
+                    downloader = MediaIoBaseDownload(file, request)
+
+                    done = False
+                    while not done:
+                        status, done = downloader.next_chunk()
+
+                print(f"✅ Restored from: {f['name']}")
+                return True
+
+            except Exception as e:
+                print(f"❌ Failed restore from {f['name']}:", e)
+
+        print("❌ All restore attempts failed")
+        return False
+
+    except Exception as e:
+        print("Restore error:", e)
+        return False
 
 
 # =========================
