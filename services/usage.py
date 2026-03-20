@@ -1,4 +1,8 @@
 from storage.sqlite_db import get_connection
+from datetime import datetime, timedelta
+
+
+
 
 def get_subscription(user_id):
     conn = get_connection()
@@ -104,7 +108,7 @@ def can_generate(user_id):
     }
 
 
-from datetime import datetime
+
 
 def reset_daily_if_needed(user_id):
     conn = get_connection()
@@ -265,3 +269,126 @@ def get_subscription_full(user_id):
         "daily_quiz_limit": row[2],
         "daily_ocr_limit": row[3]
     }
+
+
+#--------------------------
+#       ترقية المستخدمين      
+#----------------------------
+
+
+def get_plan_limits(plan):
+    if plan == "pro":
+        return {
+            "quiz_limit": 25,
+            "ocr_limit": 3,
+            "days": 30
+        }
+    elif plan == "pro_plus":
+        return {
+            "quiz_limit": 50,
+            "ocr_limit": 5,
+            "days": 30
+        }
+    else:
+        return {
+            "quiz_limit": 3,
+            "ocr_limit": 1,
+            "days": 0
+    }
+
+
+
+
+def activate_subscription(user_id, plan):
+    conn = get_connection()
+    c = conn.cursor()
+
+    limits = get_plan_limits(plan)
+
+    expires_at = None
+    if limits["days"] > 0:
+        expires_at = (datetime.utcnow() + timedelta(days=limits["days"])).isoformat()
+
+    # هل المستخدم لديه اشتراك سابق؟
+    c.execute("SELECT id FROM subscriptions WHERE user_id=?", (user_id,))
+    exists = c.fetchone()
+
+    if exists:
+        # تحديث
+        c.execute("""
+            UPDATE subscriptions
+            SET plan=?,
+                expires_at=?,
+                daily_quiz_limit=?,
+                daily_ocr_limit=?,
+                updated_at=?
+            WHERE user_id=?
+        """, (
+            plan,
+            expires_at,
+            limits["quiz_limit"],
+            limits["ocr_limit"],
+            datetime.utcnow().isoformat(),
+            user_id
+        ))
+    else:
+        # إدخال جديد
+        c.execute("""
+            INSERT INTO subscriptions 
+            (user_id, plan, expires_at, daily_quiz_limit, daily_ocr_limit)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            user_id,
+            plan,
+            expires_at,
+            limits["quiz_limit"],
+            limits["ocr_limit"]
+        ))
+
+    conn.commit()
+    conn.close()
+
+
+
+def downgrade_to_free(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("""
+        UPDATE subscriptions
+        SET plan='free',
+            expires_at=NULL,
+            daily_quiz_limit=3,
+            daily_ocr_limit=1
+        WHERE user_id=?
+    """, (user_id,))
+
+    conn.commit()
+    conn.close()
+
+
+def check_subscription_valid(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT plan, expires_at FROM subscriptions WHERE user_id=?
+    """, (user_id,))
+    
+    row = c.fetchone()
+
+    if not row:
+        conn.close()
+        return "free"
+
+    plan, expires_at = row
+
+    if expires_at:
+        if datetime.utcnow() > datetime.fromisoformat(expires_at):
+            conn.close()
+            downgrade_to_free(user_id)
+            return "free"
+
+    conn.close()
+    return plan
+
