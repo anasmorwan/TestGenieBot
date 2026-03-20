@@ -176,6 +176,16 @@ def register(bot):
             plan = user_states.get(user_id)
 
             if data == "pay_stars" and plan:
+                titles = {
+                    "pro": "🚀 اشتراك Pro جاهز للتفعيل",
+                    "pro_plus": "⚡ اشتراك Pro+ (أسرع تجربة)"
+                }
+
+                descriptions = {
+                    "pro": "احصل الآن على 25 اختبار يومياً + AI Vision وسرعة أعلى. التفعيل فوري بعد الدفع.",
+    
+                    "pro_plus": "أفضل أداء ممكن: 50 اختبار يومياً + أولوية قصوى. التفعيل يتم فوراً بعد الدفع."
+                }
     
                 if plan == "pro":
                     prices = [LabeledPrice(label="Pro Plan", amount=500)]
@@ -187,8 +197,8 @@ def register(bot):
 
                 bot.send_invoice(
                     chat_id=chat_id,
-                    title="Upgrade to Premium",
-                    description=f"Subscribe to {plan}",
+                    title=titles.get(plan, "Upgrade to Premium"),
+                    description=descriptions.get(plan, "Subscribe to our premium plans"),
                     payload=payload,
                     provider_token="",
                     currency="XTR",
