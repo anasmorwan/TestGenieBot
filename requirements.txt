@@ -14,3 +14,6 @@ python-pptx
 PyMuPDF
 google.genai
 cohere
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
