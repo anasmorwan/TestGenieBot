@@ -408,3 +408,68 @@ def check_subscription_valid(user_id):
     conn.close()
     return plan
 
+
+
+from datetime import datetime
+from storage.sqlite_db import get_connection
+from services.usage import reset_daily_if_needed
+
+
+def is_paid_user_active(user_id):
+    """
+    ترجع True إذا:
+    - المستخدم لديه اشتراك مدفوع (pro / pro+)
+    - الاشتراك ساري (لم ينتهِ)
+    - لم يتجاوز الحد اليومي
+    """
+
+    conn = get_connection()
+    c = conn.cursor()
+
+    # 1️⃣ جلب الاشتراك
+    c.execute("""
+        SELECT plan, expires_at, daily_quiz_limit 
+        FROM subscriptions 
+        WHERE user_id=?
+    """, (user_id,))
+    
+    sub = c.fetchone()
+
+    if not sub:
+        conn.close()
+        return False
+
+    plan, expires_at, daily_limit = sub
+
+    # 2️⃣ التأكد أنه خطة مدفوعة
+    if plan not in ("pro", "pro_plus"):
+        conn.close()
+        return False
+
+    # 3️⃣ التأكد أن الاشتراك لم ينتهِ
+    if expires_at:
+        if datetime.fromisoformat(expires_at) < datetime.utcnow():
+            conn.close()
+            return False
+
+    # 4️⃣ reset يومي إن لزم
+    reset_daily_if_needed(user_id)
+
+    # 5️⃣ جلب الاستخدام الحالي
+    c.execute("""
+        SELECT used_today FROM users WHERE user_id=?
+    """, (user_id,))
+    
+    row = c.fetchone()
+    conn.close()
+
+    if not row:
+        return False
+
+    used_today = row[0]
+
+    # 6️⃣ التحقق من الحد
+    if used_today < daily_limit:
+        return True
+
+    return False
