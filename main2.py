@@ -27,13 +27,13 @@ poll_answer_handler.register(bot)
 # سجل الويب هوك داخلياً
 flask.register(); print("flask.register done", flush=True)
 
-init_db(); print("init_db done", flush=True)
 
 # ضع webhook ثم شغّل Flask
 set_webhook(); print("set_webhook done", flush=True)
 
 restore_if_needed()
-init_db()
+
+init_db(); print("init_db done", flush=True)
 
 start_auto_backup(bot)
 
