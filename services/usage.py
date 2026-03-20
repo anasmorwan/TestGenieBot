@@ -181,3 +181,57 @@ def get_daily_limit(user_id):
         return 25
     else:
         return 3
+
+
+
+
+
+
+def get_usage(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("""
+    SELECT used_today FROM users WHERE user_id=?
+    """, (user_id,))
+    
+    row = c.fetchone()
+    conn.close()
+
+    return row[0] if row else 0
+
+def build_status_message(data):
+    plan = data["plan"]
+    used = data["used"]
+    limit = data["limit"]
+    remaining = limit - used
+
+    if plan == "free":
+        return f"""
+📊 <b>حالة حسابك</b>
+
+🆓 الخطة: Free  
+⚡ المتبقي اليوم: <b>{remaining}/{limit}</b>
+
+🎁 الدعوات: {data['referrals']}
+
+━━━━━━━━━━━━━━━
+🚀 تريد استخدام أكثر بدون قيود؟
+
+✨ Pro: 25 اختبار يومياً  
+🔥 Pro+: 50 اختبار يومياً  
+
+أو ادعُ أصدقاءك واحصل على محاولات إضافية مجاناً 👇
+"""
+
+    else:
+        return f"""
+📊 <b>حالة اشتراكك</b>
+
+💎 الخطة: {plan.upper()}  
+⚡ المتبقي اليوم: <b>{remaining}/{limit}</b>  
+⏳ ينتهي في: {data['expires_at'] or "غير محدد"}
+
+━━━━━━━━━━━━━━━
+🔥 استمر! أنت تستخدم البوت بكفاءة
+"""
