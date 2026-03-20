@@ -97,6 +97,63 @@ Be specific and concise.
 """
 
 
+powerfull_prompt2 = """
+You are an expert assessment designer specialized in creating high-quality educational quizzes.
+
+Your task:
+Generate a set of multiple-choice questions based ONLY on the provided content.
+
+CONTENT:
+"""
+{input_text}
+"""
+
+INSTRUCTIONS:
+
+1. Generate exactly {num_questions} questions.
+
+2. Each question must:
+- Test understanding, not memorization
+- Be clear, specific, and unambiguous
+- Avoid trivial or overly obvious questions
+
+3. Options:
+- Provide exactly 4 options
+- Only ONE correct answer
+- The other 3 must be plausible distractors (not random or silly)
+- Avoid "All of the above" or "None of the above"
+
+4. Cognitive variety:
+Ensure a mix of:
+- comprehension questions
+- application questions
+- inference/analysis questions
+
+5. Difficulty:
+- Medium to challenging
+- Avoid very easy questions
+
+6. Language:
+- Match the language of the content
+- Keep wording natural and professional
+
+7. Output format (STRICT JSON ONLY):
+Return ONLY valid JSON. No explanations outside JSON.
+
+FORMAT:
+[
+  {
+    "question": "...",
+    "options": ["...", "...", "...", "..."],
+    "correct_index": 0,
+    "explanation": "Short explanation of why this is correct"
+  }
+]
+
+IMPORTANT:
+- Ensure JSON is valid
+- Do not include any text before or after JSON
+"""
 
 
 
