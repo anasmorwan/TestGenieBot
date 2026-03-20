@@ -127,12 +127,35 @@ def backup_to_telegram(bot):
 
 
 # =========================
+# 🔹 safe_backup
+# =========================
+def safe_backup(bot, retries=3):
+    for i in range(retries):
+        try:
+            backup_manual(bot)
+            return True
+        except Exception as e:
+            print(f"Backup attempt {i+1} failed:", e)
+            time.sleep(2)
+
+    print("❌ Backup failed after retries")
+    return False
+
+
+# =========================
 # 🔹 Combined Backup
 # =========================
-def backup_all(bot):
+def backup_all():
+    upload_to_drive()
+    
+
+# =========================
+# 🔹 Combined Backup
+# =========================
+def backup_manual(bot):
     upload_to_drive()
     backup_to_telegram(bot)
-
+    
 
 # =========================
 # 🔹 Auto Backup Thread
