@@ -43,10 +43,10 @@ def register(bot):
                 
             # 👇 استهلك محاولة
             consume_quiz(user_id)
-            safe_backup(bot)
+            backup_all()
             # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
             reward_referral_if_needed(user_id)
-            safe_backup()
+            backup_all()
 
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
