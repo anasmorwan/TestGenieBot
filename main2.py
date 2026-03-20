@@ -5,6 +5,11 @@ from bot.handlers import start, text_handler, file_handler, callback_handler, pr
 from storage.sqlite_db import init_db
 from bot.handlers import poll_answer_handler
 from bot import flask
+from services.backup_service import restore_if_needed, start_auto_backup
+
+
+
+
 
 print("main starting...", flush=True)
 
@@ -26,6 +31,12 @@ init_db(); print("init_db done", flush=True)
 
 # ضع webhook ثم شغّل Flask
 set_webhook(); print("set_webhook done", flush=True)
+
+restore_if_needed()
+init_db()
+
+start_auto_backup(bot)
+
 
 port = int(os.environ.get("PORT", 10000))
 print(f"Starting Flask on port {port}", flush=True)
