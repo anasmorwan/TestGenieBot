@@ -61,27 +61,25 @@ def get_drive_service():
 # =========================
 def upload_to_drive():
     try:
-        service = get_drive_service()
+        # تأكد من وجود ملف لرفعه
+        if not os.path.exists(DB_PATH):
+            print("❌ لا يوجد ملف قاعدة بيانات لرفعه")
+            return
 
+        service = get_drive_service()
         timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
         filename = f"quiz_users_{timestamp}.db"
 
-        file_metadata = {
-            'name': filename,
-            'parents': [FOLDER_ID]
-        }
+        file_metadata = {'name': filename, 'parents': [FOLDER_ID]}
+        
+        # نستخدم mimetype المناسب لـ SQLite
+        media = MediaFileUpload(DB_PATH, mimetype='application/x-sqlite3', resumable=True)
 
-        media = MediaFileUpload(DB_PATH, mimetype='application/octet-stream')
-
-        service.files().create(
-            body=file_metadata,
-            media_body=media
-        ).execute()
-
-        print(f"✅ Uploaded to Drive: {filename}")
+        service.files().create(body=file_metadata, media_body=media).execute()
+        print(f"✅ تم الرفع بنجاح: {filename}")
 
     except Exception as e:
-        print("❌ Drive upload failed:", e)
+        print("❌ فشل الرفع إلى Drive:", e)
 
 
 
@@ -285,11 +283,16 @@ def is_db_valid():
 # 🔹 Restore on Startup
 # =========================
 def restore_if_needed():
-    if not os.path.exists(DB_PATH):
-        print("⚠️ No local DB found, restoring...")
+    # نتحقق: هل الملف غير موجود؟ أو هل حجمه 0 بايت (فارغ)؟ أو هل هو غير صالح؟
+    if not os.path.exists(DB_PATH) or os.path.getsize(DB_PATH) < 100 or not is_db_valid():
+        print("⚠️ قاعدة البيانات مفقودة، فارغة أو تالفة. جاري الاستعادة من Drive...")
+        
+        # محاولة التحميل
         download_latest_backup()
+        
+        # إذا فشل التحميل العادي، نجرب الـ smart_restore
+        if not is_db_valid():
+             smart_restore()
     else:
-        print("✅ Local DB exists, skipping restore")
-
-
+        print(f"✅ قاعدة البيانات موجودة وصالحة (الحجم: {os.path.getsize(DB_PATH)} بايت)")
 
