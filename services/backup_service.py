@@ -7,6 +7,7 @@ import base64
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from google.oauth2 import service_account
+from storage.sqlite_db import get_connection
 
 DB_PATH = "quiz_users.db"
 
@@ -240,6 +241,21 @@ def start_auto_backup(bot, interval=300):
 
     t = threading.Thread(target=loop, daemon=True)
     t.start()
+
+
+
+# =========================
+# 🔹 Restore on Startup
+# =========================
+def is_db_valid():
+    try:
+        conn = get_connection
+        c = conn.cursor()
+        c.execute("SELECT name FROM sqlite_master LIMIT 1;")
+        conn.close()
+        return True
+    except:
+        return False
 
 
 # =========================
