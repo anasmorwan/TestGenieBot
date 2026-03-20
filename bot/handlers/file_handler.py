@@ -33,7 +33,7 @@ def register(bot):
         message_id = msg.message_id
 
         try:
-            plan = check_subscription_valid(user_id):
+            plan = check_subscription_valid(user_id)
 
             allowed, info = can_generate(user_id)
 
