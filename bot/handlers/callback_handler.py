@@ -117,7 +117,7 @@ def register(bot):
                     "referrals": referrals
                 })
 
-                keyboard = account_status_keyboard()
+                keyboard = account_status_keyboard(user_id)
 
                 bot.edit_message_text(
                     chat_id=chat_id,
