@@ -187,11 +187,11 @@ def register(bot):
                     "pro_plus": "أفضل أداء ممكن: 50 اختبار يومياً + أولوية قصوى. التفعيل يتم فوراً بعد الدفع."
                 }
     
-                if plan == "pro":
+                if plan == "pro_plan":
                     prices = [LabeledPrice(label="Pro Plan", amount=500)]
                     payload = "pro_plan"
 
-                elif plan == "pro_plus":
+                elif plan == "pro_plus_plan":
                     prices = [LabeledPrice(label="Pro+ Plan", amount=700)]
                     payload = "pro_plus_plan"
 
