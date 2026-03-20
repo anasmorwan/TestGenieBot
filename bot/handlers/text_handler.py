@@ -26,7 +26,7 @@ def register(bot):
         text = msg.text
 
         try:
-            plan = check_subscription_valid(user_id):
+            plan = check_subscription_valid(user_id)
 
             allowed, info = can_generate(user_id)
 
