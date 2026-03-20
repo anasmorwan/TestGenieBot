@@ -12,7 +12,7 @@ DB_PATH = "quiz_users.db"
 # ⚙️ CONFIG
 SERVICE_ACCOUNT_FILE = "credentials.json"
 FOLDER_ID = "1iNbwM1kx9sBZKw4ve3PEiZ2W2VZ1JChq"
-ADMIN_CHAT_ID = 123456789  # ضع ID الخاص بك
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_ID"))
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
 
