@@ -39,7 +39,7 @@ if not is_db_valid():
 
 init_db(); print("init_db done", flush=True)
 
-start_auto_backup(bot)
+start_auto_backup()
 
 
 port = int(os.environ.get("PORT", 10000))
