@@ -69,6 +69,7 @@ def register(bot):
                     bot.send_message(chat_id, f"ERROR: {str(e)}")
     
                     return
+                return
 
 
             # ✅ معالجة روابط المشاركة مثل: ?start=quiz_ab12cd
