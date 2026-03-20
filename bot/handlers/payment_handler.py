@@ -4,14 +4,14 @@ def register(bot):
 
     @bot.message_handler(content_types=['successful_payment'])
     def got_payment(message):
-
         user_id = message.from_user.id
-
         payload = message.successful_payment.invoice_payload
 
-        if payload == "user_premium_subscription":
-            # تحديث قاعدة البيانات
-            activate_premium(user_id)
+        if payload == "pro_plan":
+            activate_subscription(user_id, "pro")
+
+        elif payload == "pro_plus_plan":
+            activate_subscription(user_id, "pro_plus")
 
         bot.send_message(
             message.chat.id,
