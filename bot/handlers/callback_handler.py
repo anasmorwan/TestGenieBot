@@ -18,7 +18,6 @@ from services.usage import get_subscription_full, get_usage, build_status_messag
 from services.referral import get_referral_count
 
 
-
 def register(bot):
 
     @bot.callback_query_handler(func=lambda call: True)
@@ -63,7 +62,7 @@ def register(bot):
                 quiz_manager.start_quiz(chat_id, quiz_code, bot)
                 
             elif data == "input_text":
-                activate_subscription(user_id, "pro")
+                
                 bot.answer_callback_query(call.id)
                 bot.send_message(chat_id, "📄 أرسل نص الآن لإنشاء الاختبار")
 
