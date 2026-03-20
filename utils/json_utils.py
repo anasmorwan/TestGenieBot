@@ -67,3 +67,24 @@ def extract_json_objects_safely(text: str):
             continue  # تجاهل أي JSON غير صالح
 
     return objects
+
+
+
+
+def parse_llm_json(text):
+    # 1️⃣ حاول parsing بسيط (سريع)
+    try:
+        return json.loads(text)
+    except:
+        pass
+
+    # 2️⃣ حاول تنظيف markdown
+    cleaned = re.sub(r'```json|```', '', text)
+
+    try:
+        return json.loads(cleaned)
+    except:
+        pass
+
+    # 3️⃣ fallback (النسخة القديمة)
+    return extract_json_objects_safely(text)
