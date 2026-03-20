@@ -1,3 +1,49 @@
+# prompts.py
+ENGLISH_QUIZ_PROMPT = "Generate quiz questions strictly from content, return JSON only."
+ARABIC_QUIZ_PROMPT = "قم بإنشاء أسئلة اختبار فقط من المحتوى المعطى، وأعد JSON صالح."
+
+
+LANGUAGE_RULE = """
+Language rule:
+Use the same language as the content.
+"""
+QUIZ_RULES = """
+Rules:
+- Use ONLY information in the content.
+- Do NOT invent or assume information.
+- Questions must test recall or understanding.
+"""
+
+SYSTEM_ROLE = """
+You are a precise AI quiz generator.
+Your task is to create quiz questions strictly from the provided content.
+"""
+
+
+
+ANTI_HALLUCINATION = """
+If the content is insufficient, generate fewer questions rather than inventing information.
+"""
+
+
+
+
+QUIZ_FORMAT = """
+Output JSON format:
+
+[
+  {
+    "question": "...",
+    "options": ["A","B","C","D"],
+    "correct_index": 0
+  }
+]
+
+Return ONLY valid JSON.
+No markdown.
+"""
+
+
 #----------------------------------------
 #               توليد الإختبارات للمستخدمين Pro                    
 #-----------------------------------------
@@ -46,14 +92,7 @@ prompt2 = (
     "Output format (STRICT JSON ONLY):\n"
     "Return ONLY valid JSON. No explanations outside JSON.\n\n"
     "FORMAT:\n\n"
-    "[\n"
-    "  {\n"
-    "    \"question\": \"...\",\n"
-    "    \"options\": [\"...\", \"...\", \"...\", \"...\"],\n"
-    "    \"correct_index\": 0,\n"
-    "    \"explanation\": \"Short explanation of why this is correct\"\n"
-    "  }\n"
-    "]\n\n"
+    f"{QUIZ_FORMAT}\n\n"
     "IMPORTANT:\n"
     "- Ensure JSON is valid\n"
     "- Do not include any text before or after JSON\n"
@@ -73,14 +112,7 @@ prompt3 = (
     "Output format (STRICT JSON ONLY):\n"
     "Return ONLY valid JSON. No explanations outside JSON.\n\n"
     "FORMAT:\n\n"
-    "[\n"
-    "  {\n"
-    '    "question": "...",\n'
-    '    "options": ["...", "...", "...", "..."],\n'
-    '    "correct_index": 0,\n'
-    '    "explanation": "Short explanation of why this is correct"\n'
-    "  }\n"
-    "]\n\n"
+    f"{QUIZ_FORMAT}\n\n"
     "IMPORTANT:\n"
     "- Ensure JSON is valid\n"
     "- Do not include any text before or after JSON\n"
@@ -244,51 +276,6 @@ def pro_quiz_generator(content, num_questions=5):
 # --------------------------
 #      توليد الأختبار ل free users   
 #--------------------------
-
-QUIZ_RULES = """
-Rules:
-- Use ONLY information in the content.
-- Do NOT invent or assume information.
-- Questions must test recall or understanding.
-"""
-
-SYSTEM_ROLE = """
-You are a precise AI quiz generator.
-Your task is to create quiz questions strictly from the provided content.
-"""
-
-
-
-ANTI_HALLUCINATION = """
-If the content is insufficient, generate fewer questions rather than inventing information.
-"""
-
-LANGUAGE_RULE = """
-Language rule:
-Use the same language as the content.
-"""
-
-
-QUIZ_FORMAT = """
-Output JSON format:
-
-[
-  {
-    "question": "...",
-    "options": ["A","B","C","D"],
-    "correct_index": 0
-  }
-]
-
-Return ONLY valid JSON.
-No markdown.
-"""
-
-# prompts.py
-ENGLISH_QUIZ_PROMPT = "Generate quiz questions strictly from content, return JSON only."
-ARABIC_QUIZ_PROMPT = "قم بإنشاء أسئلة اختبار فقط من المحتوى المعطى، وأعد JSON صالح."
-
-
 def build_quiz_prompt(content, num_questions, user_instruction=None):
 
     user_part = f"User instruction:\n{user_instruction}" if user_instruction else ""
