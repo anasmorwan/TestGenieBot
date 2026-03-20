@@ -3,75 +3,88 @@
 #-----------------------------------------
 
 
+prompt1 = (
+    "You are an expert educator.\n\n"
+    "Analyze the following content and extract:\n\n"
+    "1. Main topics\n"
+    "2. Key concepts\n"
+    "3. Important facts\n"
+    "4. Difficulty level (easy, medium, hard)\n"
+    "5. Type of content (theory, definitions, processes, case-based)\n"
+    f"6 {LANGUAGE_RULE}\n\n"
+    "Return JSON only:\n"
+    "{\n"
+    '  "topics": [],\n'
+    '  "key_concepts": [],\n'
+    '  "facts": [],\n'
+    '  "difficulty": "",\n'
+    '  "content_type": ""\n'
+    "}\n"
+)
 
-prompt1 = f"""
-You are an expert educator.
+prompt2 = (
+    "You are a professional exam creator.\n\n"
+    "Based on the analysis below, generate high-quality MCQs.\n\n"
+    "Rules:\n"
+    "- Questions must test understanding, not memorization\n"
+    "- Use realistic distractors (wrong answers)\n"
+    "- Avoid obvious answers\n"
+    "- Mix difficulty levels\n"
+    "- Include at least:\n"
+    "  - 30% conceptual questions\n"
+    "  - 30% application questions\n"
+    "  - 20% tricky questions\n"
+    "  - 20% direct questions\n\n"
+    "Each question must include:\n"
+    "- question\n"
+    "- 4 options\n"
+    "- correct_index\n"
+    "- explanation (very important)\n"
+    "- difficulty\n"
+    "- topic\n\n"
+    f"{LANGUAGE_RULE}\n\n"
+    "Output format (STRICT JSON ONLY):\n"
+    "Return ONLY valid JSON. No explanations outside JSON.\n\n"
+    "FORMAT:\n\n"
+    "[\n"
+    "  {\n"
+    "    \"question\": \"...\",\n"
+    "    \"options\": [\"...\", \"...\", \"...\", \"...\"],\n"
+    "    \"correct_index\": 0,\n"
+    "    \"explanation\": \"Short explanation of why this is correct\"\n"
+    "  }\n"
+    "]\n\n"
+    "IMPORTANT:\n"
+    "- Ensure JSON is valid\n"
+    "- Do not include any text before or after JSON\n"
+)
 
-Analyze the following content and extract:
 
-1. Main topics
-2. Key concepts
-3. Important facts
-4. Difficulty level (easy, medium, hard)
-5. Type of content (theory, definitions, processes, case-based)
-6 {LANGUAGE_RULE}
-
-Return JSON only:
-{
-  "topics": [],
-  "key_concepts": [],
-  "facts": [],
-  "difficulty": "",
-  "content_type": ""
-}
-"""
-
-
-prompt2 = f"""
-You are a professional exam creator.
-
-Based on the analysis below, generate high-quality MCQs.
-
-Rules:
-- Questions must test understanding, not memorization
-- Use realistic distractors (wrong answers)
-- Avoid obvious answers
-- Mix difficulty levels
-- Include at least:
-  - 30% conceptual questions
-  - 30% application questions
-  - 20% tricky questions
-  - 20% direct questions
-
-Each question must include:
-- question
-- 4 options
-- correct_index
-- explanation (very important)
-- difficulty
-- topic
-
-{LANGUAGE_RULE}
-
-Return JSON array only.
-"""
-
-prompt3 = f"""
-You are a strict exam reviewer.
-
-Review the following MCQs:
-
-Check:
-- Is the correct answer واضح؟
-- Are distractors strong?
-- Is the question testing understanding?
-- Is there ambiguity?
-
-Fix and improve weak questions.
-
-{LANGUAGE_RULE}
-Return improved version only.
-"""
+prompt3 = (
+    "You are a strict exam reviewer.\n\n"
+    "Review the following MCQs:\n\n"
+    "Check:\n"
+    "- Is the correct answer واضح؟\n"
+    "- Are distractors strong?\n"
+    "- Is the question testing understanding?\n"
+    "- Is there ambiguity?\n\n"
+    "Fix and improve weak questions.\n\n"
+    f"{LANGUAGE_RULE}\n"
+    "Output format (STRICT JSON ONLY):\n"
+    "Return ONLY valid JSON. No explanations outside JSON.\n\n"
+    "FORMAT:\n\n"
+    "[\n"
+    "  {\n"
+    '    "question": "...",\n'
+    '    "options": ["...", "...", "...", "..."],\n'
+    '    "correct_index": 0,\n'
+    '    "explanation": "Short explanation of why this is correct"\n'
+    "  }\n"
+    "]\n\n"
+    "IMPORTANT:\n"
+    "- Ensure JSON is valid\n"
+    "- Do not include any text before or after JSON\n"
+)
 
 
 
