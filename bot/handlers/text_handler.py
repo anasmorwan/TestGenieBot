@@ -3,7 +3,7 @@ from storage.quiz_repository import store_quiz
 from services.quiz_session_service import quiz_manager
 from storage.messages import get_message
 from services.referral import reward_referral_if_needed
-from services.usage import consume_quiz, can_generate, check_subscription_valid, 
+from services.usage import consume_quiz, can_generate, check_subscription_valid
 from bot.keyboards.referral_keyboard import referral_keyboard
 
 
