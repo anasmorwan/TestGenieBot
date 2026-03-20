@@ -139,63 +139,48 @@ Be specific and concise.
 """
 
 
-powerfull_prompt2 = f"""
-You are an expert assessment designer specialized in creating high-quality educational quizzes.
-
-Your task:
-Generate a set of multiple-choice questions based ONLY on the provided content.
-
-CONTENT:
-"""
-{input_text}
-"""
-
-INSTRUCTIONS:
-
-1. Generate exactly {num_questions} questions.
-
-2. Each question must:
-- Test understanding, not memorization
-- Be clear, specific, and unambiguous
-- Avoid trivial or overly obvious questions
-
-3. Options:
-- Provide exactly 4 options
-- Only ONE correct answer
-- The other 3 must be plausible distractors (not random or silly)
-- Avoid "All of the above" or "None of the above"
-
-4. Cognitive variety:
-Ensure a mix of:
-- comprehension questions
-- application questions
-- inference/analysis questions
-
-5. Difficulty:
-- Medium to challenging
-- Avoid very easy questions
-
-6. Language:
-- Match the language of the content
-- Keep wording natural and professional
-
-7. Output format (STRICT JSON ONLY):
-Return ONLY valid JSON. No explanations outside JSON.
-
-FORMAT:
-[
-  {
-    "question": "...",
-    "options": ["...", "...", "...", "..."],
-    "correct_index": 0,
-    "explanation": "Short explanation of why this is correct"
-  }
-]
-
-IMPORTANT:
-- Ensure JSON is valid
-- Do not include any text before or after JSON
-"""
+powerfull_prompt2 = (
+    "You are an expert assessment designer specialized in creating high-quality educational quizzes.\n\n"
+    "Your task:\n"
+    "Generate a set of multiple-choice questions based ONLY on the provided content.\n\n"
+    "CONTENT:\n\n"
+    "INSTRUCTIONS:\n\n"
+    f"1. Generate exactly {num_questions} questions.\n\n"
+    "2. Each question must:\n"
+    "- Test understanding, not memorization\n"
+    "- Be clear, specific, and unambiguous\n"
+    "- Avoid trivial or overly obvious questions\n\n"
+    "3. Options:\n"
+    "- Provide exactly 4 options\n"
+    "- Only ONE correct answer\n"
+    "- The other 3 must be plausible distractors (not random or silly)\n"
+    '- Avoid "All of the above" or "None of the above"\n\n'
+    "4. Cognitive variety:\n"
+    "Ensure a mix of:\n"
+    "- comprehension questions\n"
+    "- application questions\n"
+    "- inference/analysis questions\n\n"
+    "5. Difficulty:\n"
+    "- Medium to challenging\n"
+    "- Avoid very easy questions\n\n"
+    "6. Language:\n"
+    "- Match the language of the content\n"
+    "- Keep wording natural and professional\n\n"
+    "7. Output format (STRICT JSON ONLY):\n"
+    "Return ONLY valid JSON. No explanations outside JSON.\n\n"
+    "FORMAT:\n\n"
+    "[\n"
+    "  {\n"
+    '    "question": "...",\n'
+    '    "options": ["...", "...", "...", "..."],\n'
+    '    "correct_index": 0,\n'
+    '    "explanation": "Short explanation of why this is correct"\n'
+    "  }\n"
+    "]\n\n"
+    "IMPORTANT:\n"
+    "- Ensure JSON is valid\n"
+    "- Do not include any text before or after JSON\n"
+)
 
 
 
