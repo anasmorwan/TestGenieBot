@@ -235,3 +235,33 @@ def build_status_message(data):
 ━━━━━━━━━━━━━━━
 🔥 استمر! أنت تستخدم البوت بكفاءة
 """
+
+
+
+def get_subscription_full(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("""
+    SELECT plan, expires_at, daily_quiz_limit, daily_ocr_limit
+    FROM subscriptions
+    WHERE user_id=?
+    """, (user_id,))
+    
+    row = c.fetchone()
+    conn.close()
+
+    if not row:
+        return {
+            "plan": "free",
+            "expires_at": None,
+            "daily_quiz_limit": 3,
+            "daily_ocr_limit": 1
+        }
+
+    return {
+        "plan": row[0],
+        "expires_at": row[1],
+        "daily_quiz_limit": row[2],
+        "daily_ocr_limit": row[3]
+    }
