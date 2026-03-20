@@ -234,11 +234,11 @@ def backup_manual(bot):
 # =========================
 # 🔹 Auto Backup Thread
 # =========================
-def start_auto_backup(bot, interval=300):
+def start_auto_backup(interval=300):
     def loop():
         while True:
             print("🔄 Running auto backup...")
-            backup_all(bot)
+            backup_all()
             time.sleep(interval)
 
     t = threading.Thread(target=loop, daemon=True)
