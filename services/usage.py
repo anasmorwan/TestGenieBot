@@ -75,6 +75,10 @@ def can_generate(user_id):
     conn = get_connection()
     c = conn.cursor()
 
+
+    # 👇 بعد التأكد من وجود المستخدم
+    reset_daily_if_needed(user_id)
+
     c.execute("""
     SELECT used_today FROM users WHERE user_id=?
     """, (user_id,))
@@ -85,12 +89,12 @@ def can_generate(user_id):
     if not row:
         used_today = add_new_user(user_id)
     else:
+        
         used_today = row[0]
 
     conn.close()
 
-    # 👇 بعد التأكد من وجود المستخدم
-    reset_daily_if_needed(user_id)
+    
 
     # 👇 تحديد الحد
     limit = get_daily_limit(user_id)
