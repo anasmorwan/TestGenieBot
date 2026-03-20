@@ -73,3 +73,20 @@ def reward_referral_if_needed(user_id):
 
     conn.commit()
     conn.close()
+
+
+
+
+def get_referral_count(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("""
+    SELECT COUNT(*) FROM referrals 
+    WHERE referrer_id=? AND rewarded=1
+    """, (user_id,))
+    
+    count = c.fetchone()[0]
+    conn.close()
+
+    return count
