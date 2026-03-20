@@ -4,8 +4,8 @@ def paid_plans_keyboard():
 
     upgrade_options_keyboard = InlineKeyboardMarkup(row_width=1)
     upgrade_options_keyboard.add(
-        InlineKeyboardButton("🟢 خطة Pro", callback_data="buy_subscription"),
-        InlineKeyboardButton("🔵 خطة Pro+", callback_data="buy_subscription"),
+        InlineKeyboardButton("🟢 خطة Pro", callback_data="buy_subscription1"),
+        InlineKeyboardButton("🔵 خطة Pro+", callback_data="buy_subscription2"),
         InlineKeyboardButton("📩 تواصل معي", url="https://t.me/anasM2002"),
         InlineKeyboardButton("🏠 العودة للقائمة الرئيسية", callback_data="main_menu")
     )
