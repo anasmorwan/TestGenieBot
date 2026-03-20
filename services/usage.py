@@ -173,7 +173,19 @@ def add_new_user(user_id):
 
     return used_today
 
+def get_daily_limit(user_id):
+    sub = get_subscription(user_id)
 
+    plan = sub.get("plan", "free")
+
+    if plan == "pro":
+        return 25
+    elif plan == "pro_plus":
+        return 50
+    else:
+        return 3
+
+"""
 def get_daily_limit(user_id):
     sub = get_subscription(user_id)
 
@@ -186,7 +198,7 @@ def get_daily_limit(user_id):
     else:
         return 3
 
-
+"""
 
 
 
