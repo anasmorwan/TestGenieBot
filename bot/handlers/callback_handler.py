@@ -199,7 +199,7 @@ def register(bot):
                     chat_id=chat_id,
                     title=titles.get(plan, "Upgrade to Premium"),
                     description=descriptions.get(plan, "Subscribe to our premium plans"),
-                    payload=payload,
+                    invoice_payload=payload,
                     provider_token="",
                     currency="XTR",
                     prices=prices,
