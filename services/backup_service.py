@@ -2,7 +2,8 @@ import os
 import time
 import threading
 from datetime import datetime
-
+import json
+import base64
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from google.oauth2 import service_account
@@ -10,11 +11,28 @@ from google.oauth2 import service_account
 DB_PATH = "quiz_users.db"
 
 # ⚙️ CONFIG
-SERVICE_ACCOUNT_FILE = "credentials.json"
+SERVICE_ACCOUNT_FILE = get_gdrive_service()
 FOLDER_ID = "1iNbwM1kx9sBZKw4ve3PEiZ2W2VZ1JChq"
 ADMIN_CHAT_ID = int(os.getenv("ADMIN_ID"))
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
+
+
+
+def get_gdrive_service():
+    # 1. جلب النص المشفر من متغيرات بيئة ريندر
+    encoded_creds = os.environ.get('GDRIVE_CREDENTIALS_BASE64')
+    
+    if not encoded_creds:
+        raise ValueError("خطأ: لم يتم العثور على متغير البيئة GDRIVE_CREDENTIALS_BASE64")
+
+    # 2. فك تشفير Base64 وتحويله إلى نص JSON
+    decoded_creds = base64.b64decode(encoded_creds).decode('utf-8')
+    
+    # 3. تحويل نص الـ JSON إلى قاموس (Dictionary) بايثون
+    credentials_dict = json.loads(decoded_creds)
+
+    return credentials_dict
 
 
 # =========================
