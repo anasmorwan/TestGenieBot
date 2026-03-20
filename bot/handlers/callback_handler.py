@@ -52,7 +52,21 @@ def register(bot):
                 keyboard = upgrade_options_keyboard()
                 print("opening post_quiz menu", flush=True)
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"), reply_markup=keyboard, parse_mode="HTML")
-                
+
+            elif data == "buy_subscription1":
+                keyboard = upgrade_options_keyboard()
+                print("opening post_quiz menu", flush=True)
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"), reply_markup=keyboard, parse_mode="HTML")
+                user_states[user_id] = "pro_plan"
+
+            elif data == "buy_subscription2":
+                keyboard = upgrade_options_keyboard()
+                print("opening post_quiz menu", flush=True)
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"), reply_markup=keyboard, parse_mode="HTML")
+                user_states[user_id] = "pro_plus_plan"
+
+
+            
             elif data == "go_generate":
                 user_states[user_id] = "awating_test"
                 bot.answer_callback_query(call.id)
