@@ -5,6 +5,8 @@ from storage.messages import get_message
 from services.referral import reward_referral_if_needed
 from services.usage import consume_quiz, can_generate, check_subscription_valid
 from bot.keyboards.referral_keyboard import referral_keyboard
+from services.backup_service import safe_backup, backup_all
+from services.backup_service import smart_restore, is_db_valid
 
 
 
@@ -36,8 +38,10 @@ def register(bot):
 
             # 👇 فقط إذا مسموح
             consume_quiz(user_id)
+            safe_backup(bot)
             # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
             reward_referral_if_needed(user_id)
+            safe_backup(bot)
 
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
@@ -58,6 +62,7 @@ def register(bot):
 
         # تخزين الاختبار
         quiz_code = store_quiz(user_id, quizzes)
+        backup_all()
 
         # بدء الاختبار مباشرة
         quiz_manager.start_quiz(chat_id, quiz_code, bot)
