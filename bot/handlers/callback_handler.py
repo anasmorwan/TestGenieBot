@@ -173,20 +173,27 @@ def register(bot):
                 )
 
 
-            elif data == "pay_stars":
+            plan = user_states.get(user_id)
 
-                prices = [LabeledPrice(label="الاشتراك المميز", amount=250)]
+            if data == "pay_stars" and plan:
+    
+                if plan == "pro":
+                    prices = [LabeledPrice(label="Pro Plan", amount=500)]
+                    payload = "pro_plan"
 
-         
+                elif plan == "pro_plus":
+                    prices = [LabeledPrice(label="Pro+ Plan", amount=700)]
+                    payload = "pro_plus_plan"
+
                 bot.send_invoice(
                     chat_id=chat_id,
-                    title="تطوير الحساب (Premium)",
-                    description="احصل على ميزات غير محدودة في إنشاء الاختبارات",
-                    invoice_payload="user_premium_subscription",
+                    title="Upgrade to Premium",
+                    description=f"Subscribe to {plan}",
+                    payload=payload,
                     provider_token="",
                     currency="XTR",
                     prices=prices,
-                    start_parameter="premium-upgrade"
+                    start_parameter="upgrade"
                 )
                 
             elif data == "pay_local":
