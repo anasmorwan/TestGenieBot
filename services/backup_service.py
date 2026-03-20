@@ -10,16 +10,6 @@ from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from google.oauth2 import service_account
 from storage.sqlite_db import get_connection
 
-DB_PATH = "quiz_users.db"
-
-# ⚙️ CONFIG
-SERVICE_ACCOUNT_FILE = get_gdrive_service()
-FOLDER_ID = "1iNbwM1kx9sBZKw4ve3PEiZ2W2VZ1JChq"
-ADMIN_CHAT_ID = int(os.getenv("ADMIN_ID"))
-
-SCOPES = ['https://www.googleapis.com/auth/drive']
-
-
 
 def get_gdrive_service():
     # 1. جلب النص المشفر من متغيرات بيئة ريندر
@@ -35,6 +25,16 @@ def get_gdrive_service():
     credentials_dict = json.loads(decoded_creds)
 
     return credentials_dict
+
+
+DB_PATH = "quiz_users.db"
+
+# ⚙️ CONFIG
+SERVICE_ACCOUNT_FILE = get_gdrive_service()
+FOLDER_ID = "1iNbwM1kx9sBZKw4ve3PEiZ2W2VZ1JChq"
+ADMIN_CHAT_ID = int(os.getenv("ADMIN_ID"))
+
+SCOPES = ['https://www.googleapis.com/auth/drive']
 
 
 # =========================
