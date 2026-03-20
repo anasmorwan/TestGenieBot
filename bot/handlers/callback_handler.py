@@ -66,6 +66,14 @@ def register(bot):
                 bot.answer_callback_query(call.id)
                 bot.send_message(chat_id, "📄 أرسل نص الآن لإنشاء الاختبار")
 
+            elif data == "copylink":
+                bot_username = "testprog123bot"
+                bot.edit_message_text(
+                chat_id=chat_id, 
+                message_id=message_id, 
+                text=get_message("REFERRAL_LINK", uid=user_id, username=bot_username), 
+                parse_mode="HTML")
+
 
             elif data == "go_account_settings":
                 status = "free"
