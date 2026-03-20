@@ -1,3 +1,108 @@
+prompt1 = """
+You are an expert educator.
+
+Analyze the following content and extract:
+
+1. Main topics
+2. Key concepts
+3. Important facts
+4. Difficulty level (easy, medium, hard)
+5. Type of content (theory, definitions, processes, case-based)
+
+Return JSON only:
+{
+  "topics": [],
+  "key_concepts": [],
+  "facts": [],
+  "difficulty": "",
+  "content_type": ""
+}
+"""
+
+
+prompt2 = """
+You are a professional exam creator.
+
+Based on the analysis below, generate high-quality MCQs.
+
+Rules:
+- Questions must test understanding, not memorization
+- Use realistic distractors (wrong answers)
+- Avoid obvious answers
+- Mix difficulty levels
+- Include at least:
+  - 30% conceptual questions
+  - 30% application questions
+  - 20% tricky questions
+  - 20% direct questions
+
+Each question must include:
+- question
+- 4 options
+- correct_index
+- explanation (very important)
+- difficulty
+- topic
+
+Return JSON array only.
+"""
+
+prompt3 = """
+You are a strict exam reviewer.
+
+Review the following MCQs:
+
+Check:
+- Is the correct answer واضح؟
+- Are distractors strong?
+- Is the question testing understanding?
+- Is there ambiguity?
+
+Fix and improve weak questions.
+
+Return improved version only.
+"""
+
+
+
+prompt4 = """
+You are a strict exam reviewer.
+
+Review the following MCQs:
+
+Check:
+- Is the correct answer واضح؟
+- Are distractors strong?
+- Is the question testing understanding?
+- Is there ambiguity?
+
+Fix and improve weak questions.
+
+Return improved version only.
+""" = """
+You are an intelligent tutor.
+
+Based on:
+- student answers
+- correct answers
+- topics
+
+Generate:
+
+1. Strengths
+2. Weaknesses
+3. Smart advice (1-2 lines)
+
+Be specific and concise.
+"""
+
+
+
+
+
+
+
+
 
 QUIZ_RULES = """
 Rules:
