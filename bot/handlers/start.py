@@ -59,6 +59,9 @@ def register(bot):
                 if referrer_id != uid:
                     save_referral(referrer_id, invited_by)
 
+                # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
+                send_main_menu(chat_id)
+
 
             # ✅ معالجة روابط المشاركة مثل: ?start=quiz_ab12cd
             quiz_code = param[5:] if param.startswith("quiz_") else param
