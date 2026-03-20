@@ -12,6 +12,11 @@ from bot.keyboards.premium_info_keyboard import premium_info_keyboard
 from bot.keyboards.plans_keyboard import paid_plans_keyboard
 from bot.keyboards.how_it_works_keyboard import how_it_works_keyboard
 from bot.keyboards.referral_keyboard import referral_keyboard
+from bot.keyboards.account_status_keyboard import account_status_keyboard
+
+from services.usage import get_subscription_full, get_usage
+from services.referral import get_referral_count
+
 
 
 def register(bot):
@@ -72,6 +77,31 @@ def register(bot):
                 bot.answer_callback_query(call.id)
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("ACCOUNT_STATUS", account_status=status), reply_markup=keyboard, parse_mode="HTML"
                 )
+
+            elif data == "check_account_status":
+                bot.answer_callback_query(call.id)
+
+                sub = get_subscription_full(user_id)
+                used = get_usage(user_id)
+                referrals = get_referral_count(user_id)
+
+                message = build_status_message({
+                    "plan": sub["plan"],
+                    "used": used,
+                    "limit": sub["daily_quiz_limit"],
+                    "expires_at": sub["expires_at"],
+                    "referrals": referrals
+                })
+
+                keyboard = account_status_keyboard()
+
+                bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    text=message,
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                        )
             
             elif data == "upgrade_account":
                 bot.answer_callback_query(call.id)
