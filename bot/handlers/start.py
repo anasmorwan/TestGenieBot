@@ -46,9 +46,10 @@ def register(bot):
 
                 return
 
-            try:
+            
 
-                if param.startswith("ref_"):
+            if param.startswith("ref_"):
+                try:
                     referrer_id = int(args[1].replace("ref_", ""))
                     c.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
                     exists = c.fetchone()
@@ -63,10 +64,10 @@ def register(bot):
                     # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
                     send_main_menu(chat_id)
                     
-            except Exception as e:
-                print("ERROR IN START HANDLER:", e, flush=True)
+                except Exception as e:
+                    print("ERROR IN START HANDLER:", e, flush=True)
     
-                return
+                    return
 
 
             # ✅ معالجة روابط المشاركة مثل: ?start=quiz_ab12cd
