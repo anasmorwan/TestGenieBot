@@ -1,5 +1,6 @@
 import os
 import time
+import sqlite3
 import threading
 from datetime import datetime
 import json
@@ -245,17 +246,28 @@ def start_auto_backup(bot, interval=300):
 
 
 # =========================
-# 🔹 Restore on Startup
+# 🔹 is_db_valid
 # =========================
 def is_db_valid():
+    conn = None
     try:
-        conn = get_connection
-        c = conn.cursor()
-        c.execute("SELECT name FROM sqlite_master LIMIT 1;")
-        conn.close()
+        # تأكد من استدعاء الدالة بـ () إذا كانت get_connection دالة
+        conn = get_connection() 
+        cursor = conn.cursor()
+        
+        # نختبر القراءة من جدول داخلي للتأكد أن الملف ليس تالفاً
+        cursor.execute("SELECT name FROM sqlite_master LIMIT 1;")
+        
+        # اختياري: يمكنك التأكد من وجود أحد جداولك الخاصة 
+        # cursor.execute("SELECT 1 FROM users LIMIT 1;")
+        
         return True
-    except:
+    except sqlite3.Error:
+        # فشل في الاتصال أو الملف تالف
         return False
+    finally:
+        if conn:
+            conn.close()
 
 
 # =========================
