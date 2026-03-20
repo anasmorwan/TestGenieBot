@@ -11,7 +11,7 @@ DB_PATH = "quiz_users.db"
 
 # ⚙️ CONFIG
 SERVICE_ACCOUNT_FILE = "credentials.json"
-FOLDER_ID = "PUT_YOUR_FOLDER_ID_HERE"
+FOLDER_ID = "1iNbwM1kx9sBZKw4ve3PEiZ2W2VZ1JChq"
 ADMIN_CHAT_ID = 123456789  # ضع ID الخاص بك
 
 SCOPES = ['https://www.googleapis.com/auth/drive']
