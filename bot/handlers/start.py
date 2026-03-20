@@ -61,6 +61,7 @@ def register(bot):
 
                 # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
                 send_main_menu(chat_id)
+                return
 
 
             # ✅ معالجة روابط المشاركة مثل: ?start=quiz_ab12cd
