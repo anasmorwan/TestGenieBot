@@ -2,58 +2,63 @@ from telebot import types
 from services.usage import is_paid_user_active
 from storage.quiz_repository import get_user_current_quiz
 
+
+
+
+
+
+# دالة صياغة الرسالة الإعلانية التي ستنشر في القناة
+def publish_interactive_link(bot, target_chat_id, quiz_code, shared_by_name, watermark=True):
+    """
+    تنشر رسالة إعلانية جذابة في القناة/المجموعة تحتوي على زر لبدء الاختبار.
+    """
+    # 1. تجهيز النص التنسيقي (Markdown)
+    # استخدمنا الرموز التعبيرية (Emojis) لجعل الرسالة "حية"
+    announcement_text = (
+        f"🧠 **اختبار جديد متاح الآن!**\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"👤 **بواسطة:** {shared_by_name}\n"
+        f"📝 **النوع:** اختبار ذكاء اصطناعي تفاعلي\n"
+        f"🔢 **الكود:** `{quiz_code}`\n"
+        f"━━━━━━━━━━━━━━━━━━\n"
+        f"🚀 اضغط على الزر أدناه لبدء التحدي وقياس مستواك فوراً!"
+    )
+    
+    # إضافة العلامة المائية في نهاية النص إذا كان المستخدم مجانياً
+    if watermark:
+        announcement_text += f"\n\n✨ تم الإنشاء بواسطة: @TestGenieBot"
+
+    # 2. إنشاء زر الـ Deep Link
+    # ملاحظة: استبدل 'YourBotUsername' بيوزر بوتك الحقيقي بدون @
+    bot_username = bot.get_me().username
+    start_url = f"https://t.me/{bot_username}?start={quiz_code}"
+    
+    keyboard = types.InlineKeyboardMarkup()
+    keyboard.add(types.InlineKeyboardButton("🎯 ابدأ الاختبار الآن", url=start_url))
+
+    # 3. إرسال الرسالة إلى القناة أو المجموعة
+    try:
+        bot.send_message(
+            chat_id=target_chat_id,
+            text=announcement_text,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+        # 4. رسالة تأكيد للمستخدم
+        bot.send_message(
+            message.chat.id, 
+            f"✅ تم النشر بنجاح!\n\n"
+            f"💡 **نصيحة:** الطلاب الذين يضغطون على الزر سيتم توجيههم للبوت، وهذا يزيد من نقاطك في برنامج الإحالة!"
+        )
+        return True
+    except Exception as e:
+        print(f"❌ خطأ أثناء النشر في القناة {target_chat_id}: {e}")
+        return False
+
+
 def register(bot):
 
-    # دالة صياغة الرسالة الإعلانية التي ستنشر في القناة
-    def publish_interactive_link(bot, target_chat_id, quiz_code, shared_by_name, watermark=True):
-        """
-        تنشر رسالة إعلانية جذابة في القناة/المجموعة تحتوي على زر لبدء الاختبار.
-        """
-        # 1. تجهيز النص التنسيقي (Markdown)
-        # استخدمنا الرموز التعبيرية (Emojis) لجعل الرسالة "حية"
-        announcement_text = (
-            f"🧠 **اختبار جديد متاح الآن!**\n"
-            f"━━━━━━━━━━━━━━━━━━\n"
-            f"👤 **بواسطة:** {shared_by_name}\n"
-            f"📝 **النوع:** اختبار ذكاء اصطناعي تفاعلي\n"
-            f"🔢 **الكود:** `{quiz_code}`\n"
-            f"━━━━━━━━━━━━━━━━━━\n"
-            f"🚀 اضغط على الزر أدناه لبدء التحدي وقياس مستواك فوراً!"
-        )
-    
-        # إضافة العلامة المائية في نهاية النص إذا كان المستخدم مجانياً
-        if watermark:
-            announcement_text += f"\n\n✨ تم الإنشاء بواسطة: @TestGenieBot"
 
-        # 2. إنشاء زر الـ Deep Link
-        # ملاحظة: استبدل 'YourBotUsername' بيوزر بوتك الحقيقي بدون @
-        bot_username = bot.get_me().username
-        start_url = f"https://t.me/{bot_username}?start={quiz_code}"
-    
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(types.InlineKeyboardButton("🎯 ابدأ الاختبار الآن", url=start_url))
-
-        # 3. إرسال الرسالة إلى القناة أو المجموعة
-        try:
-            bot.send_message(
-                chat_id=target_chat_id,
-                text=announcement_text,
-                reply_markup=keyboard,
-                parse_mode="Markdown"
-            )
-            # 4. رسالة تأكيد للمستخدم
-            bot.send_message(
-                message.chat.id, 
-                f"✅ تم النشر بنجاح!\n\n"
-                f"💡 **نصيحة:** الطلاب الذين يضغطون على الزر سيتم توجيههم للبوت، وهذا يزيد من نقاطك في برنامج الإحالة!"
-            )
-            return True
-        except Exception as e:
-            print(f"❌ خطأ أثناء النشر في القناة {target_chat_id}: {e}")
-            return False
-
-
-    
     # عند استقبال القناة المختارة
     @bot.message_handler(content_types=['chat_shared'])
     def handle_chat_shared(message):
