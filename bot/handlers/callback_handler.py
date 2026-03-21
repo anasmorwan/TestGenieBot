@@ -177,13 +177,14 @@ def register(bot):
                 )
             elif data == "post_quiz":
                 bot.answer_callback_query(call.id)
-                get_chat_request_keyboard()
-                if is_paid_user_active(user_id):
-                    keyboard = upgrade_keyboard()
-                    # إرسال الرسالة
-                    bot.send_message(chat_id=chat_id, text=get_message("UPGRADE_1"), reply_markup=keyboard, parse_mode="HTML")
+                
+                
+                keyboard = get_chat_request_keyboard()
 
-                bot.send
+                bot.send_message(chat_id=chat_id, 
+                text="​📍 إختر القناة او المجموعة التي تريد مشاركة الإختبار إليها",
+                reply_markup=keyboard)
+                
                 
                     
                     
