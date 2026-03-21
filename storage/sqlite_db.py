@@ -91,8 +91,19 @@ def init_db():
         cursor.execute("ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
         cursor.execute("ALTER TABLE users ADD COLUMN used_today DEFAULT 0;")
         cursor.execute("ALTER TABLE users ADD COLUMN daily_limit DEFAULT 3;")
-        cursor.execute("ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz';")
+        # فحص وجود العمود في جدول users
+        cursor.execute("PRAGMA table_info(users)")
+        columns = [column[1] for column in cursor.fetchall()]
     
+        if "current_quiz_selection" not in columns:
+            print("⚠️ عمود current_quiz_selection مفقود، جاري الإضافة...")
+            try:
+                cursor.execute("ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz';")
+                conn.commit()
+                print("✅ تم إضافة العمود بنجاح.")
+            except Exception as e:
+                print(f"❌ خطأ أثناء إضافة العمود: {e}")
+            
 
         cursor.execute("ALTER TABLE subscriptions ADD COLUMN daily_quiz_limit INTEGER DEFAULT 3;")
         cursor.execute("ALTER TABLE subscriptions ADD COLUMN daily_ocr_limit INTEGER DEFAULT 1;")
@@ -126,3 +137,4 @@ timestamp TEXT
 )
 )
 """
+
