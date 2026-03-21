@@ -13,6 +13,24 @@ def get_chat_request_keyboard():
             bot_administrator_rights=types.ChatAdministratorRights(can_post_messages=True) # صلاحية النشر
         )
     )
+
+    from telebot import types
+
+    request_group_btn = types.KeyboardButton(
+        text="👥 اختر المجموعة التي تديرها",
+        request_chat=types.KeyboardButtonRequestChat(
+            request_id=2,
+            chat_is_channel=False,  # ❗ هذا الفرق الأساسي (False = مجموعة)
+            user_is_creator=False,
+            bot_is_member=True,
+            user_administrator_rights=types.ChatAdministratorRights(
+            can_manage_chat=True
+            ),
+            bot_administrator_rights=types.ChatAdministratorRights(
+            can_delete_messages=True
+            )
+        )
+    )
     
-    markup.add(request_channel_btn)
+    markup.add(request_channel_btn, request_group_btn)
     return markup
