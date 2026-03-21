@@ -16,7 +16,7 @@ from bot.keyboards.account_status_keyboard import account_status_keyboard
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 
 
-from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription
+from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
 import random
@@ -53,6 +53,7 @@ def register(bot):
                 print("START QUIZ RESULT:", result)
 
             elif data == "more_options":
+                
                 bot_username = "testprog123bot"
                 bot.answer_callback_query(call.id)
                 keyboard = more_options_keyboard(bot_username)
@@ -68,6 +69,7 @@ def register(bot):
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"), reply_markup=keyboard, parse_mode="HTML")
 
             elif data == "buy_subscription1":
+                downgrade_to_free()
                 keyboard = upgrade_options_keyboard()
                 print("opening post_quiz menu", flush=True)
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"), reply_markup=keyboard, parse_mode="HTML")
@@ -175,6 +177,8 @@ def register(bot):
                 )
             elif data == "post_quiz":
                 bot.answer_callback_query(call.id)
+                if is_paid_user_active(user_id):
+                    
                 keyboard = upgrade_keyboard()
                  
                 # إرسال الرسالة
