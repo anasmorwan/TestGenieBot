@@ -51,7 +51,11 @@ def register(bot):
             elif data == "more_options":
                 bot.answer_callback_query(call.id)
                 keyboard = more_options_keyboard()
-                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message(
+                bot.edit_message_text(chat_id=chat_id, 
+                message_id=message_id, 
+                text=get_message("MORE"), 
+                relpy_markup=keyboard, 
+                parse_mode="HTML")
     
             elif data == "buy_subscription":
                 keyboard = upgrade_options_keyboard()
