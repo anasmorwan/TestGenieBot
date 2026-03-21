@@ -13,6 +13,8 @@ from bot.keyboards.plans_keyboard import paid_plans_keyboard
 from bot.keyboards.how_it_works_keyboard import how_it_works_keyboard
 from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.account_status_keyboard import account_status_keyboard
+from bot.keyboards.more_options_keyboard import more_options_keyboard
+
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription
 from services.referral import get_referral_count
