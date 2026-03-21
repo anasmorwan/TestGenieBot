@@ -15,6 +15,8 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.account_status_keyboard import account_status_keyboard
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
+from storage.quiz_repository import update_user_current_quiz
+
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
@@ -51,6 +53,23 @@ def register(bot):
                 quiz_code = parts[1] if len(parts) > 1 else None
                 result = quiz_manager.start_quiz(chat_id, quiz_code, bot)
                 print("START QUIZ RESULT:", result)
+
+            
+            elif data.startswith("post_quiz"):
+                parts = data.split(":")
+                quiz_code = parts[1] if len(parts) > 1 else None
+                update_user_current_quiz(user_id, quiz_code)
+                bot.answer_callback_query(call.id)
+                
+                
+                keyboard = get_chat_request_keyboard()
+
+                bot.send_message(chat_id=chat_id, 
+                text="​📍 إختر القناة او المجموعة التي تريد مشاركة الإختبار إليها",
+                reply_markup=keyboard)
+                
+                
+                    
 
             elif data == "more_options":
                 
@@ -175,18 +194,8 @@ def register(bot):
                 reply_markup=keyboard,
                 parse_mode="HTML"
                 )
-            elif data == "post_quiz":
-                bot.answer_callback_query(call.id)
                 
-                
-                keyboard = get_chat_request_keyboard()
-
-                bot.send_message(chat_id=chat_id, 
-                text="​📍 إختر القناة او المجموعة التي تريد مشاركة الإختبار إليها",
-                reply_markup=keyboard)
-                
-                
-                    
+            
                     
                 
             elif data == "main_menu":
