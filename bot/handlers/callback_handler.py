@@ -18,6 +18,7 @@ from bot.keyboards.more_options_keyboard import more_options_keyboard
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription
 from services.referral import get_referral_count
+from services.backup_service import safe_backup, backup_all
 import random
 
 
@@ -90,6 +91,7 @@ def register(bot):
                 
             elif data == "input_text":
                 activate_subscription(user_id, "pro_plus")
+                backup_all()
                 bot.answer_callback_query(call.id)
                 bot.send_message(chat_id, "📄 أرسل نص الآن لإنشاء الاختبار")
 
