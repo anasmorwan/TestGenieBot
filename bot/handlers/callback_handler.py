@@ -47,6 +47,11 @@ def register(bot):
                 quiz_code = parts[1] if len(parts) > 1 else None
                 result = quiz_manager.start_quiz(chat_id, quiz_code, bot)
                 print("START QUIZ RESULT:", result)
+
+            elif data == "more_options":
+                bot.answer_callback_query(call.id)
+                keyboard = more_options_keyboard()
+                bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message(
     
             elif data == "buy_subscription":
                 keyboard = upgrade_options_keyboard()
