@@ -33,7 +33,7 @@ DB_PATH = "quiz_users.db"
 
 # ⚙️ CONFIG
 # 2. إعداد المتغيرات الأساسية
-CREDENTIALS_DICT = load_credentials()
+# CREDENTIALS_DICT = load_credentials()
 
 
 FOLDER_ID = "1iNbwM1kx9sBZKw4ve3PEiZ2W2VZ1JChq"
