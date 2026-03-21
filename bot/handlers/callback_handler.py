@@ -14,7 +14,7 @@ from bot.keyboards.how_it_works_keyboard import how_it_works_keyboard
 from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.account_status_keyboard import account_status_keyboard
 from bot.keyboards.more_options_keyboard import more_options_keyboard
-
+from bot.keyboards.chat import get_chat_request_keyboard
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
@@ -177,12 +177,16 @@ def register(bot):
                 )
             elif data == "post_quiz":
                 bot.answer_callback_query(call.id)
+                get_chat_request_keyboard()
                 if is_paid_user_active(user_id):
+                    keyboard = upgrade_keyboard()
+                    # إرسال الرسالة
+                    bot.send_message(chat_id=chat_id, text=get_message("UPGRADE_1"), reply_markup=keyboard, parse_mode="HTML")
+
+                bot.
+                
                     
-                keyboard = upgrade_keyboard()
-                 
-                # إرسال الرسالة
-                bot.send_message(chat_id=chat_id, text=get_message("UPGRADE_1"), reply_markup=keyboard, parse_mode="HTML")
+                    
                 
             elif data == "main_menu":
                 send_main_menu(chat_id, message_id)
