@@ -80,3 +80,33 @@ def store_quiz(user_id, quizzes):
 
     return quiz_code
 """
+
+def update_user_current_quiz(user_id, quiz_code):
+    """
+    تحديث الكويز الذي يتفاعل معه المستخدم حالياً (الذاكرة المؤقتة).
+    """
+    try:
+        conn = get_connection()
+        c = conn.cursor()
+        c.execute(
+            "UPDATE users SET current_quiz_selection = ? WHERE user_id = ?",
+            (quiz_code, user_id)
+        )
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        print(f"❌ Error updating current quiz: {e}")
+        return False
+
+def get_user_current_quiz(user_id):
+    """
+    استرجاع الكود الذي اختاره المستخدم آخر مرة.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT current_quiz_selection FROM users WHERE user_id = ?", (user_id,))
+    row = c.fetchone()
+    conn.close()
+    return row[0] if row else "sample_quiz"
+
