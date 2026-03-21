@@ -1,11 +1,15 @@
 # storage/quiz_repository.py
 
 import json
+import time
 import uuid
 from datetime import datetime
 from storage.sqlite_db import get_connection
 
 
+#----------------------------
+#  🔹 توليد و حفظ ال QC
+#----------------------------
 def generate_quiz_code():
 
     return "QC_" + uuid.uuid4().hex[:6]
@@ -34,18 +38,10 @@ def store_quiz(user_id, quizzes):
 
     return code
 
-"""
-def generate_unique_quiz_code():
-    while True:
-        code = f"QC_{uuid.uuid4().hex[:6]}"
-        conn = sqlite3.connect("quiz_users.db")
-        c = conn.cursor()
-        c.execute("SELECT 1 FROM user_quizzes WHERE quiz_code = ?", (code,))
-        if not c.fetchone():
-            conn.close()
-            return code
-        conn.close()
-"""
+
+#----------------------------
+#  🔹 Quiz share log
+#----------------------------
 def log_quiz_share(quiz_code, shared_by_user_id, shared_by_name):
     conn = get_connection()
     c = conn.cursor()
@@ -62,25 +58,11 @@ def log_quiz_share(quiz_code, shared_by_user_id, shared_by_name):
 
 
 
-"""
-def store_quiz(user_id, quizzes):
 
-    conn = sqlite3.connect("quiz_users.db")
-    c = conn.cursor()
 
-    quiz_code = generate_unique_quiz_code()
-
-    c.execute(
-        "INSERT INTO user_quizzes (user_id, quiz_data, quiz_code) VALUES (?, ?, ?)",
-        (user_id, json.dumps(quizzes), quiz_code)
-    )
-
-    conn.commit()
-    conn.close()
-
-    return quiz_code
-"""
-
+#----------------------------
+#  🔹 تحديث و إسترجاع ال QC
+#----------------------------
 def update_user_current_quiz(user_id, quiz_code):
     """
     تحديث الكويز الذي يتفاعل معه المستخدم حالياً (الذاكرة المؤقتة).
@@ -110,3 +92,54 @@ def get_user_current_quiz(user_id):
     conn.close()
     return row[0] if row else "sample_quiz"
 
+
+
+#----------------------------
+#  🔹 إرسال الاختبارات إلى الشات
+#----------------------------
+def send_quiz_to_chat(bot, chat_id, quiz_code, is_pro=False):
+    """
+    تسترجع الاختبار من القاعدة وترسله كـ Polls متتالية إلى الدردشة المستهدفة.
+    """
+    conn = get_connection()
+    c = conn.cursor()
+    
+    # 1. جلب بيانات الاختبار باستخدام الكود الفريد
+    c.execute("SELECT quiz_data FROM user_quizzes WHERE quiz_code = ?", (quiz_code,))
+    row = c.fetchone()
+    conn.close()
+
+    if not row:
+        print(f"❌ الاختبار {quiz_code} غير موجود في القاعدة.")
+        return False
+
+    try:
+        # 2. تحويل النص المخزن (JSON) إلى قائمة بايثون
+        quizzes = json.loads(row[0]) 
+
+        for item in quizzes:
+            question = item.get('question', 'سؤال بدون عنوان')
+            options = item.get('options', [])
+            correct_id = item.get('correct_option_index', 0)
+            explanation = item.get('explanation', '')
+
+            # 3. إرسال السؤال بنمط الاختبار (Quiz Mode)
+            bot.send_poll(
+                chat_id=chat_id,
+                question=question,
+                options=options,
+                type='quiz',
+                correct_option_id=correct_id,
+                is_anonymous=False, # يسمح لصاحب القناة برؤية من أجاب (اختياري)
+                explanation=explanation if is_pro else "تم التوليد بواسطة @TestGenieBot",
+                explanation_parse_mode="Markdown"
+            )
+            
+            # 4. تأخير بسيط لتجنب الـ Flood (حظر تيليجرام للإرسال السريع)
+            time.sleep(0.5) 
+
+        return True
+
+    except Exception as e:
+        print(f"❌ خطأ أثناء إرسال الكويز {quiz_code}: {e}")
+        return False
