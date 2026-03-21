@@ -1,4 +1,6 @@
 from telebot import types
+
+
 def get_chat_request_keyboard():
     markup = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     
@@ -14,8 +16,7 @@ def get_chat_request_keyboard():
         )
     )
 
-    from telebot import types
-
+    
     request_group_btn = types.KeyboardButton(
         text="👥 اختر المجموعة التي تديرها",
         request_chat=types.KeyboardButtonRequestChat(
