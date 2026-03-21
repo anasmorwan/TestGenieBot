@@ -1,4 +1,4 @@
-
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def more_options_keyboard()
     keyboard = keyboard = InlineKeyboardMarkup(row_width=1)
