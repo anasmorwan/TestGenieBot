@@ -57,7 +57,7 @@ def register(bot):
                 bot.edit_message_text(chat_id=chat_id, 
                 message_id=message_id, 
                 text=get_message("MORE"), 
-                relpy_markup=keyboard, 
+                reply_markup=keyboard, 
                 parse_mode="HTML")
     
             elif data == "buy_subscription":
