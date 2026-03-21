@@ -123,6 +123,21 @@ def init_db():
     conn.close()
 
 
+def force_add_column():
+    conn = sqlite3.connect("quiz_users.db")
+    cursor = conn.cursor()
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz';")
+        conn.commit()
+        print("✅ تم إضافة العمود بالقوة!")
+    except Exception as e:
+        print(f"ℹ️ العمود قد يكون موجوداً بالفعل: {e}")
+    finally:
+        conn.close()
+
+force_add_column() # استدعها هنا مرة واحدة فقط
+
+
 
 
 """
