@@ -51,8 +51,9 @@ def register(bot):
                 print("START QUIZ RESULT:", result)
 
             elif data == "more_options":
+                bot_username = "testprog123bot"
                 bot.answer_callback_query(call.id)
-                keyboard = more_options_keyboard()
+                keyboard = more_options_keyboard(bot_username)
                 bot.edit_message_text(chat_id=chat_id, 
                 message_id=message_id, 
                 text=get_message("MORE"), 
