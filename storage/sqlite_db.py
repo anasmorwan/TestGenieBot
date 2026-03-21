@@ -64,6 +64,19 @@ def init_db():
     """)
 
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS saved_channels (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,      -- صاحب الحساب
+        channel_id INTEGER NOT NULL,   -- Chat ID الخاص بالقناة
+        channel_name TEXT,             -- اسم القناة للعرض على الزر
+        channel_type TEXT,             -- 'channel' أو 'group'
+        last_used TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, channel_id)    -- لمنع التكرار لنفس المستخدم
+    )
+    """)
+
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS sample_quizzes (
         quiz_code TEXT PRIMARY KEY,
         quiz_data TEXT NOT NULL,
