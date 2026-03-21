@@ -88,7 +88,7 @@ def register(bot):
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"), reply_markup=keyboard, parse_mode="HTML")
 
             elif data == "buy_subscription1":
-                downgrade_to_free()
+                downgrade_to_free(user_id)
                 keyboard = upgrade_options_keyboard()
                 print("opening post_quiz menu", flush=True)
                 bot.edit_message_text(chat_id=chat_id, message_id=message_id, text=get_message("UPGRADE_2"), reply_markup=keyboard, parse_mode="HTML")
