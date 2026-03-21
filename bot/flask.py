@@ -2,7 +2,7 @@
 import json
 import telebot
 from flask import Flask, request
-from bot.bot_instance import BOT_TOKEN, bot
+from bot.bot_instance import BOT_TOKEN, mybot
 
 app = Flask(__name__)
 
@@ -25,7 +25,7 @@ def register():
 
             # حوّل القاموس إلى كائن Update ثم أرسله لمكتبة telebot
             update = telebot.types.Update.de_json(update_dict)
-            bot.process_new_updates([update])
+            mybot.process_new_updates([update])
 
             return "OK", 200
 
