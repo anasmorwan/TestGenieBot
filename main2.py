@@ -8,7 +8,7 @@ from bot import flask
 from services.backup_service import restore_if_needed, start_auto_backup
 from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import force_add_column
-
+import bot.handlers.chat_shared_handler 
 
 
 
@@ -23,7 +23,7 @@ callback_handler.register(bot); print("callback_handler.register done", flush=Tr
 pre_checkout_query_handler.register_payment(bot); print("pre_checkout_query_handler.register done", flush=True)
 payment_handler.register(bot); print("payment_handler.register done", flush=True)
 poll_answer_handler.register(bot)
-
+chat_shared_handler.register(bot)
 
 
 # سجل الويب هوك داخلياً
