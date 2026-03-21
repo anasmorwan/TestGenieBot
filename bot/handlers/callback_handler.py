@@ -16,7 +16,7 @@ from bot.keyboards.account_status_keyboard import account_status_keyboard
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat
-from bot.bot.handlers.chat_shared_handler import publish_interactive_link
+from bot.handlers.chat_shared_handler import publish_interactive_link
 
 
 
