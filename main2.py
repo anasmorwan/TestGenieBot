@@ -1,6 +1,6 @@
 # main.py (مهم: وضع طباعات للتتبع)
 import os
-from bot.bot_instance import bot, set_webhook
+from bot.bot_instance import mybot, set_webhook
 from bot.handlers import start, text_handler, file_handler, callback_handler, pre_checkout_query_handler, payment_handler
 from storage.sqlite_db import init_db
 from bot.handlers import poll_answer_handler
@@ -16,14 +16,14 @@ import bot.handlers.chat_shared_handler
 print("main starting...", flush=True)
 
 # تسجيل الهاندلرز
-start.register(bot); print("start.register done", flush=True)
-text_handler.register(bot); print("text_handler.register done", flush=True)
-file_handler.register(bot); print("file_handler.register done", flush=True)
-callback_handler.register(bot); print("callback_handler.register done", flush=True)
-pre_checkout_query_handler.register_payment(bot); print("pre_checkout_query_handler.register done", flush=True)
-payment_handler.register(bot); print("payment_handler.register done", flush=True)
-poll_answer_handler.register(bot)
-chat_shared_handler.register(bot)
+start.register(mybot); print("start.register done", flush=True)
+text_handler.register(mybot); print("text_handler.register done", flush=True)
+file_handler.register(mybot); print("file_handler.register done", flush=True)
+callback_handler.register(mybot); print("callback_handler.register done", flush=True)
+pre_checkout_query_handler.register_payment(mybot); print("pre_checkout_query_handler.register done", flush=True)
+payment_handler.register(mybot); print("payment_handler.register done", flush=True)
+poll_answer_handler.register(mybot)
+chat_shared_handler.register(mybot)
 
 
 # سجل الويب هوك داخلياً
