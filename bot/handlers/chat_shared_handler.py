@@ -1,6 +1,6 @@
 from telebot import types
 from services.usage import is_paid_user_active
-from storage.quiz_repository import get_user_current_selection
+from storage.quiz_repository import get_user_current_quiz
 
 def register(bot):
 
@@ -61,7 +61,7 @@ def register(bot):
         chat_id_to_publish = message.chat_shared.chat_id # القناة المختارة
     
         # 1. استرجاع الكويز الذي كان المستخدم يعمل عليه
-        quiz_code = get_user_current_selection(user_id) 
+        quiz_code = get_user_current_quiz(user_id) 
     
         if not quiz_code:
             bot.send_message(message.chat.id, "❌ حدث خطأ، لم نجد الاختبار المطلوب. حاول مرة أخرى.")
