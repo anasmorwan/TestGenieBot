@@ -41,6 +41,12 @@ def register(bot):
                 reply_markup=keyboard,
                 parse_mode="Markdown"
             )
+            # 4. رسالة تأكيد للمستخدم
+            bot.send_message(
+                message.chat.id, 
+                f"✅ تم النشر بنجاح!\n\n"
+                f"💡 **نصيحة:** الطلاب الذين يضغطون على الزر سيتم توجيههم للبوت، وهذا يزيد من نقاطك في برنامج الإحالة!"
+            )
             return True
         except Exception as e:
             print(f"❌ خطأ أثناء النشر في القناة {target_chat_id}: {e}")
