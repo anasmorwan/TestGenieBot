@@ -8,7 +8,7 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
-bot = telebot.TeleBot(BOT_TOKEN)
+mybot = telebot.TeleBot(BOT_TOKEN)
 
 def set_webhook():
     bot.remove_webhook()
