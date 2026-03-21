@@ -9,10 +9,8 @@ def get_chat_request_keyboard():
         request_chat=types.KeyboardButtonRequestChat(
             request_id=1,
             chat_is_channel=True,
-            bot_is_member=True, # يجب أن يكون البوت مضافاً مسبقاً
-            # حذفنا bot_administrator_rights لتجنب تعقيد المتطلبات
-            # وسنكتفي بطلب أن يكون المستخدم هو المشرف
-            user_is_creator=False 
+            bot_is_member=True  # نضمن أن البوت موجود هناك
+            # أزلنا أي وسائط إضافية تسبب تعارضات مع إصدار المكتبة
         )
     )
 
@@ -22,8 +20,7 @@ def get_chat_request_keyboard():
         request_chat=types.KeyboardButtonRequestChat(
             request_id=2,
             chat_is_channel=False,
-            bot_is_member=True,
-            user_is_creator=False
+            bot_is_member=True
         )
     )
     
