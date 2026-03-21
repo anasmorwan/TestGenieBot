@@ -18,6 +18,7 @@ from bot.keyboards.more_options_keyboard import more_options_keyboard
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription
 from services.referral import get_referral_count
+import random
 
 
 def register(bot):
@@ -154,12 +155,15 @@ def register(bot):
                         )
             
             elif data == "upgrade_account":
+                
+                message_key = "UPGRADE_MAIN" if random.random() < 0.5 else "UPGRADE_BACKUP_1"
+                
                 bot.answer_callback_query(call.id)
                 keyboard = upgrade_keyboard()
                 bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
-                text=get_message("UPGRADE_MAIN"),
+                text=get_message(message_key),
                 reply_markup=keyboard,
                 parse_mode="HTML"
                 )
