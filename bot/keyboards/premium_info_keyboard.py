@@ -4,8 +4,8 @@ def premium_info_keyboard():
     # إعداد لوحة الأزرار
     keyboard = keyboard = InlineKeyboardMarkup(row_width=1)
     buttons = [
-        InlineKeyboardButton("💳 تفعيل TestGenie Pro", callback_data="plans"),
-        InlineKeyboardButton("🏠 العودة للقائمة الرئيسية", callback_data="main_menu")
+        InlineKeyboardButton("💳 اختيار الخطة", callback_data="plans"),
+        InlineKeyboardButton("⬅️ رجوع", callback_data="main_menu")
     ]
     keyboard.add(*buttons)
     return keyboard
