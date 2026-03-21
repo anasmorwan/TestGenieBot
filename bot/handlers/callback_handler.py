@@ -26,6 +26,7 @@ from services.backup_service import safe_backup, backup_all
 import random
 
 
+
 def register(bot):
 
     
@@ -35,7 +36,7 @@ def register(bot):
             # 1. تفكيك البيانات من الـ callback_data
             # التنسيق المتوقع: pub_type_quizcode_chatid
             parts = call.data.split(":")
-            if len(parts) < 3:
+            if len(parts) < 4:
                 bot.answer_callback_query(call.id, "⚠️ بيانات غير مكتملة.")
                 return
 
