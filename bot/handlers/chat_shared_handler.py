@@ -76,8 +76,8 @@ def register(bot):
         if is_paid_user_active(user_id):
             # المستخدم برو: نعطيه خيار "كيف تريد النشر؟" لأننا نحترم وقته
             keyboard = types.InlineKeyboardMarkup()
-            keyboard.add(types.InlineKeyboardButton("📊 استطلاعات مباشرة (Native)", callback_data=f"pub_native_{quiz_code}_{chat_id_to_publish}"))
-            keyboard.add(types.InlineKeyboardButton("🔗 رابط تفاعلي (Interactive)", callback_data=f"pub_link_{quiz_code}_{chat_id_to_publish}"))
+            keyboard.add(types.InlineKeyboardButton("📊 استطلاعات مباشرة (Native)", callback_data=f"pub_native:{quiz_code}:{chat_id_to_publish}"))
+            keyboard.add(types.InlineKeyboardButton("🔗 رابط تفاعلي (Interactive)", callback_data=f"pub_link:{quiz_code}:{chat_id_to_publish}"))
         
             bot.send_message(message.chat.id, "✨ أنت مستخدم Pro! كيف تريد ظهور الاختبار في قناتك؟", reply_markup=keyboard)
         else:
