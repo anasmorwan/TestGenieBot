@@ -8,7 +8,7 @@ from bot import flask
 from services.backup_service import restore_if_needed, start_auto_backup
 from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import force_add_column
-import bot.handlers.chat_shared_handler 
+from bot.handlers import chat_shared_handler 
 
 
 
