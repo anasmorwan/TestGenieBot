@@ -1,6 +1,6 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-def more_options_keyboard():
+def more_options_keyboard(bot_username):
     keyboard = keyboard = InlineKeyboardMarkup(row_width=1)
     buttons = [
         InlineKeyboardButton("🎲 اختبار عشوائي", callback_data="quick_quiz"),
