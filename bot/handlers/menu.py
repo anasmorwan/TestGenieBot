@@ -1,7 +1,7 @@
 # menu.py
 # تم النقل
 
-from bot.bot_instance import bot
+from bot.bot_instance import mybot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.keyboards.main_menu import main_menu_keyboard
 
