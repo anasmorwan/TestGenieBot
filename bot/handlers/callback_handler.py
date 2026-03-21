@@ -130,6 +130,9 @@ def register(bot):
                 )
 
             elif data == "check_account_status":
+                user_id = call.from_user.id
+                chat_id = call.message.chat.id
+                message_id = call.message.message_id
                 bot.answer_callback_query(call.id)
 
                 sub = get_subscription_full(user_id)
