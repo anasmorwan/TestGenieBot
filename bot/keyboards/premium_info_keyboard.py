@@ -5,7 +5,7 @@ def premium_info_keyboard():
     keyboard = keyboard = InlineKeyboardMarkup(row_width=1)
     buttons = [
         InlineKeyboardButton("💳 اختيار الخطة", callback_data="plans"),
-        InlineKeyboardButton("⬅️ رجوع", callback_data="main_menu")
+        InlineKeyboardButton("⬅️ رجوع", callback_data="upgrade_account")
     ]
     keyboard.add(*buttons)
     return keyboard
