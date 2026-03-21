@@ -5,10 +5,12 @@ import threading
 from datetime import datetime
 import json
 import base64
+import pickle
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from google.oauth2 import service_account
 from storage.sqlite_db import get_connection
+from google.auth.transport.requests import Request
 
 
 
@@ -44,17 +46,28 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 # =========================
 # 3. دالة بناء الخدمة (التعديل المهم هنا)
 def get_drive_service():
-    if not CREDENTIALS_DICT:
-        raise Exception("Credentials data is missing!")
+    # جلب التوكن من متغيرات البيئة في ريندر
+    encoded_token = os.environ.get('GDRIVE_TOKEN_BASE64')
+    
+    if not encoded_token:
+        print("❌ خطأ: لم يتم العثور على متغير GDRIVE_TOKEN_BASE64")
+        return None
 
-    # ✅ التغيير هنا: استخدمنا from_service_account_info
-    # لأننا نمرر "قاموس البيانات" مباشرة وليس "مسار ملف"
-    creds = service_account.Credentials.from_service_account_info(
-        CREDENTIALS_DICT, 
-        scopes=SCOPES
-    )
-    return build('drive', 'v3', credentials=creds)
+    try:
+        # فك تشفير الـ Base64 واستعادة كائن الصلاحيات (Credentials)
+        creds_data = base64.b64decode(encoded_token)
+        creds = pickle.loads(creds_data)
 
+        # التأكد من صلاحية التوكن وتجديده إذا انتهى (يحدث تلقائياً)
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+        
+        # بناء اتصال Drive
+        return build('drive', 'v3', credentials=creds)
+    except Exception as e:
+        print(f"❌ خطأ في الاتصال بـ Drive: {e}")
+        return None
 
 # =========================
 # 🔹 Upload Backup
