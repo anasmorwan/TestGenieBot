@@ -28,7 +28,7 @@ def handle_file_upload(msg):
     file_id = msg.document.file_id
     file_name = msg.document.file_name
 
-    if not is_file_size_allowed(bot, file_id):
+    if not is_file_size_allowed(mybot, file_id):
         mybot.send_message(chat_id, "الملف كبير جداً (الحد 5MB)")
         return
 
