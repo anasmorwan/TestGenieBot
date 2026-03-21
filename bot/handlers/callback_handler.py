@@ -16,7 +16,7 @@ from bot.keyboards.account_status_keyboard import account_status_keyboard
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from storage.quiz_repository import update_user_current_quiz
-
+from bot.chat_share import register
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
@@ -25,6 +25,68 @@ import random
 
 
 def register(bot):
+
+    
+    @bot.callback_query_handler(func=lambda call: call.data.startswith("pub_"))
+    def handle_publishing_options(call):
+        try:
+            # 1. تفكيك البيانات من الـ callback_data
+            # التنسيق المتوقع: pub_type_quizcode_chatid
+            parts = call.data.split("_")
+            if len(parts) < 4:
+                bot.answer_callback_query(call.id, "⚠️ بيانات غير مكتملة.")
+                return
+
+            action_type = parts[1]      # native أو link
+            quiz_code = parts[2]        # رمز الكويز
+            target_chat_id = parts[3]   # آي دي القناة/المجموعة (قد يكون سالباً)
+
+            # تحويل target_chat_id إلى رقم صحيح (Integer)
+            target_chat_id = int(target_chat_id)
+    
+            # 2. إبلاغ المستخدم أن العمل جارٍ
+            bot.answer_callback_query(call.id, "⌛ جاري النشر...")
+
+            if action_type == "native":
+                # --- خيار الاستطلاعات المباشرة (Native Polls) ---
+                # استدعاء الدالة التي ترسل الأسئلة كـ Polls متتالية
+                success = send_quiz_to_chat(bot, target_chat_id, quiz_code, is_pro=True)
+                if success:
+                    bot.edit_message_text(
+                        chat_id=call.message.chat.id,
+                        message_id=call.message.message_id,
+                        text="✅ تم نشر الاختبار كـ **استطلاعات مباشرة** في القناة بنجاح!"
+                    )
+                else:
+                    bot.send_message(call.message.chat.id, "❌ فشل استرجاع بيانات الاختبار.")
+
+            elif action_type == "link":
+                # --- خيار الرابط التفاعلي (Interactive Link) ---
+                # النشر باستخدام الدالة المنسقة (بدون علامة مائية للمشتركين)
+                success = register.publish_interactive_link(
+                    bot, 
+                    target_chat_id, 
+                    quiz_code, 
+                    call.from_user.first_name, 
+                    watermark=False # لأنه مشترك Pro
+                )
+                if success:
+                    bot.edit_message_text(
+                        chat_id=call.message.chat.id,
+                        message_id=call.message.message_id,
+                        text="✅ تم نشر الاختبار كـ **رابط تفاعلي** بنجاح!"
+                    )
+
+            # 3. تسجيل عملية المشاركة في قاعدة البيانات
+            log_quiz_share(quiz_code, call.from_user.id, call.from_user.first_name)
+
+    except Exception as e:
+        print(f"❌ Error in publishing callback: {e}")
+        bot.answer_callback_query(call.id, "❌ فشل النشر. تأكد من صلاحيات البوت.")
+
+
+
+    
 
     @bot.callback_query_handler(func=lambda call: True)
     def handle_callbacks(call):
