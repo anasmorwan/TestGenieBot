@@ -6,7 +6,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.keyboards.main_menu import main_menu_keyboard
 
 def send_main_menu(chat_id, message_id=None):
-    bot_username = bot.get_me().username
+    bot_username = mybot.get_me().username
     keyboard = main_menu_keyboard(bot_username)
     text = (
         "*👋 مرحباً بك في TestGenie*"
@@ -19,7 +19,7 @@ def send_main_menu(chat_id, message_id=None):
     )
 
     if message_id:
-        bot.edit_message_text(
+        mybot.edit_message_text(
             text=text,
             chat_id=chat_id,
             message_id=message_id,
@@ -27,7 +27,7 @@ def send_main_menu(chat_id, message_id=None):
             parse_mode="Markdown"
         )
     else:
-        bot.send_message(
+        mybot.send_message(
             chat_id=chat_id,
             text=text,
             reply_markup=keyboard,
