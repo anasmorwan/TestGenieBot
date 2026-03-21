@@ -227,21 +227,26 @@ def build_status_message(data):
     remaining = limit - used
 
     if plan == "free":
+        time_left = get_time_until_reset(data["user_id"])
+
         return f"""
 📊 <b>حالة حسابك</b>
 
 🆓 الخطة: Free  
-⚡ المتبقي اليوم: <b>{remaining}/{limit}</b>
+⚡ المتبقي اليوم: <b>{remaining}/{limit}</b>  
+⏳ إعادة التعيين بعد: <b>{time_left}</b>
 
 🎁 الدعوات: {data['referrals']}
 
 ━━━━━━━━━━━━━━━
-🚀 تريد استخدام أكثر بدون قيود؟
+🚫 وصلت للحد بسرعة؟
 
-✨ Pro: 25 اختبار يومياً  
-🔥 Pro+: 50 اختبار يومياً  
+🚀 لا تنتظر… واصل الآن بدون توقف:
 
-أو ادعُ أصدقاءك واحصل على محاولات إضافية مجاناً 👇
+✨ <b>Pro:</b> 25 اختبار يومياً  
+🔥 <b>Pro+:</b> 50 اختبار يومياً  
+
+أو ادعُ أصدقاءك واحصل على محاولات إضافية 👇
 """
 
     else:
@@ -473,3 +478,36 @@ def is_paid_user_active(user_id):
         return True
 
     return False
+
+
+
+
+from datetime import datetime, timedelta
+
+def get_time_until_reset(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("""
+    SELECT last_reset FROM users WHERE user_id=?
+    """, (user_id,))
+    
+    row = c.fetchone()
+    conn.close()
+
+    now = datetime.utcnow()
+
+    if not row or not row[0]:
+        # أول استخدام → reset بعد 24 ساعة
+        next_reset = now + timedelta(days=1)
+    else:
+        last_reset = datetime.fromisoformat(row[0])
+        next_reset = last_reset + timedelta(days=1)
+
+    remaining = next_reset - now
+
+    # تحويل إلى ساعات ودقائق
+    hours = remaining.seconds // 3600
+    minutes = (remaining.seconds % 3600) // 60
+
+    return f"{hours} ساعة و {minutes} دقيقة"
