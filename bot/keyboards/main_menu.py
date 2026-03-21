@@ -9,7 +9,7 @@ def main_menu_keyboard(bot_username):
         InlineKeyboardButton("✍️ إرسل نص", callback_data="input_text"),
         InlineKeyboardButton("⚙️ المزيد", callback_data="more_options")
     ]
-    keyboard.add(buttons)
+    keyboard.add(*buttons)
     return keyboard
 
 
