@@ -140,6 +140,7 @@ def register(bot):
                 referrals = get_referral_count(user_id)
 
                 message = build_status_message({
+                    "user_id": user_id,   # ✅ هذا هو الحل
                     "plan": sub["plan"],
                     "used": used,
                     "limit": sub["daily_quiz_limit"],
