@@ -91,12 +91,13 @@ def init_db():
         cursor.execute("ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
         cursor.execute("ALTER TABLE users ADD COLUMN used_today DEFAULT 0;")
         cursor.execute("ALTER TABLE users ADD COLUMN daily_limit DEFAULT 3;")
-
+        cursor.execute("ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz';")
     
 
         cursor.execute("ALTER TABLE subscriptions ADD COLUMN daily_quiz_limit INTEGER DEFAULT 3;")
         cursor.execute("ALTER TABLE subscriptions ADD COLUMN daily_ocr_limit INTEGER DEFAULT 1;")
-
+        
+        
     
         print("✅ تم إضافة عمود daily_ocr_limit بنجاح.")
     except sqlite3.OperationalError as e:
