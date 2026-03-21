@@ -82,9 +82,9 @@ def register(bot):
             # 3. تسجيل عملية المشاركة في قاعدة البيانات
             log_quiz_share(quiz_code, call.from_user.id, call.from_user.first_name)
 
-    except Exception as e:
-        print(f"❌ Error in publishing callback: {e}")
-        bot.answer_callback_query(call.id, "❌ فشل النشر. تأكد من صلاحيات البوت.")
+        except Exception as e:
+            print(f"❌ Error in publishing callback: {e}")
+            bot.answer_callback_query(call.id, "❌ فشل النشر. تأكد من صلاحيات البوت.")
 
 
 
