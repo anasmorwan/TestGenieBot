@@ -1,4 +1,6 @@
 from telebot import types
+from services.usage import is_paid_user_active
+from storage.quiz_repository import get_user_current_selection
 
 def register(bot):
     
