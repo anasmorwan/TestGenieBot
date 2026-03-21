@@ -15,8 +15,10 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.account_status_keyboard import account_status_keyboard
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
-from storage.quiz_repository import update_user_current_quiz
-from bot.chat_share import register
+from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat
+from bot.bot.handlers.chat_shared_handler import publish_interactive_link
+
+
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
@@ -32,7 +34,7 @@ def register(bot):
         try:
             # 1. تفكيك البيانات من الـ callback_data
             # التنسيق المتوقع: pub_type_quizcode_chatid
-            parts = call.data.split("_")
+            parts = call.data.split(":")
             if len(parts) < 4:
                 bot.answer_callback_query(call.id, "⚠️ بيانات غير مكتملة.")
                 return
@@ -63,7 +65,7 @@ def register(bot):
             elif action_type == "link":
                 # --- خيار الرابط التفاعلي (Interactive Link) ---
                 # النشر باستخدام الدالة المنسقة (بدون علامة مائية للمشتركين)
-                success = register.publish_interactive_link(
+                success = publish_interactive_link(
                     bot, 
                     target_chat_id, 
                     quiz_code, 
