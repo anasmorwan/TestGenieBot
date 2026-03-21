@@ -7,7 +7,7 @@ from bot.handlers import poll_answer_handler
 from bot import flask
 from services.backup_service import restore_if_needed, start_auto_backup
 from services.backup_service import is_db_valid, smart_restore
-
+from storage.sqlite_db import force_add_column
 
 
 
@@ -46,6 +46,7 @@ if not is_db_valid():
 # وظيفة هذه الخطوة هي "التكملة" فقط؛ إذا كان الملف المستورد قديماً 
 # ونقصته جداول جديدة قمت بإضافتها في التحديث الأخير، ستقوم init_db بإنشائها
 init_db() 
+force_add_column()
 print("✅ قاعدة البيانات جاهزة ومحدثة", flush=True)
 
 # 4. بدء النسخ الاحتياطي التلقائي بعد استقرار الحالة
