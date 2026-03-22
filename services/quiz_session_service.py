@@ -129,7 +129,7 @@ class QuizManager:
         # تحديد لوحة المفاتيح حسب حالة المستخدم
         keyboard = None
 
-        if not is_paid_user_active():
+        if not is_paid_user_active(chat_id):
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if extra_quiz_msg:  # تأكد أن الرسالة موجودة
                 text += f"\n\n{extra_quiz_msg}"
