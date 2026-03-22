@@ -4,6 +4,9 @@ from pptx import Presentation
 import docx
 import fitz                     # PyMuPDF
 api_key = "12k2as"
+from services.usage import is_paid_user_active
+
+
 
 # دوال مساعدة
 def is_text_empty(text):
@@ -41,8 +44,16 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
     }
 
     if ext in ("jpg", "png"):
-        if not can_generate(uid):
-            return bot.send_message(uid, "⚠️ هذه الميزة متاحة فقط للمشتركين.")
+        if not is_paid_user_active(uid):
+            keyboard = 
+            return bot.send_message(
+                chat_id=uid, 
+            text="📸 هذه الميزة متاحة فقط للمشتركين Pro.\n\n"
+            "💎 اشترك الآن لتحويل الصور إلى اختبارات تلقائيًا بلا حدود!",
+                reply_markup=keyboard
+            )
+
+        
         bot.edit_message_text("⏳ جاري تحليل الصورة...", chat_id=chat_id, message_id=message_id)
         content, ocr_debug = extract_text_with_ocr_space(path, api_key=OCR_API_KEY, language="eng")
         return content
@@ -56,7 +67,7 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
     full_length = len(content_full)
 
     # اقتطاع النص للمستخدمين غير المشتركين
-    if not can_generate(uid):
+    if not is_paid_user_active(uid):
         content = content_full[:3000]
         coverage_ratio = (len(content) / full_length) * 100 if full_length else 0
         coverage = f"{coverage_ratio:.1f}% من الملف"
@@ -66,8 +77,14 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
 
     # إذا النص فارغ، استخدم OCR
     if is_text_empty(content):
-        if not can_generate(uid):
-            return bot.send_message(uid, "⚠️ لا يمكن قراءة هذا الملف تلقائيًا. تحتاج الاشتراك.")
+        if not is_paid_user_active(uid):
+            keyboard = 
+            return bot.send_message(
+                chat_id=chat_id,
+                text="📝 لا يمكن قراءة هذا الملف تلقائيًا.\n"
+                "💎 مع الاشتراك Pro، يمكنك استخدام OCR وتحويل أي ملف نصيًا أو صورة إلى اختبار بسهولة!",
+                reply_markup=keyboard
+            )
         bot.edit_message_text("⏳ يتم تجهيز الملف... الرجاء الانتظار لحظات.", chat_id=chat_id, message_id=message_id)
         language = detect_language_from_filename(msg.document.file_name)
         ocr_func = ocr_map.get(ext)
