@@ -122,22 +122,35 @@ def init_db():
     conn.commit()
     conn.close()
 
+def column_exists(table, column):
+    conn = get_connection()
+    c = conn.cursor()
 
-def force_add_column():
-    conn = sqlite3.connect("quiz_users.db")
-    cursor = conn.cursor()
-    try:
-        cursor.execute("ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz';") 
-        cursor.execute("ALTER TABLE user_quizzes ADD COLUMN is_paid BOOLEAN DEFAULT 0;")
-        
-        conn.commit()
-        print("✅ تم إضافة العمود بالقوة!")
-    except Exception as e:
-        print(f"ℹ️ العمود قد يكون موجوداً بالفعل: {e}")
-    finally:
-        conn.close()
+    c.execute(f"PRAGMA table_info({table})")
+    columns = [row[1] for row in c.fetchall()]
 
-# استدعها هنا مرة واحدة فقط
+    conn.close()
+    return column in columns
+
+
+def safe_add_column():
+    conn = get_connection()
+    c = conn.cursor()
+
+    if not column_exists("users", "current_quiz_selection"):
+        c.execute("""
+        ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz'
+        """)
+
+    if not column_exists("user_quizzes", "is_paid"):
+        c.execute("""
+        ALTER TABLE user_quizzes ADD COLUMN is_paid BOOLEAN DEFAULT 0
+        """)
+
+    conn.commit()
+    conn.close()
+
+    print("✅ Schema updated safely")
 
 
 
