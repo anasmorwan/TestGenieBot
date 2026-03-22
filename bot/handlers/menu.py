@@ -15,7 +15,7 @@ def send_main_menu(chat_id, message_id=None):
 
     bot_username = mybot.get_me().username
     keyboard = main_menu_keyboard(bot_username)
-    base_text = get_mesaage("BASE_TEXT")
+    base_text = get_message("BASE_TEXT")
     
     # النص المتغير (التحية أو مقدمة مخصصة)
     welcome_new_user = "*👋 مرحباً بك في TestGenie*\n\nحوّل ملفاتك إلى اختبارات تفاعلية خلال 10 ثوانٍ.\n\n"
