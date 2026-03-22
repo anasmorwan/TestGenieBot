@@ -8,7 +8,7 @@ import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
 from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell
-
+from storage.quiz_attempts import log_quiz_attempt
 
 class QuizManager:
     def __init__(self):
@@ -144,6 +144,7 @@ class QuizManager:
         else:
             # المستخدم مدفوع - لا نضيف شيء
             keyboard = None
+            log_quiz_attempt(chat_id)
 
         # إرسال الرسالة مع التحقق
         try:
