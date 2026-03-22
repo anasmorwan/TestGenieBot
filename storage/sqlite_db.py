@@ -170,5 +170,18 @@ timestamp TEXT
 
 
 def is_user_exist(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
     cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,))
     return cursor.fetchone() is not None
+
+def log_new_user():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO users (user_id, last_reset) VALUES (?, ?)",
+        (user_id, datetime.utcnow().isoformat())
+    )
+    conn.commit()
