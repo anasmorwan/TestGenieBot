@@ -15,6 +15,7 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.account_status_keyboard import account_status_keyboard
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
+from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat, log_quiz_share, is_quiz_expired
 from bot.handlers.chat_shared_handler import publish_interactive_link
 
@@ -96,6 +97,7 @@ def register(bot):
 
                 if is_quiz_expired(quiz_code):
                     bot.answer_callback_query(call.id)
+                    keyboard = saved_quiz_upsell()
         
                     bot.edit_message_text(
                     chat_id=chat_id,
@@ -115,6 +117,7 @@ def register(bot):
                 
                 if is_quiz_expired(quiz_code):
                     bot.answer_callback_query(call.id)
+                    keyboard = saved_quiz_upsell()
         
                     bot.edit_message_text(
                     chat_id=chat_id,
