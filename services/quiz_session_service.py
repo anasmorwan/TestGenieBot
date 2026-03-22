@@ -41,16 +41,17 @@ class QuizManager:
         if not questions:
             print("❌ No questions", flush=True)
             return False
+
         
         
         with self.lock:
             self.sessions[chat_id] = {
-            "questions": questions,
-            "index": 0,
-            "score": 0,
-            "quiz_code": quiz_code
-        }
-
+                "questions": questions,
+                "index": 0,
+                "score": 0,
+                "quiz_code": quiz_code,
+                "is_shared_user": is_shared_user   # ✅ أضف هذا السطر
+            }
         
         
         self.send_current_question(chat_id, bot, is_shared_user=None)
@@ -99,6 +100,9 @@ class QuizManager:
         if not state:
             return
 
+        # إذا لم يُمرر is_shared_user كمعامل، نقرأه من الجلسة
+        shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
+
         q = state["questions"][state["index"]]
 
         if selected_option == q.correct_index:
@@ -107,7 +111,7 @@ class QuizManager:
         state["index"] += 1
 
         if state["index"] >= len(state["questions"]):
-            self.finish_quiz(chat_id, bot, is_shared_user=None)
+            self.finish_quiz(chat_id, bot, is_shared_user=shared)
         else:
             self.send_current_question(chat_id, bot)
          
@@ -122,6 +126,8 @@ class QuizManager:
         total = len(state["questions"])
         total = len(state["questions"])
         score = state.get("score", 0)  # تأكد من وجود score
+        # إذا لم تُمرر القيمة، نستخدم المخزنة في الجلسة (احتياطي)
+        shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
 
         # بناء النص الأساسي
         text = f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
@@ -129,7 +135,7 @@ class QuizManager:
         # تحديد لوحة المفاتيح حسب حالة المستخدم
         keyboard = None
 
-        if not is_paid_user_active(chat_id) and not is_shared_user:
+        if not is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if extra_quiz_msg:  # تأكد أن الرسالة موجودة
                 text += f"\n\n{extra_quiz_msg}"
@@ -187,3 +193,4 @@ class QuizManager:
 
 
 quiz_manager = QuizManager()
+
