@@ -111,7 +111,13 @@ class QuizManager:
         state["index"] += 1
 
         if state["index"] >= len(state["questions"]):
+            score = state["score"]
+            quiz_code = state["quiz_code"]
+            total = len(state["questions"])
+            log_quiz_attempt(chat_id, quiz_code, score, total)
             self.finish_quiz(chat_id, bot, is_shared_user=shared)
+
+        
         else:
             self.send_current_question(chat_id, bot)
          
@@ -126,6 +132,7 @@ class QuizManager:
         total = len(state["questions"])
         total = len(state["questions"])
         score = state.get("score", 0)  # تأكد من وجود score
+        
         # إذا لم تُمرر القيمة، نستخدم المخزنة في الجلسة (احتياطي)
         shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
 
@@ -144,8 +151,7 @@ class QuizManager:
         else:
             # المستخدم مدفوع - لا نضيف شيء
             keyboard = None
-            log_quiz_attempt(chat_id)
-
+            
         # إرسال الرسالة مع التحقق
         try:
             if keyboard:
