@@ -55,6 +55,7 @@ def register(bot):
             path = handle_file_upload(msg)
 
         except Exception as e:
+            bot.send_message(chat_id, f"❌ Error: {str(e)}")
             print("FILE UPLOAD ERROR:", e, flush=True)
 
         
