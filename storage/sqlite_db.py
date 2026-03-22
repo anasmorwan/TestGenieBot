@@ -168,3 +168,7 @@ timestamp TEXT
 )
 """
 
+
+def is_user_exist(user_id):
+    cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,))
+    return cursor.fetchone() is not None
