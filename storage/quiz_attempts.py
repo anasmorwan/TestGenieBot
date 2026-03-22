@@ -4,7 +4,25 @@ from storage.sqlite_db import get_connection
 
 
 
+#--------------------------
+#     تسجيل بداية الاختبار
+#-----------------------------
+def log_quiz_start(user_id, quiz_code):
+    conn = get_connection()
+    c = conn.cursor()
 
+    c.execute("""
+        INSERT OR IGNORE INTO quiz_attempts 
+        (quiz_code, user_id, score, total, timestamp)
+        VALUES (?, ?, NULL, NULL, ?)
+    """, (
+        quiz_code,
+        user_id,
+        datetime.utcnow().isoformat()
+    ))
+
+    conn.commit()
+    conn.close()
 
 #--------------------------
 #      تحليل الاداء للسمتخدمين    
