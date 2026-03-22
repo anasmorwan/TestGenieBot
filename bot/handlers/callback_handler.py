@@ -52,11 +52,9 @@ def register(bot):
                 success = publish_interactive_link(bot, target_chat_id, quiz_code, call.from_user.first_name, watermark=False)
 
             if success:
-                bot.edit_message_text(
-                    chat_id=call.message.chat.id,
-                    message_id=call.message.message_id,
-                    text="✅ تم النشر في القناة بنجاح!"
-                )
+                
+                bot.answer_callback_query(call.id, "✅ تم نشر الإختبار في القناة بنجاح")
+
                 # 3. تسجيل عملية المشاركة في قاعدة البيانات
                 log_quiz_share(quiz_code, call.from_user.id, call.from_user.first_name)
             else:
