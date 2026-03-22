@@ -68,11 +68,11 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
 
     # اقتطاع النص للمستخدمين غير المشتركين
     if not is_paid_user_active(uid):
-        content = content_full[:3000]
+        content = content_full[:1000]
         coverage_ratio = (len(content) / full_length) * 100 if full_length else 0
         coverage = f"{coverage_ratio:.1f}% من الملف"
     else:
-        content = content_full
+        content = content_full[:3000]
         coverage = "كاملة ✅"
 
     # إذا النص فارغ، استخدم OCR
