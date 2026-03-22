@@ -137,7 +137,7 @@ def force_add_column():
     finally:
         conn.close()
 
-force_add_column() # استدعها هنا مرة واحدة فقط
+# استدعها هنا مرة واحدة فقط
 
 
 
