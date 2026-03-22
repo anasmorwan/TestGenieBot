@@ -110,6 +110,6 @@ def register(bot):
 """
 
             bot.reply_to(msg, text, parse_mode="HTML")
-        except:
+        except Exception as e:
             bot.reply_to(msg, "❌ الخطأ: {str(e)}")
 
