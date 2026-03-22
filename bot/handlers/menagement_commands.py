@@ -93,9 +93,11 @@ def register(bot):
         if msg.from_user.id != ADMIN_ID:
             return
 
-        data = get_metrics()
+        try:
 
-        text = f"""
+            data = get_metrics()
+
+            text = f"""
 📊 <b>TestGenie Metrics</b>
 
 👥 Total Users: {data['users']}
@@ -107,4 +109,7 @@ def register(bot):
 🎁 Referrals: {data['referrals']}
 """
 
-        bot.reply_to(msg, text, parse_mode="HTML")
+            bot.reply_to(msg, text, parse_mode="HTML")
+        except:
+            bot.reply_to(msg, "❌ الخطأ: {str(e)}")
+
