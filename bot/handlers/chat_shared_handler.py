@@ -1,7 +1,7 @@
 from telebot import types
 from services.usage import is_paid_user_active
 from storage.quiz_repository import get_user_current_quiz
-
+from storage.messages import get_message
 
 
 def publish_interactive_link(bot, target_chat_id, quiz_code, shared_by_name, watermark=True):
@@ -82,7 +82,7 @@ def register(bot):
             bot.send_message(message.chat.id, "✅ تم نشر الاختبار في قناتك بنجاح باستخدام الرابط التفاعلي!")
         
             # تلميح للترقية (Soft Sell)
-            bot.send_message(message.chat.id, "💡 هل تعلم؟ يمكنك نشر الاختبار كـ استطلاعات (Polls) مباشرة بدون روابط عند الاشتراك في البرو.")
+            bot.send_message(message.chat.id, text=get_message("SHARED_QUIZ_REACTIONS")")
 
 
 
