@@ -175,6 +175,31 @@ def send_quiz_to_chat(bot, chat_id, quiz_code, is_pro=False):
 
 
 
+def is_quiz_expired(quiz_code):
+    cursor.execute("""
+    SELECT created_at, is_paid
+    FROM user_quizzes
+    WHERE quiz_code = ? AND is_active = 1
+    """, (quiz_code,))
+    
+    row = cursor.fetchone()
+    
+    if not row:
+        return True  # غير موجود = منتهي
+    
+    created_at, is_paid = row
+    
+    # المدفوعين لا ينتهي
+    if is_paid:
+        return False
+    
+    created_time = datetime.fromisoformat(created_at)
+    
+    # مدة الصلاحية (مثلاً 48 ساعة)
+    if datetime.utcnow() - created_time > timedelta(hours=48):
+        return True
+    
+    return False
 
 
 """
