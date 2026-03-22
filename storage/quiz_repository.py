@@ -32,7 +32,8 @@ def store_quiz(user_id, quizzes):
         user_id,
         json.dumps(quizzes),
         code,
-        datetime.now().isoformat()
+        datetime.now().isoformat(),
+        is_paid
     ))
     maybe_cleanup()
     print("🗑 old quizzes deleated", flush=True)
