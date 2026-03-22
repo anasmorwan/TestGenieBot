@@ -5,7 +5,7 @@ from datetime import datetime
 from models.quiz import QuizQuestion
 # from services.poll_service import send_quiz_poll
 import threading
-from service.usage import is_paid_user_active
+from services.usage import is_paid_user_active
 from storage.messages import get_message
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 class QuizManager:
