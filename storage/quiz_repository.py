@@ -170,3 +170,21 @@ def send_quiz_to_chat(bot, chat_id, quiz_code, is_pro=False):
     except Exception as e:
         print(f"❌ خطأ أثناء إرسال الكويز {quiz_code}: {e}")
         return False
+
+
+
+
+
+
+"""
+import threading
+import time
+
+def run_cleanup():
+    while True:
+        cleanup_old_quizzes()
+        time.sleep(3600)  # كل ساعة
+
+threading.Thread(target=run_cleanup, daemon=True).start()
+
+"""
