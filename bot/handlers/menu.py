@@ -14,13 +14,14 @@ def send_main_menu(chat_id, message_id=None):
     bot_username = mybot.get_me().username
     keyboard = main_menu_keyboard(bot_username)
     base_text = get_message("BASE_TEXT")
+    ux_text = get_message("UX_TEXT")
     
     # النص المتغير (التحية أو مقدمة مخصصة)
     welcome_new_user = "*👋 مرحباً بك في TestGenie*\n\nحوّل ملفاتك إلى اختبارات تفاعلية خلال 10 ثوانٍ.\n\n"
     welcome_returning_user = "*👋 مرحباً بك مجددًا في TestGenie*\n\nما الذي ترغب في القيام به اليوم؟\n\n"
 
     if is_user_exist(chat_id):
-        text = welcome_returning_user + base_text
+        text = ux_text
 
     else:
         text = welcome_new_user + base_text
