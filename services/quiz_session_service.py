@@ -7,7 +7,7 @@ from models.quiz import QuizQuestion
 import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
-from bot.keyboards.upsell_keyboard import saved_quiz_upsell
+from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell
 
 
 class QuizManager:
@@ -133,7 +133,7 @@ class QuizManager:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if extra_quiz_msg:  # تأكد أن الرسالة موجودة
                 text += f"\n\n{extra_quiz_msg}"
-            keyboard = saved_quiz_upsell()
+            keyboard = quiz_number_limit_upsell()
             # لا تعيد تعريف text هنا
         else:
             # المستخدم مدفوع - لا نضيف شيء
