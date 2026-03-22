@@ -60,6 +60,9 @@ def cleanup_old_quizzes():
     conn.commit()
 
 def maybe_cleanup():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
     now = datetime.utcnow()
 
     cursor.execute("""
