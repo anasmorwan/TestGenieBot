@@ -43,7 +43,7 @@ def register(bot):
             action_type = parts[1]
             quiz_code = parts[2]
             target_chat_id = int(parts[3]) # تحويل ID القناة إلى رقم صحيح
-            chat_type = part[4]
+            chat_type = parts[4]
             
 
             bot.answer_callback_query(call.id, "⌛ جاري النشر في القناة...")
