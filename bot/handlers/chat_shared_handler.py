@@ -19,7 +19,7 @@ def publish_interactive_link(bot, target_chat_id, quiz_code, shared_by_name, wat
         announcement_text += f"\n\n✨ تم الإنشاء بواسطة: @testprog123bot"
 
     bot_username = bot.get_me().username
-    start_url = f"https://t.me/{bot_username}?start={quiz_code}"
+    start_url = f"https://t.me/{bot_username}?start=shared_{quiz_code}"
     
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(types.InlineKeyboardButton("🎯 ابدأ الاختبار الآن", url=start_url))
