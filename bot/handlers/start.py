@@ -74,6 +74,8 @@ def register(bot):
                 
             if param.startswith("shared_"):
                 try:
+                    loading_msg = bot.send_message(chat_id, "🧠 جاري تحميل الاختبار...")
+
                     # param = "shared_ABC123"
                     parts = param.split("_", maxsplit=1)  # يقسم على أول شرطة سفلية فقط
                     shared_user = parts[0]                # "shared"
