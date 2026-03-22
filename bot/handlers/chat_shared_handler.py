@@ -51,11 +51,11 @@ def register(bot):
 
         # تحديد النوع بناءً على الزر
         if request_id == 1:
-            chat_type = "channel"
+            chat_type = "القناة"
         elif request_id == 2:
-            chat_type = "group"
+            chat_type = "المجموعة"
         else:
-            chat_type = "unknown"
+            chat_type = "الشات"
         # 1. استرجاع الكويز الذي كان المستخدم يعمل عليه
         quiz_code = get_user_current_quiz(user_id) 
     
