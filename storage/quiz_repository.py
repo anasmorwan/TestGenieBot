@@ -130,7 +130,7 @@ def send_quiz_to_chat(bot, chat_id, quiz_code, is_pro=False):
                 options=options,
                 type='quiz',
                 correct_option_id=correct_id,
-                is_anonymous=False, # يسمح لصاحب القناة برؤية من أجاب (اختياري)
+                is_anonymous=True, # يسمح لصاحب القناة برؤية من أجاب (اختياري)
                 explanation=explanation if is_pro else "تم التوليد بواسطة @TestGenieBot",
                 explanation_parse_mode="Markdown"
             )
