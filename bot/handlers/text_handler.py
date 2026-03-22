@@ -23,7 +23,7 @@ def register(bot):
     
     @bot.message_handler(content_types=["text"])
     def handle_text_message(msg):
-        if message.chat.type != "private":
+        if msg.chat.type != "private":
         
             return
         user_id = msg.from_user.id
