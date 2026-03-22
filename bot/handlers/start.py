@@ -71,6 +71,32 @@ def register(bot):
     
                     return
                 return
+                
+            if param.startswith("shared_"):
+                # param = "shared_ABC123"
+                parts = param.split("_", maxsplit=1)  # يقسم على أول شرطة سفلية فقط
+                shared_user = parts[0]                # "shared"
+                quiz_code = parts[1] if len(parts) > 1 else None
+                # quiz_code = "ABC123"
+                # ✅ محاولة بدء الاختبار
+                if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=True):
+                    bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=loading_msg.message_id,
+                        text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
+                    )
+                    return
+                bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=loading_msg.message_id,
+                text="🎯 لنبدأ الاختبار..."
+                )
+                time.sleep(2)
+                bot.delete_message(chat_id=chat_id, message_id=loading_msg.message_id)
+                                  
+                return
+
+            
 
 
             # ✅ معالجة روابط المشاركة مثل: ?start=quiz_ab12cd
