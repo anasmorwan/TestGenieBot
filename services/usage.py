@@ -560,3 +560,34 @@ def activate_subscription_manual(user_id, plan, days=None):
     conn.close()
 
 
+def get_user_full_info(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+
+    # users
+    c.execute("""
+    SELECT used_today, daily_limit, created_at
+    FROM users WHERE user_id=?
+    """, (user_id,))
+    user = c.fetchone()
+
+    # subscription
+    c.execute("""
+    SELECT plan, expires_at, daily_quiz_limit, daily_ocr_limit
+    FROM subscriptions WHERE user_id=?
+    """, (user_id,))
+    sub = c.fetchone()
+
+    # referrals
+    c.execute("""
+    SELECT COUNT(*) FROM referrals WHERE referrer_id=?
+    """, (user_id,))
+    referrals = c.fetchone()[0]
+
+    conn.close()
+
+    return {
+        "user": user,
+        "sub": sub,
+        "referrals": referrals
+    }
