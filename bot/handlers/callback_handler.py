@@ -250,18 +250,6 @@ def register(bot):
                     parse_mode="HTML"
                         )
 
-            
-
-
-try:
-    bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=message_id,
-        text=message,
-        reply_markup=keyboard,
-        parse_mode="HTML"
-    )
-
 
             elif data == "update_account_status":
                 from datetime import datetime
