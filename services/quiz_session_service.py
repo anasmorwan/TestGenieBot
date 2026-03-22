@@ -18,7 +18,7 @@ class QuizManager:
         # ✅ هذا هو الناقص
         self.poll_map = {}
 
-    def start_quiz(self, chat_id, quiz_code, bot):
+    def start_quiz(self, chat_id, quiz_code, bot, is_shared_user=None):
         print("QUIZ CODE:", quiz_code, flush=True)
         quiz_data = self.load_quiz(quiz_code)
         print("LOADED QUIZ:", quiz_data, flush=True)
@@ -53,7 +53,7 @@ class QuizManager:
 
         
         
-        self.send_current_question(chat_id, bot)
+        self.send_current_question(chat_id, bot, is_shared_user=None)
 
         return True
 
@@ -94,7 +94,7 @@ class QuizManager:
 
         self.send_quiz_poll(bot, chat_id, q)
 
-    def handle_answer(self, chat_id, selected_option, bot):
+    def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
         state = self.sessions.get(chat_id)
         if not state:
             return
@@ -107,11 +107,11 @@ class QuizManager:
         state["index"] += 1
 
         if state["index"] >= len(state["questions"]):
-            self.finish_quiz(chat_id, bot)
+            self.finish_quiz(chat_id, bot, is_shared_user=None)
         else:
             self.send_current_question(chat_id, bot)
          
-    def finish_quiz(self, chat_id, bot):
+    def finish_quiz(self, chat_id, bot, is_shared_user=None):
         
         
         state = self.sessions.pop(chat_id, None)
@@ -129,7 +129,7 @@ class QuizManager:
         # تحديد لوحة المفاتيح حسب حالة المستخدم
         keyboard = None
 
-        if not is_paid_user_active(chat_id):
+        if not is_paid_user_active(chat_id) and not is_shared_user:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if extra_quiz_msg:  # تأكد أن الرسالة موجودة
                 text += f"\n\n{extra_quiz_msg}"
