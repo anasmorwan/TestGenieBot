@@ -29,7 +29,7 @@ def register(bot):
     def handle_file(msg):
         if message.chat.type != "private":
         
-        return
+            return
 
         user_id = msg.from_user.id
         chat_id = msg.chat.id
