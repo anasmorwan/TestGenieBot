@@ -10,9 +10,10 @@ from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import safe_add_column
 from bot.handlers import chat_shared_handler 
 from bot.handlers import commands
+print("main starting...", flush=True)
 
 
-
+# سجل الويب هوك داخلياً
 flask.register(); print("flask.register done", flush=True)
 
 
@@ -41,7 +42,8 @@ start_auto_backup()
 
 
 
-print("main starting...", flush=True)
+
+
 
 # تسجيل الهاندلرز
 start.register(mybot); print("start.register done", flush=True)
@@ -52,9 +54,9 @@ pre_checkout_query_handler.register_payment(mybot); print("pre_checkout_query_ha
 payment_handler.register(mybot); print("payment_handler.register done", flush=True)
 poll_answer_handler.register(mybot)
 chat_shared_handler.register(mybot)
-commands.register(mybot)
+commands.register(mybot); print("commands.register done", flush=True)
 
-# سجل الويب هوك داخلياً
+
 
 
 
