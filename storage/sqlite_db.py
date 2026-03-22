@@ -127,7 +127,9 @@ def force_add_column():
     conn = sqlite3.connect("quiz_users.db")
     cursor = conn.cursor()
     try:
-        cursor.execute("ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz';")
+        cursor.execute("ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz';") 
+        cursor.execute("ALTER TABLE user_quizzes ADD COLUMN is_paid BOOLEAN DEFAULT 0;")
+        
         conn.commit()
         print("✅ تم إضافة العمود بالقوة!")
     except Exception as e:
