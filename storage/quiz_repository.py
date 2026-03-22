@@ -6,6 +6,8 @@ import uuid
 from datetime import datetime, timedelta
 from storage.sqlite_db import get_connection
 from services.usage import is_paid_user_active
+import threading
+import time
 
 #----------------------------
 #  🔹 توليد و حفظ ال QC
@@ -210,9 +212,6 @@ def is_quiz_expired(quiz_code):
 
 
 """
-import threading
-import time
-
 def run_cleanup():
     while True:
         cleanup_old_quizzes()
