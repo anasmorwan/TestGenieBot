@@ -27,7 +27,7 @@ def register(bot):
 
     @bot.message_handler(content_types=["document"])
     def handle_file(msg):
-        if message.chat.type != "private":
+        if msg.chat.type != "private":
         
             return
 
