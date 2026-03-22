@@ -16,7 +16,7 @@ def publish_interactive_link(bot, target_chat_id, quiz_code, shared_by_name, wat
     )
     
     if watermark:
-        announcement_text += f"\n\n✨ تم الإنشاء بواسطة: @TestGenieBot"
+        announcement_text += f"\n\n✨ تم الإنشاء بواسطة: @testprog123bot"
 
     bot_username = bot.get_me().username
     start_url = f"https://t.me/{bot_username}?start={quiz_code}"
