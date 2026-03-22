@@ -5,7 +5,7 @@ import docx
 import fitz                     # PyMuPDF
 api_key = "12k2as"
 from services.usage import is_paid_user_active
-
+from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 
 
 # دوال مساعدة
@@ -45,7 +45,7 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
 
     if ext in ("jpg", "png"):
         if not is_paid_user_active(uid):
-            keyboard = 
+            keyboard = saved_quiz_upsell()
             return bot.send_message(
                 chat_id=uid, 
             text="📸 هذه الميزة متاحة فقط للمشتركين Pro.\n\n"
@@ -78,7 +78,7 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
     # إذا النص فارغ، استخدم OCR
     if is_text_empty(content):
         if not is_paid_user_active(uid):
-            keyboard = 
+            keyboard = saved_quiz_upsell()
             return bot.send_message(
                 chat_id=chat_id,
                 text="📝 لا يمكن قراءة هذا الملف تلقائيًا.\n"
