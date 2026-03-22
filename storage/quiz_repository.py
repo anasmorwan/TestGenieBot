@@ -34,6 +34,7 @@ def store_quiz(user_id, quizzes):
         code,
         datetime.now().isoformat()
     ))
+    maybe_cleanup()
 
     conn.commit()
     conn.close()
