@@ -77,7 +77,7 @@ class QuizManager:
             return json.loads(row[0])
     
 
-    def send_current_question(self, chat_id, bot):
+    def send_current_question(self, chat_id, bot, is_shared_user=None):
         with self.lock:
             state = self.sessions.get(chat_id)
 
