@@ -3,6 +3,7 @@ from services.quiz_session_service import quiz_manager
 # تم النقل
 # start.py
 # bot/handlers/start.py
+import time
 from bot.handlers.menu import send_main_menu
 from storage.session_store import user_states
 from services.referral import save_referral
@@ -84,6 +85,15 @@ def register(bot):
                     message_id=loading_msg.message_id,
                     text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
                 )
+                return
+            bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=loading_msg.message_id,
+            text="🎯 لنبدأ الاختبار...إستعد"
+            )
+            time.sleep(2)
+            bot.delete_message(chat_id=chat_id, message_id=loading_msg.message_id)
+                                  
             return
 
         # ✅ إذا لم يوجد باراميتر → عرض القائمة الرئيسية
