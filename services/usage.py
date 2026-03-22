@@ -26,18 +26,6 @@ def get_subscription(user_id):
     "daily_quiz_limit": row[2]
     }
 
-# def consume_quiz(user_id):
-#    conn = get_connection()
-#    c = conn.cursor()
-
-#    c.execute("""
-#        UPDATE users 
-#        SET free_quizzes = free_quizzes - 1 
-#        WHERE user_id=? AND free_quizzes > 0
-#    """, (user_id,))
-
-#    conn.commit()
-#    conn.close()
 
 
 def consume_quiz(user_id):
@@ -55,19 +43,6 @@ def consume_quiz(user_id):
 
 
 
-# def can_generate(user_id):
- #   conn = get_connection()
-#    c = conn.cursor()
-#
-#    c.execute("SELECT free_quizzes FROM users WHERE user_id=?", (user_id,))
-#    row = c.fetchone()
-
-#    conn.close()
-
-#    if not row:
-#        return False
-
-#    return row[0] > 0
 
 def can_generate(user_id):
     sub = get_subscription(user_id)
@@ -511,3 +486,77 @@ def get_time_until_reset(user_id):
     minutes = (remaining.seconds % 3600) // 60
 
     return f"{hours} ساعة و {minutes} دقيقة"
+
+
+
+def reset_or_set_daily_usage(user_id, new_limit=3):
+    conn = get_connection()
+    c = conn.cursor()
+
+    # تأكد أن المستخدم موجود
+    c.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
+    if not c.fetchone():
+        add_new_user(user_id)
+
+    c.execute("""
+        UPDATE users
+        SET used_today = 0,
+            daily_limit = ?
+        WHERE user_id=?
+    """, (new_limit, user_id))
+
+    conn.commit()
+    conn.close()
+
+
+
+def activate_subscription_manual(user_id, plan, days=None):
+    conn = get_connection()
+    c = conn.cursor()
+
+    limits = get_plan_limits(plan)
+
+    # 👇 لو الأدمن حدد مدة
+    duration = days if days else limits["days"]
+
+    expires_at = None
+    if duration > 0:
+        expires_at = (datetime.utcnow() + timedelta(days=duration)).isoformat()
+
+    c.execute("SELECT id FROM subscriptions WHERE user_id=?", (user_id,))
+    exists = c.fetchone()
+
+    if exists:
+        c.execute("""
+            UPDATE subscriptions
+            SET plan=?,
+                expires_at=?,
+                daily_quiz_limit=?,
+                daily_ocr_limit=?,
+                updated_at=?
+            WHERE user_id=?
+        """, (
+            plan,
+            expires_at,
+            limits["quiz_limit"],
+            limits["ocr_limit"],
+            datetime.utcnow().isoformat(),
+            user_id
+        ))
+    else:
+        c.execute("""
+            INSERT INTO subscriptions 
+            (user_id, plan, expires_at, daily_quiz_limit, daily_ocr_limit)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            user_id,
+            plan,
+            expires_at,
+            limits["quiz_limit"],
+            limits["ocr_limit"]
+        ))
+
+    conn.commit()
+    conn.close()
+
+
