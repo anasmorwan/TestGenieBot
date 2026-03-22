@@ -140,6 +140,7 @@ class QuizManager:
     
     def send_quiz_poll(self, bot, chat_id, question):
         try:
+            # open_peroid = get_user_config(user_id, "quiz_period")
             poll = bot.send_poll(
                 chat_id=chat_id,
                 question=str(question.question)[:300],
@@ -147,8 +148,8 @@ class QuizManager:
                 type="quiz",
                 correct_option_id=int(question.correct_index),
                 explanation=str(question.explanation or "")[:200],
-                is_anonymous=False,
-                open_period=30
+                is_anonymous=False
+                
             )
 
             self.poll_map[poll.poll.id] = chat_id
