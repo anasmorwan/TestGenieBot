@@ -1,6 +1,6 @@
 import os
 from services.usage import activate_subscription_manual, reset_or_set_daily_usage, get_user_full_info
-
+from analytics.metrics import get_metrics
 
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
@@ -87,3 +87,24 @@ def register(bot):
             bot.reply_to(msg, "❌ استخدم: /user_info 123456")
 
 
+
+    @bot.message_handler(commands=["metrics"])
+    def metrics(msg):
+        if msg.from_user.id != ADMIN_ID:
+            return
+
+        data = get_metrics()
+
+        text = f"""
+📊 <b>TestGenie Metrics</b>
+
+👥 Total Users: {data['users']}
+⚡ Active Today: {data['active_today']}
+
+🔥 Hit Limit: {data['hit_limit']}
+💎 Paid Users: {data['paid']}
+
+🎁 Referrals: {data['referrals']}
+"""
+
+        bot.reply_to(msg, text, parse_mode="HTML")
