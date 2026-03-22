@@ -180,7 +180,6 @@ def register(bot):
                 quiz_manager.start_quiz(chat_id, quiz_code, bot)
                 
             elif data == "input_text":
-                activate_subscription(user_id, "pro_plus")
                 backup_all()
                 bot.answer_callback_query(call.id)
                 bot.send_message(chat_id, "📄 أرسل نص الآن لإنشاء الاختبار")
