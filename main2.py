@@ -46,6 +46,7 @@ start_auto_backup()
 
 
 # تسجيل الهاندلرز
+commands.register(mybot); print("commands.register done", flush=True)
 start.register(mybot); print("start.register done", flush=True)
 text_handler.register(mybot); print("text_handler.register done", flush=True)
 file_handler.register(mybot); print("file_handler.register done", flush=True)
@@ -54,7 +55,6 @@ pre_checkout_query_handler.register_payment(mybot); print("pre_checkout_query_ha
 payment_handler.register(mybot); print("payment_handler.register done", flush=True)
 poll_answer_handler.register(mybot)
 chat_shared_handler.register(mybot)
-commands.register(mybot); print("commands.register done", flush=True)
 
 
 
