@@ -249,6 +249,59 @@ def register(bot):
                     reply_markup=keyboard,
                     parse_mode="HTML"
                         )
+
+            
+
+
+try:
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=message_id,
+        text=message,
+        reply_markup=keyboard,
+        parse_mode="HTML"
+    )
+
+
+            elif data == "update_account_status":
+                from datetime import datetime
+                now = datetime.utcnow().strftime("%H:%M:%S")
+                
+        
+                user_id = call.from_user.id
+                chat_id = call.message.chat.id
+                message_id = call.message.message_id
+                bot.answer_callback_query(call.id)
+
+                sub = get_subscription_full(user_id)
+                used = get_usage(user_id)
+                referrals = get_referral_count(user_id)
+
+                message = build_status_message({
+                    "user_id": user_id,   # ✅ هذا هو الحل
+                    "plan": sub["plan"],
+                    "used": used,
+                    "limit": sub["daily_quiz_limit"],
+                    "expires_at": sub["expires_at"],
+                    "referrals": referrals
+                })
+                message += f"\n\n⏱ آخر تحديث: {now}"
+
+                keyboard = account_status_keyboard(user_id)
+
+                try:
+                    bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=message_id,
+                        text=message,
+                        reply_markup=keyboard,
+                        parse_mode="HTML"
+                    )
+                except Exception as e:
+                    if "message is not modified" in str(e):
+                        pass
+                    else:
+                        raise e
             
             elif data == "upgrade_account":
                 
