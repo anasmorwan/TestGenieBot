@@ -89,7 +89,7 @@ def register(bot):
             bot.edit_message_text(
             chat_id=chat_id,
             message_id=loading_msg.message_id,
-            text="🎯 لنبدأ الاختبار...إستعد"
+            text="🎯 لنبدأ الاختبار..."
             )
             time.sleep(2)
             bot.delete_message(chat_id=chat_id, message_id=loading_msg.message_id)
