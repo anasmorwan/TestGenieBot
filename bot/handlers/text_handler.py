@@ -41,10 +41,10 @@ def register(bot):
 
             # 👇 فقط إذا مسموح
             consume_quiz(user_id)
-            backup_all()
+            # backup_all()
             # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
             reward_referral_if_needed(user_id)
-            backup_all()
+            # backup_all()
 
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
@@ -68,7 +68,7 @@ def register(bot):
             # تخزين الاختبار
             quiz_code = store_quiz(user_id, quizzes)
             maybe_cleanup()
-            backup_all()
+            # backup_all()
             quiz_len = len(quizzes)
 
 
