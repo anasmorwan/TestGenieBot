@@ -1,7 +1,7 @@
 import os # لا تنسى استيراد مكتبة نظام التشغيل
 from services.content_parser import extract_text_from_file
 from services.quiz_service import generate_quizzes_from_text
-from storage.quiz_repository import store_quiz
+from storage.quiz_repository import store_quiz, maybe_cleanup
 from services.quiz_session_service import quiz_manager
 from services.file_upload import handle_file_upload
 # from services.poll_service import send_quiz_message
@@ -97,6 +97,7 @@ def register(bot):
                 user_id=user_id,
                 user_instruction=user_instruction
             )
+            maybe_cleanup()
 
             if not quizzes:
                 bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
