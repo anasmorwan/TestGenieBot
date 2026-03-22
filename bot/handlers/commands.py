@@ -1,4 +1,5 @@
 from services.usage import activate_subscription_manual, reset_or_set_daily_usage
+ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
 def register(bot):
     
