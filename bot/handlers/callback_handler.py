@@ -60,7 +60,7 @@ def register(bot):
                 # 3. تسجيل عملية المشاركة في قاعدة البيانات
                 log_quiz_share(quiz_code, call.from_user.id, call.from_user.first_name)
             else:
-                bot.send_message(call.message.chat.id, "❌ فشل النشر. تأكد أن البوت مشرف في القناة/المجموعة ولديه صلاحية النشر.")
+                bot.answer_callback_query(call.id, "❌ فشل النشر. تأكد أن البوت مشرف في {chat_type} ولديه صلاحية النشر.")
 
         except Exception as e:
             print(f"Error in callback pub: {e}")
