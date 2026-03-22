@@ -4,7 +4,7 @@
 
 def register(bot):
 
-    @bot.message_handler(content_types=["document"])
+    @bot.message_handler(content_types=["image"])
     def handle_file(msg):
         if msg.chat.type != "private":
         
