@@ -177,6 +177,9 @@ def send_quiz_to_chat(bot, chat_id, quiz_code, is_pro=False):
 
 
 def is_quiz_expired(quiz_code):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
     cursor.execute("""
     SELECT created_at, is_paid
     FROM user_quizzes
