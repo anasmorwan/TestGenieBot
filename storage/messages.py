@@ -6,6 +6,13 @@ MESSAGES = {
         "FILE_TOO_LARGE": "الملف كبير جداً (الحد 5MB)",
         "QUIZ_CREATED": "تم توليد {count} سؤال!",
 
+        "BASE_TEXT": (
+            "📄 أرسل:\n"
+            "PDF • DOCX • نص\n\n"
+            "وسيحوّله البوت إلى اختبار تلقائياً.\n\n"
+            "👇 أو اختر:"
+        ),
+
         
         "ACCOUNT_STATUS": (
             "<b>⚙️ حسابك في TestGenie</b>\n\n"
