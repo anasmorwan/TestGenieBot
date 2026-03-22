@@ -1,5 +1,6 @@
 # menu.py
 # تم النقل
+from storage.sqlite_db import is_user_exist
 
 from bot.bot_instance import mybot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
