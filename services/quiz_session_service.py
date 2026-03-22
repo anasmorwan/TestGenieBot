@@ -7,7 +7,7 @@ from models.quiz import QuizQuestion
 import threading
 from service.usage import is_paid_user_active
 from storage.messages import get_message
- 
+from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 class QuizManager:
     def __init__(self):
         self.sessions = {}
@@ -119,14 +119,20 @@ class QuizManager:
         score = state["score"]
         total = len(state["questions"])
         text = f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
+     
         if not is_paid_user_active():
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             text += f"\n\n{extra_quiz_msg}"
+            keyboard = saved_quiz_upsell()
+        else:
+            keyboard = None
+            
      
 
         bot.send_message(
          chat_id=chat_id,
-         text=text
+         text=text,
+         reply_markup=keyboard
             
         )
 
