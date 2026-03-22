@@ -1,5 +1,5 @@
 from services.quiz_service import generate_quizzes_from_text
-from storage.quiz_repository import store_quiz
+from storage.quiz_repository import store_quiz, maybe_cleanup
 from services.quiz_session_service import quiz_manager
 from storage.messages import get_message
 from services.referral import reward_referral_if_needed
@@ -67,6 +67,7 @@ def register(bot):
 
             # تخزين الاختبار
             quiz_code = store_quiz(user_id, quizzes)
+            maybe_cleanup()
             backup_all()
 
 
