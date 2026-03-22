@@ -27,6 +27,9 @@ def register(bot):
 
     @bot.message_handler(content_types=["document"])
     def handle_file(msg):
+        if message.chat.type != "private":
+        
+        return
 
         user_id = msg.from_user.id
         chat_id = msg.chat.id
