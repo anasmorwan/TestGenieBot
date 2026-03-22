@@ -17,8 +17,8 @@ def register(bot):
 
             bot.reply_to(msg, "✅ تم تفعيل الاشتراك")
 
-        except:
-            bot.reply_to(msg, "❌ استخدم: /give_pro user_id pro")
+        except Exception as e:
+            bot.reply_to(msg, f"❌ استخدم: /give_pro user_id pro, str({e})")
 
 
     @bot.message_handler(commands=["reset_usage"])
@@ -35,5 +35,5 @@ def register(bot):
 
             bot.reply_to(msg, "✅ تم إعادة ضبط الاستخدام")
 
-        except:
-            bot.reply_to(msg, "❌ استخدم: /reset_usage user_id 3")
+        except Exception as e:
+            bot.reply_to(msg, f"❌ استخدم: /reset_usage user_id 3 , str({e})")
