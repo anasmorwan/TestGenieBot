@@ -8,6 +8,8 @@ import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
+
+
 class QuizManager:
     def __init__(self):
         self.sessions = {}
