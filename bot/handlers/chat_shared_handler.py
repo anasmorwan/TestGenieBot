@@ -82,7 +82,7 @@ def register(bot):
             bot.send_message(message.chat.id, "✅ تم نشر الاختبار في قناتك بنجاح باستخدام الرابط التفاعلي!")
         
             # تلميح للترقية (Soft Sell)
-            bot.send_message(message.chat.id, text=get_message("SHARED_QUIZ_REACTIONS")")
+            # bot.send_message(message.chat.id, text=get_message("SHARED_QUIZ_REACTIONS"))
 
 
 
