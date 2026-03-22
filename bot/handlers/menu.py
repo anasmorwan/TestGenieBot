@@ -1,6 +1,6 @@
 # menu.py
 # تم النقل
-from storage.sqlite_db import is_user_exist
+from storage.sqlite_db import is_user_exist, log_new_user
 
 from bot.bot_instance import mybot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
