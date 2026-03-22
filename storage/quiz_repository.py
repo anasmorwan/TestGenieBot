@@ -35,7 +35,7 @@ def store_quiz(user_id, quizzes):
         datetime.now().isoformat(),
         is_paid
     ))
-    maybe_cleanup()
+    
     print("🗑 old quizzes deleated", flush=True)
 
     conn.commit()
