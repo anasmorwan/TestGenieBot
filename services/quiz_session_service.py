@@ -132,7 +132,8 @@ class QuizManager:
         bot.send_message(
          chat_id=chat_id,
          text=text,
-         reply_markup=keyboard
+         reply_markup=keyboard,
+         parse_mode="HTML"
             
         )
 
