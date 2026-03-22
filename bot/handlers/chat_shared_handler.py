@@ -45,8 +45,17 @@ def register(bot):
     @bot.message_handler(content_types=['chat_shared'])
     def handle_chat_shared(message):
         user_id = message.from_user.id
-        chat_id_to_publish = message.chat_shared.chat_id # القناة المختارة
     
+        chat_id_to_publish = message.chat_shared.chat_id
+        request_id = message.chat_shared.request_id  # 🔥 هذا المهم
+
+        # تحديد النوع بناءً على الزر
+        if request_id == 1:
+            chat_type = "channel"
+        elif request_id == 2:
+            chat_type = "group"
+        else:
+            chat_type = "unknown"
         # 1. استرجاع الكويز الذي كان المستخدم يعمل عليه
         quiz_code = get_user_current_quiz(user_id) 
     
@@ -58,8 +67,8 @@ def register(bot):
         if is_paid_user_active(user_id):
             # المستخدم برو: نعطيه خيار "كيف تريد النشر؟" لأننا نحترم وقته
             keyboard = types.InlineKeyboardMarkup()
-            keyboard.add(types.InlineKeyboardButton("📊 استطلاعات مباشرة (Native)", callback_data=f"pub:native:{quiz_code}:{chat_id_to_publish}"))
-            keyboard.add(types.InlineKeyboardButton("🔗 رابط تفاعلي (Interactive)", callback_data=f"pub:link:{quiz_code}:{chat_id_to_publish}"))
+            keyboard.add(types.InlineKeyboardButton("📊 استطلاعات مباشرة (Native)", callback_data=f"pub:native:{quiz_code}:{chat_id_to_publish}:{chat_type}"))
+            keyboard.add(types.InlineKeyboardButton("🔗 رابط تفاعلي (Interactive)", callback_data=f"pub:link:{quiz_code}:{chat_id_to_publish}:{chat_type}"))
         
             bot.send_message(message.chat.id, "✨ أنت مستخدم Pro! كيف تريد ظهور الاختبار في قناتك؟", reply_markup=keyboard)
         else:
