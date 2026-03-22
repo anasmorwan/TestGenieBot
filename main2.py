@@ -1,7 +1,7 @@
 # main.py (مهم: وضع طباعات للتتبع)
 import os
 from bot.bot_instance import mybot, set_webhook
-from bot.handlers import start, text_handler, file_handler, callback_handler, pre_checkout_query_handler, payment_handler
+from bot.handlers import start, text_handler, file_handler, image_handler, callback_handler, pre_checkout_query_handler, payment_handler
 from storage.sqlite_db import init_db
 from bot.handlers import poll_answer_handler
 from bot import flask
@@ -10,6 +10,7 @@ from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import safe_add_column
 from bot.handlers import chat_shared_handler 
 from bot.handlers import menagement_commands
+
 print("main starting...", flush=True)
 
 
@@ -51,6 +52,7 @@ scheduler.start()
 
 
 # تسجيل الهاندلرز
+image_handler.register(mybot)
 menagement_commands.register(mybot); print("commands.register done", flush=True)
 start.register(mybot); print("start.register done", flush=True)
 text_handler.register(mybot); print("text_handler.register done", flush=True)
