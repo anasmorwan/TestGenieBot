@@ -1,6 +1,8 @@
 import os
 from services.usage import activate_subscription_manual, reset_or_set_daily_usage, get_user_full_info
 from analytics.metrics import get_metrics
+from services.backup_service import backup_all
+
 
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
@@ -16,6 +18,7 @@ def register(bot):
             user_id = int(user_id)
 
             activate_subscription_manual(user_id, plan)
+            backup_all()
 
             bot.reply_to(msg, "✅ تم تفعيل الاشتراك")
 
@@ -34,6 +37,7 @@ def register(bot):
             limit = int(limit)
 
             reset_or_set_daily_usage(user_id, limit)
+            backup_all()
 
             bot.reply_to(msg, "✅ تم إعادة ضبط الاستخدام")
 
