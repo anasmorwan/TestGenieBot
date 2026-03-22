@@ -44,6 +44,9 @@ def register(bot):
     # عند استقبال القناة المختارة
     @bot.message_handler(content_types=['chat_shared'])
     def handle_chat_shared(message):
+        if message.chat.type != "private":
+        
+            return
         user_id = message.from_user.id
     
         chat_id_to_publish = message.chat_shared.chat_id
