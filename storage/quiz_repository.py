@@ -3,9 +3,9 @@
 import json
 import time
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 from storage.sqlite_db import get_connection
-
+from services.usage import is_paid_user_active
 
 #----------------------------
 #  🔹 توليد و حفظ ال QC
@@ -21,11 +21,13 @@ def store_quiz(user_id, quizzes):
     c = conn.cursor()
 
     code = generate_quiz_code()
+    is_paid = 1 if is_paid_user_active(user_id) else 0
+
 
     c.execute("""
     INSERT INTO user_quizzes
-    (user_id, quiz_data, quiz_code, created_at)
-    VALUES (?, ?, ?, ?)
+    (user_id, quiz_data, quiz_code, created_at, is_paid)
+    VALUES (?, ?, ?, ?, ?)
     """, (
         user_id,
         json.dumps(quizzes),
@@ -37,6 +39,22 @@ def store_quiz(user_id, quizzes):
     conn.close()
 
     return code
+
+#----------------------------
+#  🔹 cleanup old quizzes
+#----------------------------
+def cleanup_old_quizzes():
+    conn = get_connection()
+    cursor = conn.cursor()
+    expiry_time = datetime.utcnow() - timedelta(hours=48)
+
+    cursor.execute("""
+    DELETE FROM user_quizzes
+    WHERE is_paid = 0
+    AND datetime(created_at) < datetime(?)
+    """, (expiry_time.isoformat(),))
+
+    conn.commit()
 
 
 #----------------------------
