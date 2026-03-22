@@ -48,7 +48,7 @@ def register(bot):
         
             return
         user_id = message.from_user.id
-    
+        shared_by = message.from_user.first_name
         chat_id_to_publish = message.chat_shared.chat_id
         request_id = message.chat_shared.request_id  # 🔥 هذا المهم
 
@@ -76,7 +76,7 @@ def register(bot):
             bot.send_message(message.chat.id, "✨ أنت مستخدم Pro! كيف تريد ظهور الاختبار في قناتك؟", reply_markup=keyboard)
         else:
             # المستخدم مجاني: ننشر فوراً بـ "الطريقة التفاعلية" (التي تفيدك أنت)
-            publish_interactive_link(bot, chat_id_to_publish, quiz_code, watermark=True)
+            publish_interactive_link(bot, chat_id_to_publish, quiz_code, shared_by, watermark=True)
         
             # رسالة نجاح في شات البوت الخاص
             bot.send_message(message.chat.id, "✅ تم نشر الاختبار في قناتك بنجاح باستخدام الرابط التفاعلي!")
