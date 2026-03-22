@@ -1,7 +1,7 @@
 # menu.py
 # تم النقل
 from storage.sqlite_db import is_user_exist, log_new_user
-from storage.messages import gey_message
+from storage.messages import get_message
 
 
 from bot.bot_instance import mybot
