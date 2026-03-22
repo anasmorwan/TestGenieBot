@@ -69,6 +69,7 @@ def register(bot):
             quiz_code = store_quiz(user_id, quizzes)
             maybe_cleanup()
             backup_all()
+            quiz_len = len(quizzes)
 
 
             bot.edit_message_text(
