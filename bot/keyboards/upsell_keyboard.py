@@ -1,6 +1,12 @@
-keyboard = types.InlineKeyboardMarkup()
-keyboard.add(
-    types.InlineKeyboardButton("💎 ترقية إلى Pro", callback_data="upgrade_account")
-)
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-bot.send_message(chat_id, text, reply_markup=keyboard)
+def saved_quiz_upsell():
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    
+    buttons = [ 
+    InlineKeyboardButton("💎 ترقية إلى Pro", callback_data="upgrade_account")
+        ]
+    keyboard.add(*buttons)
+    
+    return keyboard
+
