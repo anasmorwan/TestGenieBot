@@ -118,24 +118,44 @@ class QuizManager:
 
         score = state["score"]
         total = len(state["questions"])
+        total = len(state["questions"])
+        score = state.get("score", 0)  # تأكد من وجود score
+
+        # بناء النص الأساسي
         text = f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
-     
+
+        # تحديد لوحة المفاتيح حسب حالة المستخدم
+        keyboard = None
+
         if not is_paid_user_active():
             extra_quiz_msg = get_message("QUIZ_LIMIT")
-            text += f"\n\n{extra_quiz_msg}"
+            if extra_quiz_msg:  # تأكد أن الرسالة موجودة
+                text += f"\n\n{extra_quiz_msg}"
             keyboard = saved_quiz_upsell()
+            # لا تعيد تعريف text هنا
         else:
+            # المستخدم مدفوع - لا نضيف شيء
             keyboard = None
-            
-     
 
-        bot.send_message(
-         chat_id=chat_id,
-         text=text,
-         reply_markup=keyboard,
-         parse_mode="HTML"
-            
-        )
+        # إرسال الرسالة مع التحقق
+        try:
+            if keyboard:
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
+            else:
+                # بدون keyboard
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    parse_mode="HTML"
+                )
+            print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")
+        except Exception as e:
+            print(f"❌ فشل إرسال النتيجة: {e}")
 
     
     def send_quiz_poll(self, bot, chat_id, question):
@@ -146,7 +166,7 @@ class QuizManager:
                 question=str(question.question)[:300],
                 options=[str(opt) for opt in question.options if opt],
                 type="quiz",
-                correct_option_id=int(question.correct_index),
+                correct_option_id=int(question.correct_index) if question.correct_index is not None else 0,
                 explanation=str(question.explanation or "")[:200],
                 is_anonymous=False
                 
