@@ -37,8 +37,13 @@ safe_add_column()
 print("✅ قاعدة البيانات جاهزة ومحدثة", flush=True)
 
 # 4. بدء النسخ الاحتياطي التلقائي بعد استقرار الحالة
-start_auto_backup()
+# start_auto_backup()
 
+from services.backup_service import start_auto_backup, scheduler
+
+# بعد init_db و restore
+start_auto_backup()
+scheduler.start()
 
 
 
