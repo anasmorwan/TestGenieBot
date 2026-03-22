@@ -255,6 +255,7 @@ def backup_manual(bot):
 # =========================
 # 🔹 Auto Backup Thread
 # =========================
+"""
 def start_auto_backup(interval=300):
     def loop():
         while True:
@@ -266,7 +267,7 @@ def start_auto_backup(interval=300):
     t.start()
 
 
-
+"""
 # =========================
 # 🔹 is_db_valid
 # =========================
@@ -309,3 +310,17 @@ def restore_if_needed():
     else:
         print(f"✅ قاعدة البيانات موجودة وصالحة (الحجم: {os.path.getsize(DB_PATH)} بايت)")
 
+
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = BackgroundScheduler()
+
+def start_auto_backup():
+    scheduler.add_job(
+        func=backup_all,
+        trigger='interval',
+        minutes=30,
+        id='auto_backup',
+        replace_existing=True
+        )
