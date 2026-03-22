@@ -10,3 +10,16 @@ def saved_quiz_upsell():
     
     return keyboard
 
+def quiz_number_limit_upsell():
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    
+    buttons = [ 
+    InlineKeyboardButton("💎 ترقية إلى Pro", callback_data="plans"),
+    InlineKeyboardButton("🚀 مشاركة الإختبار", callback_data="post_quiz")
+
+        ]
+    keyboard.add(*buttons)
+    
+    return keyboard
+    
+
