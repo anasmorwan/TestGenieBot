@@ -7,26 +7,12 @@ from bot.handlers import poll_answer_handler
 from bot import flask
 from services.backup_service import restore_if_needed, start_auto_backup
 from services.backup_service import is_db_valid, smart_restore
-from storage.sqlite_db import force_add_column
+from storage.sqlite_db import safe_add_column
 from bot.handlers import chat_shared_handler 
 from bot.handlers import commands
 
 
 
-print("main starting...", flush=True)
-
-# تسجيل الهاندلرز
-start.register(mybot); print("start.register done", flush=True)
-text_handler.register(mybot); print("text_handler.register done", flush=True)
-file_handler.register(mybot); print("file_handler.register done", flush=True)
-callback_handler.register(mybot); print("callback_handler.register done", flush=True)
-pre_checkout_query_handler.register_payment(mybot); print("pre_checkout_query_handler.register done", flush=True)
-payment_handler.register(mybot); print("payment_handler.register done", flush=True)
-poll_answer_handler.register(mybot)
-chat_shared_handler.register(mybot)
-commands.register(mybot)
-
-# سجل الويب هوك داخلياً
 flask.register(); print("flask.register done", flush=True)
 
 
@@ -46,11 +32,30 @@ if not is_db_valid():
 # وظيفة هذه الخطوة هي "التكملة" فقط؛ إذا كان الملف المستورد قديماً 
 # ونقصته جداول جديدة قمت بإضافتها في التحديث الأخير، ستقوم init_db بإنشائها
 init_db() 
-force_add_column()
+safe_add_column()
 print("✅ قاعدة البيانات جاهزة ومحدثة", flush=True)
 
 # 4. بدء النسخ الاحتياطي التلقائي بعد استقرار الحالة
 start_auto_backup()
+
+
+
+
+print("main starting...", flush=True)
+
+# تسجيل الهاندلرز
+start.register(mybot); print("start.register done", flush=True)
+text_handler.register(mybot); print("text_handler.register done", flush=True)
+file_handler.register(mybot); print("file_handler.register done", flush=True)
+callback_handler.register(mybot); print("callback_handler.register done", flush=True)
+pre_checkout_query_handler.register_payment(mybot); print("pre_checkout_query_handler.register done", flush=True)
+payment_handler.register(mybot); print("payment_handler.register done", flush=True)
+poll_answer_handler.register(mybot)
+chat_shared_handler.register(mybot)
+commands.register(mybot)
+
+# سجل الويب هوك داخلياً
+
 
 
 
