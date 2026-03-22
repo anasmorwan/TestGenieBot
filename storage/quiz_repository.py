@@ -56,7 +56,15 @@ def cleanup_old_quizzes():
 
     conn.commit()
 
+def maybe_cleanup():
+    now = datetime.utcnow()
 
+    cursor.execute("""
+    DELETE FROM user_quizzes
+    WHERE is_paid = 0
+    AND datetime(created_at) < datetime('now', '-48 hours')
+    """)
+    conn.commit()
 #----------------------------
 #  🔹 Quiz share log
 #----------------------------
