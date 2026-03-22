@@ -15,7 +15,7 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.account_status_keyboard import account_status_keyboard
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
-from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat, log_quiz_share
+from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat, log_quiz_share, is_quiz_expired
 from bot.handlers.chat_shared_handler import publish_interactive_link
 
 
@@ -93,13 +93,37 @@ def register(bot):
             if data.startswith("start_quiz"):
                 parts = data.split(":")
                 quiz_code = parts[1] if len(parts) > 1 else None
+
+                if is_quiz_expired(quiz_code):
+                    bot.answer_callback_query(call.id)
+        
+                    bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    text=get_message("SAVE_LIMIT"),
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                    )
+                    return
+
                 result = quiz_manager.start_quiz(chat_id, quiz_code, bot)
                 print("START QUIZ RESULT:", result)
-
             
             elif data.startswith("post_quiz"):
                 parts = data.split(":")
                 quiz_code = parts[1] if len(parts) > 1 else None
+                
+                if is_quiz_expired(quiz_code):
+                    bot.answer_callback_query(call.id)
+        
+                    bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    text=get_message("SAVE_LIMIT"),
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                    )
+                    return
                 update_user_current_quiz(user_id, quiz_code)
                 bot.answer_callback_query(call.id)
                 
