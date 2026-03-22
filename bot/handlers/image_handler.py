@@ -19,7 +19,7 @@ from services.backup_service import smart_restore, is_db_valid
 
 def register(bot):
 
-    @bot.message_handler(content_types=["image"])
+    @bot.message_handler(content_types=["photo"])
     def handle_image(msg):
         if msg.chat.type != "private":
         
