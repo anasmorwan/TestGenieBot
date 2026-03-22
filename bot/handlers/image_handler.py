@@ -1,3 +1,18 @@
+import os # لا تنسى استيراد مكتبة نظام التشغيل
+from services.content_parser import extract_text_from_file
+from services.quiz_service import generate_quizzes_from_text
+from storage.quiz_repository import store_quiz, maybe_cleanup
+from services.quiz_session_service import quiz_manager
+from services.file_upload import handle_file_upload
+# from services.poll_service import send_quiz_message
+from bot.keyboards.quiz_buttons import quiz_keyboard
+from storage.messages import get_message
+from services.referral import reward_referral_if_needed
+from services.usage import consume_quiz, can_generate, check_subscription_valid
+from bot.keyboards.referral_keyboard import referral_keyboard
+from services.backup_service import safe_backup, backup_all
+from services.backup_service import smart_restore, is_db_valid
+
 
 
 
@@ -5,7 +20,7 @@
 def register(bot):
 
     @bot.message_handler(content_types=["image"])
-    def handle_file(msg):
+    def handle_image(msg):
         if msg.chat.type != "private":
         
             return
