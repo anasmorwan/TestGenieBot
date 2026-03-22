@@ -42,8 +42,8 @@ def register(bot):
             parts = call.data.split(":")
             action_type = parts[1]
             quiz_code = parts[2]
-            chat_type = part[3]
             target_chat_id = int(parts[3]) # تحويل ID القناة إلى رقم صحيح
+            chat_type = part[4]
             
 
             bot.answer_callback_query(call.id, "⌛ جاري النشر في القناة...")
@@ -55,7 +55,7 @@ def register(bot):
 
             if success:
                 
-                bot.answer_callback_query(call.id, "✅ تم نشر الإختبار في القناة بنجاح")
+                bot.answer_callback_query(call.id, f"✅ تم نشر الإختبار في {chat_type} بنجاح")
 
                 # 3. تسجيل عملية المشاركة في قاعدة البيانات
                 log_quiz_share(quiz_code, call.from_user.id, call.from_user.first_name)
