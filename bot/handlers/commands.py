@@ -1,5 +1,7 @@
 import os
-from services.usage import activate_subscription_manual, reset_or_set_daily_usage
+from services.usage import activate_subscription_manual, reset_or_set_daily_usage, get_user_full_info
+
+
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
 def register(bot):
@@ -37,3 +39,51 @@ def register(bot):
 
         except Exception as e:
             bot.reply_to(msg, f"❌ استخدم: /reset_usage user_id 3\nالخطأ: {str(e)}")
+
+    
+
+    @bot.message_handler(commands=["user_info"])
+    def user_info(msg):
+        if msg.from_user.id != ADMIN_ID:
+            return
+
+        try:
+            _, user_id = msg.text.split()
+            user_id = int(user_id)
+
+            data = get_user_full_info(user_id)
+
+            user = data["user"]
+            sub = data["sub"]
+
+            if not user:
+                bot.reply_to(msg, "❌ المستخدم غير موجود")
+                return
+
+            used_today, daily_limit, created_at = user
+
+            if sub:
+                plan, expires_at, quiz_limit, ocr_limit = sub
+            else:
+                plan, expires_at, quiz_limit, ocr_limit = ("free", None, 3, 1)
+
+            text = f"""
+📊 <b>User Info</b>
+
+🆔 ID: <code>{user_id}</code>
+
+👤 Plan: <b>{plan}</b>
+⚡ Used Today: {used_today} / {quiz_limit}
+📅 Expires: {expires_at or "N/A"}
+
+🎁 Referrals: {data['referrals']}
+
+📆 Joined: {created_at}
+"""
+
+            bot.reply_to(msg, text, parse_mode="HTML")
+
+        except:
+            bot.reply_to(msg, "❌ استخدم: /user_info 123456")
+
+
