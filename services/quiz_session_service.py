@@ -5,8 +5,8 @@ from datetime import datetime
 from models.quiz import QuizQuestion
 # from services.poll_service import send_quiz_poll
 import threading
-
-
+from service.usage import is_paid_user_active
+from storage.messages import get_message
  
 class QuizManager:
     def __init__(self):
@@ -118,10 +118,16 @@ class QuizManager:
 
         score = state["score"]
         total = len(state["questions"])
+        text = f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
+        if not is_paid_user_active():
+            extra_quiz_msg = get_message("QUIZ_LIMIT")
+            text += f"\n\n{extra_quiz_msg}"
+     
 
         bot.send_message(
-            chat_id,
-            f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
+         chat_id=chat_id,
+         text=text
+            
         )
 
     
