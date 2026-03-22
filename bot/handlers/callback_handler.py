@@ -338,11 +338,11 @@ def register(bot):
                 }
     
                 if plan == "pro_plan":
-                    prices = [LabeledPrice(label="Pro Plan", amount=500)]
+                    prices = [LabeledPrice(label="Pro Plan", amount=400)]
                     payload = "pro_plan"
 
                 elif plan == "pro_plus_plan":
-                    prices = [LabeledPrice(label="Pro+ Plan", amount=700)]
+                    prices = [LabeledPrice(label="Pro+ Plan", amount=500)]
                     payload = "pro_plus_plan"
 
                 bot.send_invoice(
