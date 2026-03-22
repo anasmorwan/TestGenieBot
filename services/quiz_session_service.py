@@ -158,6 +158,7 @@ class QuizManager:
             print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")
         except Exception as e:
             print(f"❌ فشل إرسال النتيجة: {e}")
+            bot.send_message(chat_id, f"خطأ: {str(e)}")
 
     
     def send_quiz_poll(self, bot, chat_id, question):
