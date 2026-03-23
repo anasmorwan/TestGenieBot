@@ -8,8 +8,8 @@ import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
 # from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell, tracking_upsell_keyboard
-from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_advanced_stats_message
-from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate 
+from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_viral_message
+from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
 from bot.keyboards.quiz_buttons import share_quiz_button
 import random
 import time
