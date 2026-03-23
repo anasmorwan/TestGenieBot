@@ -8,7 +8,7 @@ import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
 # from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell, tracking_upsell_keyboard
-from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_viral_message
+from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_viral_message, get_quiz_user_ids
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
 from bot.keyboards.quiz_buttons import share_quiz_button
 import random
@@ -168,7 +168,17 @@ class QuizManager:
             if quiz_code:
                 log_quiz_attempt(chat_id, quiz_code, score, total)
                 stats = get_quiz_stats(quiz_code)
-                if stats["users"] >= 3 and stats["completed"] >= 2:
+
+                # if stats["users"] >= 3 and stats["completed"] < 5:
+                if stats["users"] >= 3:
+                    user_ids = get_quiz_user_ids(quiz_code)
+                    names = format_usernames(bot, user_ids)
+
+                    message = build_quiz_viral_message(stats, names)
+                    bot.send_message(chat_id, message)
+
+     
+                elif stats["users"] >= 3 and stats["completed"] >= 5:
                     hardest = get_hardest_question(quiz_code)
                     success = get_success_rate(quiz_code)
                     message = build_advanced_stats_message(stats, hardest, success)
@@ -218,3 +228,16 @@ class QuizManager:
 
 quiz_manager = QuizManager()
 
+
+
+
+# 1️⃣ تسجيل المحاولة
+log_quiz_attempt(user_id, quiz_code, score, total)
+
+# 2️⃣ جلب stats
+stats = get_quiz_stats(quiz_code)
+
+# 3️⃣ شرط الرسالة الفيرال
+
+
+    
