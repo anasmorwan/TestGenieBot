@@ -8,7 +8,7 @@ import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
 # from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell, tracking_upsell_keyboard
-from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_viral_message, get_quiz_user_ids
+from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_viral_message, format_usernames, get_quiz_user_ids
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
 from bot.keyboards.quiz_buttons import share_quiz_button
 import random
@@ -229,15 +229,3 @@ class QuizManager:
 quiz_manager = QuizManager()
 
 
-
-
-# 1️⃣ تسجيل المحاولة
-log_quiz_attempt(user_id, quiz_code, score, total)
-
-# 2️⃣ جلب stats
-stats = get_quiz_stats(quiz_code)
-
-# 3️⃣ شرط الرسالة الفيرال
-
-
-    
