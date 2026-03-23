@@ -173,7 +173,7 @@ class QuizManager:
                 # if stats["users"] >= 3 and stats["completed"] < 5:
 
                 
-                if stats["users"] >= 3:
+                if stats["users"] >= 1:
                     
                     user_ids = get_quiz_user_ids(quiz_code)
                     names = format_usernames(bot, user_ids)
@@ -184,7 +184,7 @@ class QuizManager:
                     bot.send_message(chat_id=creator_id, text=message, reply_markup=keyboard)
 
      
-                elif stats["users"] >= 3 and stats["completed"] >= 5:
+                elif stats["users"] >= 1 and stats["completed"] >= 1:
                     hardest = get_hardest_question(quiz_code)
                     success = get_success_rate(quiz_code)
                     message = build_advanced_stats_message(stats, hardest, success)
