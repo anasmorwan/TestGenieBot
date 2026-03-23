@@ -171,7 +171,7 @@ def safe_add_column():
 def safe_add_table():
     conn = get_connection()
     c = conn.cursor()
-    if table_exists(quiz_attempts):
+    if table_exists("quiz_attempts"):
         
         c.execute("""
         DROP TABLE quiz_attempts;
