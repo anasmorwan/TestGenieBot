@@ -7,7 +7,7 @@ from models.quiz import QuizQuestion
 import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
-# from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell
+# from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell, tracking_upsell_keyboard
 from storage.quiz_attempts import log_quiz_attempt
 from analytics.shared_quiz_analytics import get_quiz_stats, get_hardest_question, get_success_rate, build_advanced_stats_message 
 from bot.keyboards.quiz_buttons import share_quiz_button
@@ -185,7 +185,8 @@ class QuizManager:
                             text="🎉"
                         )
                         time.sleep(2)
-                    bot.edit_message_text(chat_id, message_id=waiting_msg.message_id, text=message, parse_mode="HTML")
+                    keyboard = tracking_upsell_keyboard()
+                    bot.edit_message_text(chat_id, message_id=waiting_msg.message_id, text=message, reply_markup=keyboard, parse_mode="HTML")
 
             
             
