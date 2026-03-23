@@ -25,6 +25,25 @@ def log_quiz_start(user_id, quiz_code):
     conn.close()
 
 #--------------------------
+#    جلب صانع الاختبار    
+#-----------------------------
+def get_quiz_creator(quiz_code):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute("""
+        SELECT user_id 
+        FROM user_quizzes
+        WHERE quiz_code=?
+    """, (quiz_code,))
+
+    row = c.fetchone()
+    conn.close()
+
+    return row[0] if row else None
+
+
+#--------------------------
 #      تحليل الاداء للسمتخدمين    
 #-----------------------------
 def get_quiz_stats(quiz_code):
