@@ -8,7 +8,8 @@ import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
 # from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell
-from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, get_hardest_question, get_success_rate, build_advanced_stats_message 
+from storage.quiz_attempts import log_quiz_attempt
+from analytics.shared_quiz_analytics import get_quiz_stats, get_hardest_question, get_success_rate, build_advanced_stats_message 
 
 class QuizManager:
     def __init__(self):
@@ -111,10 +112,7 @@ class QuizManager:
         state["index"] += 1
 
         if state["index"] >= len(state["questions"]):
-            score = state["score"]
-            quiz_code = state["quiz_code"]
-            total = len(state["questions"])
-            log_quiz_attempt(chat_id, quiz_code, score, total)
+            
             self.finish_quiz(chat_id, bot, is_shared_user=shared)
 
         
@@ -122,17 +120,16 @@ class QuizManager:
             self.send_current_question(chat_id, bot)
          
     def finish_quiz(self, chat_id, bot, is_shared_user=None):
-        
-        
+    
         state = self.sessions.pop(chat_id, None)
         if not state:
             return
 
-        score = state["score"]
+        # ✅ استخراج جميع البيانات مرة واحدة في البداية
+        score = state.get("score", 0)
         total = len(state["questions"])
-        total = len(state["questions"])
-        score = state.get("score", 0)  # تأكد من وجود score
-        
+        quiz_code = state.get("quiz_code")  # استخراج quiz_code
+    
         # إذا لم تُمرر القيمة، نستخدم المخزنة في الجلسة (احتياطي)
         shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
 
@@ -141,22 +138,36 @@ class QuizManager:
 
         if not is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
-            if extra_quiz_msg:  # تأكد أن الرسالة موجودة
+            if extra_quiz_msg:
                 text += f"\n\n{extra_quiz_msg}"
+    
+            # ✅ إرسال الرسالة وتسجيل المحاولة
+            try:
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    parse_mode="HTML"
+                )
+                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")
+        
             
-        # إرسال الرسالة مع التحقق
-        try:
-            bot.send_message(
-                chat_id=chat_id,
-                text=text,
-                parse_mode="HTML"
-            )
+            except Exception as e:
+                print(f"❌ فشل إرسال النتيجة: {e}")
+                bot.send_message(chat_id, f"خطأ: {str(e)}")
+                
+        elif shared:
             
-            print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")
-        except Exception as e:
-            print(f"❌ فشل إرسال النتيجة: {e}")
-            bot.send_message(chat_id, f"خطأ: {str(e)}")
+            if quiz_code:
+                log_quiz_attempt(chat_id, quiz_code, score, total)
+                stats = get_quiz_stats(quiz_code)
+                if stats["users"] >= 3 and stats["completed"] >= 2:
+                    hardest = get_hardest_question(quiz_code)
+                    success = get_success_rate(quiz_code)
+                    message = build_advanced_stats_message(stats, hardest, success)
+                    bot.send_message(chat_id, message, parse_mode="HTML")
 
+            
+            
     
     def send_quiz_poll(self, bot, chat_id, question):
         try:
@@ -185,24 +196,3 @@ class QuizManager:
 
 quiz_manager = QuizManager()
 
-
-
-
-# 1️⃣ سجل المحاولة
-log_quiz_attempt(user_id, quiz_code, score, total)
-
-# 2️⃣ احسب الإحصائيات
-stats = get_quiz_stats(quiz_code)
-
-# 3️⃣ شرط العرض
-if stats["users"] >= 3 and stats["completed"] >= 2:
-
-    # 4️⃣ جلب التحليل
-    hardest = get_hardest_question(quiz_code)
-    success = get_success_rate(quiz_code)
-
-    # 5️⃣ بناء الرسالة
-    message = build_advanced_stats_message(stats, hardest, success)
-
-    # 6️⃣ إرسالها
-    bot.send_message(chat_id, message, parse_mode="HTML")
