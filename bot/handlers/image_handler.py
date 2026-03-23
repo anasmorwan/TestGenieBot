@@ -8,7 +8,7 @@ from services.file_upload import handle_file_upload
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.messages import get_message
 from services.referral import reward_referral_if_needed
-from services.usage import consume_quiz, can_generate, check_subscription_valid
+from services.usage import consume_quiz, can_generate, check_subscription_valid, is_paid_user_active
 from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
@@ -30,6 +30,14 @@ def register(bot):
         message_id = msg.message_id
 
         try:
+            if not is_paid_user_active(user_id):
+                keyboard = saved_quiz_upsell()
+                return bot.send_message(
+                    chat_id=chat_id, 
+                    text="📸 هذه الميزة متاحة فقط للمشتركين Pro.\n\n"
+                    "💎 اشترك الآن لتحويل الصور إلى اختبارات تلقائيًا بلا حدود!",
+                    reply_markup=keyboard
+            )
             plan = check_subscription_valid(user_id)
 
             allowed, info = can_generate(user_id)
