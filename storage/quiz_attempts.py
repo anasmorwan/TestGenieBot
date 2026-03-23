@@ -101,7 +101,24 @@ def get_top_users(quiz_code, limit=5):
 
     return rows
 
+#--------------------------
+#    جلب اسماء المستخدمين    
+#---------------------------
+def get_quiz_user_ids(quiz_code):
+    conn = get_connection()
+    c = conn.cursor()
 
+    c.execute("""
+        SELECT DISTINCT user_id 
+        FROM quiz_attempts
+        WHERE quiz_code=?
+    """, (quiz_code,))
+
+    rows = c.fetchall()
+    conn.close()
+
+    return [r[0] for r in rows]
+    
 #--------------------------
 #      . أسماء المستخدمين (اختياري)    
 #---------------------------
