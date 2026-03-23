@@ -93,7 +93,7 @@ def register(bot):
 
                         return
 
-                    log_quiz_start(user_id, quiz_code)
+                    log_quiz_start(uid, quiz_code)
                     bot.edit_message_text(
                     chat_id=chat_id,
                     message_id=loading_msg.message_id,
