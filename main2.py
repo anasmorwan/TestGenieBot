@@ -7,7 +7,7 @@ from bot.handlers import poll_answer_handler
 from bot import flask
 from services.backup_service import restore_if_needed, start_auto_backup
 from services.backup_service import is_db_valid, smart_restore
-from storage.sqlite_db import safe_add_column
+from storage.sqlite_db import safe_add_column, safe_add_table
 from bot.handlers import chat_shared_handler 
 from bot.handlers import menagement_commands
 
@@ -35,6 +35,7 @@ if not is_db_valid():
 # ونقصته جداول جديدة قمت بإضافتها في التحديث الأخير، ستقوم init_db بإنشائها
 init_db() 
 safe_add_column()
+safe_add_table()
 print("✅ قاعدة البيانات جاهزة ومحدثة", flush=True)
 
 # 4. بدء النسخ الاحتياطي التلقائي بعد استقرار الحالة
