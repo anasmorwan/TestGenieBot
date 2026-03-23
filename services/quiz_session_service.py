@@ -7,7 +7,7 @@ from models.quiz import QuizQuestion
 import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
-from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell
+# from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell
 from storage.quiz_attempts import log_quiz_attempt
 
 class QuizManager:
@@ -139,35 +139,19 @@ class QuizManager:
         # بناء النص الأساسي
         text = f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
 
-        # تحديد لوحة المفاتيح حسب حالة المستخدم
-        keyboard = None
-
         if not is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if extra_quiz_msg:  # تأكد أن الرسالة موجودة
                 text += f"\n\n{extra_quiz_msg}"
-            keyboard = quiz_number_limit_upsell()
-            # لا تعيد تعريف text هنا
-        else:
-            # المستخدم مدفوع - لا نضيف شيء
-            keyboard = None
             
         # إرسال الرسالة مع التحقق
         try:
-            if keyboard:
-                bot.send_message(
-                    chat_id=chat_id,
-                    text=text,
-                    reply_markup=keyboard,
-                    parse_mode="HTML"
-                )
-            else:
-                # بدون keyboard
-                bot.send_message(
-                    chat_id=chat_id,
-                    text=text,
-                    parse_mode="HTML"
-                )
+            bot.send_message(
+                chat_id=chat_id,
+                text=text,
+                parse_mode="HTML"
+            )
+            
             print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")
         except Exception as e:
             print(f"❌ فشل إرسال النتيجة: {e}")
