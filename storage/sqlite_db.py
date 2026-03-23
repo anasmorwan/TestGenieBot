@@ -28,7 +28,7 @@ def init_db():
         user_id INTEGER,
         score INTEGER,
         total INTEGER,
-        timestamp TEXT
+        timestamp TEXT,
         UNIQUE(user_id, quiz_code)
     )
     """)
