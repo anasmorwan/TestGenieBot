@@ -184,6 +184,7 @@ class QuizManager:
                             message_id=waiting_msg.message_id, 
                             text="🎉"
                         )
+                        time.sleep(2)
                     bot.edit_message_text(chat_id, message_id=waiting_msg.message_id, text=message, parse_mode="HTML")
 
             
