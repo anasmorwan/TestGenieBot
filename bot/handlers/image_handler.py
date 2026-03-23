@@ -52,7 +52,7 @@ def register(bot):
         
         try:
             waiting_msg = bot.send_message(chat_id=chat_id, text=get_message("FILE_QUIZ"))
-            path = handle_file_upload(msg)
+            path, filename = handle_file_upload(msg)
 
         except Exception as e:
             bot.send_message(chat_id, f"❌ Error: {str(e)}")
