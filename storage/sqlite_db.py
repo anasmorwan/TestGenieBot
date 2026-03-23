@@ -21,17 +21,7 @@ def init_db():
         last_reset TEXT
     )
     """)
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS quiz_attempts (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        quiz_code TEXT,
-        user_id INTEGER,
-        score INTEGER,
-        total INTEGER,
-        timestamp TEXT
-        
-    )
-    """)
+    
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS subscriptions (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -133,6 +123,20 @@ def init_db():
     conn.commit()
     conn.close()
 
+
+def table_exists(table):
+    """التحقق من وجود جدول في قاعدة البيانات"""
+    conn = get_connection()
+    c = conn.cursor()
+    
+    # التحقق من وجود الجدول
+    c.execute(f"SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table,))
+    exists = c.fetchone() is not None
+    
+    conn.close()
+    return exists
+
+
 def column_exists(table, column):
     conn = get_connection()
     c = conn.cursor()
@@ -157,15 +161,37 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE user_quizzes ADD COLUMN is_paid BOOLEAN DEFAULT 0
         """)
+    conn.commit()
+    conn.close()
+    print("✅ Schema updated safely")
+
+
+
+
+def safe_add_table():
+    conn = get_connection()
+    c = conn.cursor()
+    if table_exists(quiz_attempts):
+        
         c.execute("""
         DROP TABLE quiz_attempts;
         """)
+        
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS quiz_attempts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        quiz_code TEXT,
+        user_id INTEGER,
+        score INTEGER,
+        total INTEGER,
+        timestamp TEXT 
+    )
+    """)
 
     conn.commit()
     conn.close()
 
-    print("✅ Schema updated safely")
-
+    
 
 
 
