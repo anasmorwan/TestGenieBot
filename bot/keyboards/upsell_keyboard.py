@@ -27,7 +27,7 @@ def tracking_upsell_keyboard():
     keyboard = InlineKeyboardMarkup(row_width=1)
     
     buttons = [ 
-    InlineKeyboardButton("🔓 إلغاء قفل التتبع", callback_data="plans")
+    InlineKeyboardButton("🔓 إفتح القائمة كاملة", callback_data="plans")
         ]
     keyboard.add(*buttons)
     
