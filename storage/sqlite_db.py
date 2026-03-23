@@ -28,8 +28,8 @@ def init_db():
         user_id INTEGER,
         score INTEGER,
         total INTEGER,
-        timestamp TEXT,
-        UNIQUE(user_id, quiz_code)
+        timestamp TEXT
+        
     )
     """)
     cursor.execute("""
@@ -156,6 +156,9 @@ def safe_add_column():
     if not column_exists("user_quizzes", "is_paid"):
         c.execute("""
         ALTER TABLE user_quizzes ADD COLUMN is_paid BOOLEAN DEFAULT 0
+        """)
+        c.execute("""
+        DROP TABLE quiz_attempts;
         """)
 
     conn.commit()
