@@ -73,7 +73,6 @@ def handle_file_upload(msg):
     # ✅ حفظ الملف
     path = save_file(uid, file_name, file_data, file_type)
     
-    mybot.send_message(chat_id, f"✅ تم رفع {file_type}: {file_name}")
     
     return path, file_name
 
