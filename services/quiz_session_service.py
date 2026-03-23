@@ -10,6 +10,11 @@ from storage.messages import get_message
 # from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell
 from storage.quiz_attempts import log_quiz_attempt
 from analytics.shared_quiz_analytics import get_quiz_stats, get_hardest_question, get_success_rate, build_advanced_stats_message 
+from bot.keyboards.quiz_buttons import share_quiz_button
+import random
+import time
+
+
 
 class QuizManager:
     def __init__(self):
@@ -140,12 +145,15 @@ class QuizManager:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if extra_quiz_msg:
                 text += f"\n\n{extra_quiz_msg}"
+
+            keyboard = share_quiz_button(quiz_code)
     
             # ✅ إرسال الرسالة وتسجيل المحاولة
             try:
                 bot.send_message(
                     chat_id=chat_id,
                     text=text,
+                    reply_markup=keyboard,
                     parse_mode="HTML"
                 )
                 print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")
@@ -164,7 +172,19 @@ class QuizManager:
                     hardest = get_hardest_question(quiz_code)
                     success = get_success_rate(quiz_code)
                     message = build_advanced_stats_message(stats, hardest, success)
-                    bot.send_message(chat_id, message, parse_mode="HTML")
+                    waiting_msg = bot.send_message(chat_id, "⏳ جارٍ تحليل النتائج...")
+                    
+                    wait_time = random.uniform(1, 3)
+                    time.sleep(wait_time)
+
+                    
+                    if random.randint(0, 1) == 1:  # 50% احتمال
+                        bot.edit_message_text(
+                            chat_id=chat_id, 
+                            message_id=waiting_msg.message_id, 
+                            text="🎉"
+                        )
+                    bot.edit_message_text(chat_id, message_id=waiting_msg.message_id, text=message, parse_mode="HTML")
 
             
             
