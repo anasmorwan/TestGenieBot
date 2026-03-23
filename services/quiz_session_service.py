@@ -175,7 +175,8 @@ class QuizManager:
                     names = format_usernames(bot, user_ids)
 
                     message = build_quiz_viral_message(stats, names)
-                    bot.send_message(chat_id, message)
+                    keyboard = tracking_upsell_keyboard()
+                    bot.send_message(chat_id=chat_id, text=message, reply_markup=keyboard)
 
      
                 elif stats["users"] >= 3 and stats["completed"] >= 5:
