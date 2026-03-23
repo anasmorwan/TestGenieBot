@@ -8,7 +8,7 @@ import threading
 from services.usage import is_paid_user_active
 from storage.messages import get_message
 # from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell
-from storage.quiz_attempts import log_quiz_attempt
+from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, get_hardest_question, get_success_rate, build_advanced_stats_message 
 
 class QuizManager:
     def __init__(self):
@@ -185,3 +185,24 @@ class QuizManager:
 
 quiz_manager = QuizManager()
 
+
+
+
+# 1️⃣ سجل المحاولة
+log_quiz_attempt(user_id, quiz_code, score, total)
+
+# 2️⃣ احسب الإحصائيات
+stats = get_quiz_stats(quiz_code)
+
+# 3️⃣ شرط العرض
+if stats["users"] >= 3 and stats["completed"] >= 2:
+
+    # 4️⃣ جلب التحليل
+    hardest = get_hardest_question(quiz_code)
+    success = get_success_rate(quiz_code)
+
+    # 5️⃣ بناء الرسالة
+    message = build_advanced_stats_message(stats, hardest, success)
+
+    # 6️⃣ إرسالها
+    bot.send_message(chat_id, message, parse_mode="HTML")
