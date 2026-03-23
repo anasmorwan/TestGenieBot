@@ -8,6 +8,7 @@ from bot.handlers.menu import send_main_menu
 from storage.session_store import user_states
 from services.referral import save_referral
 from storage.sqlite_db import get_connection
+from analytics.shared_quiz_analytics import log_quiz_start
 
 
 
@@ -88,7 +89,11 @@ def register(bot):
                             message_id=loading_msg.message_id,
                             text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
                         )
+                        
+
                         return
+
+                    log_quiz_start(user_id, quiz_code)
                     bot.edit_message_text(
                     chat_id=chat_id,
                     message_id=loading_msg.message_id,
