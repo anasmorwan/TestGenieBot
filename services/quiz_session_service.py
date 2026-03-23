@@ -175,7 +175,7 @@ class QuizManager:
                     # if stats["users"] >= 3 and stats["completed"] < 5:
 
                 
-                    if stats["users"] >= 1:
+                    if stats["users"] >= 3:
                     
                         user_ids = get_quiz_user_ids(quiz_code)
                         names = format_usernames(bot, user_ids)
