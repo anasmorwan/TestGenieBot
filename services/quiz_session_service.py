@@ -180,7 +180,7 @@ class QuizManager:
 
                     message = build_quiz_viral_message(stats, names)
                     keyboard = tracking_upsell_keyboard()
-                    if user_id == creator_id:
+                    
                     bot.send_message(chat_id=creator_id, text=message, reply_markup=keyboard)
 
      
