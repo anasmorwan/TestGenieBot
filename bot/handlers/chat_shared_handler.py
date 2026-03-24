@@ -4,19 +4,20 @@ from storage.quiz_repository import get_user_current_quiz
 from storage.messages import get_message
 
 
+
+
+
+
+
 def publish_interactive_link(bot, target_chat_id, quiz_code, shared_by_name, watermark=True):
     announcement_text = (
-        f"🧠 **اختبار جديد متاح الآن!**\n"
-        f"━━━━━━━━━━━━━━━━━━\n"
-        f"👤 **بواسطة:** {shared_by_name}\n"
-        f"📝 **النوع:** اختبار ذكاء اصطناعي تفاعلي\n"
-        f"🔢 **الكود:** `{quiz_code}`\n"
-        f"━━━━━━━━━━━━━━━━━━\n"
-        f"🚀 اضغط على الزر أدناه لبدء التحدي وقياس مستواك فوراً!"
+        f"🧠 هل تستطيع حل هذا التحدي؟\n\n"  
+        f"🚀 ابدأ الآن خلال 30 ثانية\n"
+        f"🏆 هل تتفوق على أصدقائك؟\n"
     )
     
     if watermark:
-        announcement_text += f"\n\n✨ تم الإنشاء بواسطة: @testprog123bot"
+        announcement_text += f"\n\n✨ مدعوم بالذكاء الاصطناعي"
 
     bot_username = bot.get_me().username
     start_url = f"https://t.me/{bot_username}?start=shared_{quiz_code}"
