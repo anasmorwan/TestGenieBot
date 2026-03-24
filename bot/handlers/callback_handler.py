@@ -191,20 +191,11 @@ def register(bot):
                 print(f"bot_username: {bot_username}")
                 print(f"user_id: {user_id}")
     
-                # جلب النص قبل التنسيق
-                raw_text = MESSAGES["ar"]["REFERRAL_LINK"]
-                print(f"Raw text: {raw_text}")
-    
-                # تطبيق التنسيق يدوياً للتأكد
-                formatted_text = raw_text.format(username=bot_username, uid=user_id)
-                print(f"Formatted text: {formatted_text}")
-    
                 # استخدام الدالة
                 message_text = get_message("REFERRAL_LINK", username=bot_username, uid=user_id)
     
-                bot.edit_message_text(
+                bot.send_message(
                     chat_id=chat_id, 
-                    message_id=message_id, 
                     text=message_text, 
                     parse_mode="HTML"
                 )
