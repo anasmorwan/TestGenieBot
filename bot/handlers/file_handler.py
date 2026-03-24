@@ -69,6 +69,9 @@ def register(bot):
         try:
 
             if path:
+                bot.edit_message_text(chat_id=chat_id,
+                    message_id=waiting_msg.message_id,
+                    text="⏳ لحظة واحدة بعد...")
                 content = extract_text_from_file(
                     user_id,
                     bot,
@@ -107,9 +110,11 @@ def register(bot):
             # backup_all()
             quiz_len = len(quizzes)
 
-            bot.edit_message_text(
+            bot.delete_message(chat_id, message_id=waiting_msg.message_id)
+            
+
+            bot.send_message(
                 chat_id=chat_id,
-                message_id=waiting_msg.message_id,
                 text=get_message("QUIZ_CREATED", count=quiz_len),
                 reply_markup=quiz_keyboard(quiz_code),
                 parse_mode="HTML"
