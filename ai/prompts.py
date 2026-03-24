@@ -96,7 +96,13 @@ Return ONLY a JSON object with this exact keys:
 - Distractors must be strong misleads.
 - No 'All of the above'.
 {LANGUAGE_RULE}
+[STRICT LIMITS]:
+- Question text: Max 250 characters.
+- EACH Option: STRICTLY MAX 95 characters. This is a hard technical limit.
+- If an option is long, condense it without losing the academic meaning.
 """
+
+# أضف هذا الجزء داخل البرومبت في ملف prompts.py
 
 
 #----------------------------------------
@@ -183,47 +189,6 @@ Be specific and concise.
 """
 
 
-powerfull_prompt2 = (
-    "You are an expert assessment designer specialized in creating high-quality educational quizzes.\n\n"
-    "Your task:\n"
-    "Generate a set of multiple-choice questions based ONLY on the provided content.\n\n"
-    "CONTENT:\n\n"
-    "INSTRUCTIONS:\n\n"
-    "2. Each question must:\n"
-    "- Test understanding, not memorization\n"
-    "- Be clear, specific, and unambiguous\n"
-    "- Avoid trivial or overly obvious questions\n\n"
-    "3. Options:\n"
-    "- Provide exactly 4 options\n"
-    "- Only ONE correct answer\n"
-    "- The other 3 must be plausible distractors (not random or silly)\n"
-    '- Avoid "All of the above" or "None of the above"\n\n'
-    "4. Cognitive variety:\n"
-    "Ensure a mix of:\n"
-    "- comprehension questions\n"
-    "- application questions\n"
-    "- inference/analysis questions\n\n"
-    "5. Difficulty:\n"
-    "- Medium to challenging\n"
-    "- Avoid very easy questions\n\n"
-    "6. Language:\n"
-    "- Match the language of the content\n"
-    "- Keep wording natural and professional\n\n"
-    "7. Output format (STRICT JSON ONLY):\n"
-    "Return ONLY valid JSON. No explanations outside JSON.\n\n"
-    "FORMAT:\n\n"
-    "[\n"
-    "  {\n"
-    '    "question": "...",\n'
-    '    "options": ["...", "...", "...", "..."],\n'
-    '    "correct_index": 0,\n'
-    '    "explanation": "Short explanation of why this is correct"\n'
-    "  }\n"
-    "]\n\n"
-    "IMPORTANT:\n"
-    "- Ensure JSON is valid\n"
-    "- Do not include any text before or after JSON\n"
-)
 
 
 
@@ -370,6 +335,10 @@ Generate {num_questions} quiz questions.
 
 Content:
 {content}
+[STRICT LIMITS]:
+- Question text: Max 250 characters.
+- EACH Option: STRICTLY MAX 95 characters. This is a hard technical limit.
+- If an option is long, condense it without losing the academic meaning.
 """
 
     return prompt
