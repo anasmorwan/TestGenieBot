@@ -215,7 +215,7 @@ class QuizManager:
 
 
             
-            
+"""            
     
     def send_quiz_poll(self, bot, chat_id, question):
         try:
@@ -239,6 +239,51 @@ class QuizManager:
             import logging
             logging.exception("SEND POLL FAILED")
             return None
+
+"""
+    def send_quiz_poll(self, bot, chat_id, question_dict):
+        """
+        إرسال استطلاع رأي مع حماية كاملة من قيود تيليجرام
+        """
+        try:
+            # 1. الوصول للمفاتيح باستخدام القواميس (Dictionary Access)
+            # مع استخدام .get() لتجنب KeyError
+            q_text = question_dict.get('question', 'سؤال بدون عنوان')
+            options = question_dict.get('options', [])
+            correct_idx = question_dict.get('correct_index', 0)
+            # التأكد من وجود المفتاح الجديد 'explanation'
+            explanation_text = question_dict.get('explanation', '')
+
+            # 2. الحماية: قص النصوص لتطابق قيود تيليجرام الصارمة
+            # السؤال: بحد أقصى 300 حرف
+            safe_question = str(q_text)[:300]
+        
+            # الخيارات: بحد أقصى 100 حرف لكل خيار (حل مشكلة الخطأ 400)
+            safe_options = [str(opt)[:100] for opt in options if opt]
+        
+            # الشرح: بحد أقصى 200 حرف
+            safe_explanation = str(explanation_text)[:200]
+
+            # 3. إرسال الـ Poll
+            poll = bot.send_poll(
+                chat_id=chat_id,
+                question=safe_question,
+                options=safe_options,
+                type="quiz",
+                correct_option_id=int(correct_idx) if correct_idx is not None else 0,
+                explanation=safe_explanation,
+                is_anonymous=False
+            )
+
+            self.poll_map[poll.poll.id] = chat_id
+            return poll.message_id
+
+        except Exception as e:
+            import logging
+            logging.error(f"SEND POLL FAILED for chat {chat_id}: {e}")
+            return None
+
+
 
 
 
