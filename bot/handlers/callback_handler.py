@@ -310,7 +310,20 @@ def register(bot):
             elif data == "main_menu":
                 send_main_menu(chat_id, message_id)
 
-            elif data == "plans":
+            elif data.startswith("plans"):  # ✅ startswith
+                parts = data.split(":", maxsplit=1)
+                pram = parts[1]
+                if pram == "tracking":
+                    keyboard = paid_plans_keyboard()
+                    bot.answer_callback_query(call.id)
+                    bot.send_message(
+                        chat_id=chat_id,
+                        text=get_message("PLANS"),
+                        reply_markup=keyboard,
+                        parse_mode="HTML"
+                    )
+                    return
+
                 keyboard = paid_plans_keyboard()
                 bot.answer_callback_query(call.id)
                 bot.edit_message_text(
