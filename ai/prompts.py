@@ -4,9 +4,12 @@ ARABIC_QUIZ_PROMPT = "قم بإنشاء أسئلة اختبار فقط من ال
 
 
 LANGUAGE_RULE = """
-Language rule:
-Use the same language as the content.
+[CRITICAL LANGUAGE INSTRUCTION]
+1. Analyze the exact language of the provided CONTENT.
+2. The ENTIRE JSON output (keys can be English, but all values: questions, options, explanations, topics) MUST STRICTLY be written in the EXACT SAME LANGUAGE as the CONTENT.
+3. NEVER translate the content. If the content is Arabic, output Arabic. If English, output English.
 """
+
 QUIZ_RULES = """
 Rules:
 - Use ONLY information in the content.
@@ -69,54 +72,43 @@ prompt1 = (
 )
 
 prompt2 = (
-    "You are a professional exam creator.\n\n"
-    "Based on the analysis below, generate high-quality MCQs.\n\n"
-    "Rules:\n"
-    "- Questions must test understanding, not memorization\n"
-    "- Use realistic distractors (wrong answers)\n"
-    "- Avoid obvious answers\n"
-    "- Mix difficulty levels\n"
-    "- Include at least:\n"
-    "  - 30% conceptual questions\n"
-    "  - 30% application questions\n"
-    "  - 20% tricky questions\n"
-    "  - 20% direct questions\n\n"
+    "You are a strict University Professor and Board Examiner creating high-stakes academic MCQs.\n\n"
+    "Based on the analysis below and the original content, generate rigorous questions.\n\n"
+    "ACADEMIC RULES:\n"
+    "- 0% Recall: Do NOT ask for simple definitions or direct facts.\n"
+    "- 100% Cognitive Load: Questions MUST require Application, Analysis, or Evaluation of the concepts.\n"
+    "- Clinical/Scenario-based (if applicable): Frame questions as real-world problems or academic case studies where possible.\n"
+    "- Distractors (Wrong Options): MUST be highly plausible common misconceptions. No obvious or silly wrong answers.\n"
+    "- Do NOT use 'All of the above' or 'None of the above'.\n\n"
     "Each question must include:\n"
-    "- question\n"
-    "- 4 options\n"
-    "- correct_index\n"
-    "- explanation (very important)\n"
-    "- difficulty\n"
+    "- question (Clear, academic tone)\n"
+    "- 4 options (Similar in length and grammatical structure)\n"
+    "- correct_index (0-3)\n"
+    "- explanation (Detailed academic rationale explaining why the correct answer is right AND why the distractors are wrong)\n"
+    "- difficulty (Medium, Hard, Expert)\n"
     "- topic\n\n"
     f"{LANGUAGE_RULE}\n\n"
     "Output format (STRICT JSON ONLY):\n"
-    "Return ONLY valid JSON. No explanations outside JSON.\n\n"
-    "FORMAT:\n\n"
-    f"{QUIZ_FORMAT}\n\n"
-    "IMPORTANT:\n"
-    "- Ensure JSON is valid\n"
-    "- Do not include any text before or after JSON\n"
+    f"{QUIZ_FORMAT}\n"
 )
 
 
 prompt3 = (
-    "You are a strict exam reviewer.\n\n"
-    "Review the following MCQs:\n\n"
-    "Check:\n"
-    "- Is the correct answer واضح؟\n"
-    "- Are distractors strong?\n"
-    "- Is the question testing understanding?\n"
-    "- Is there ambiguity?\n\n"
-    "Fix and improve weak questions.\n\n"
-    f"{LANGUAGE_RULE}\n"
+    "You are a rigorous Academic Peer-Reviewer.\n\n"
+    "Review the following MCQs generated from the content.\n\n"
+    "EVALUATION CRITERIA:\n"
+    "1. Plausibility: Are the distractors tricky enough to confuse an unprepared student?\n"
+    "2. Clarity: Is the wording grammatically perfect and academically formal?\n"
+    "3. Depth: Does it test deep understanding rather than surface-level memorization?\n\n"
+    "ACTION:\n"
+    "- Rewrite any question that fails these criteria.\n"
+    "- Strengthen weak distractors.\n"
+    "- Enhance the explanation to be highly educational.\n\n"
+    f"{LANGUAGE_RULE}\n\n"
     "Output format (STRICT JSON ONLY):\n"
-    "Return ONLY valid JSON. No explanations outside JSON.\n\n"
-    "FORMAT:\n\n"
-    f"{QUIZ_FORMAT}\n\n"
-    "IMPORTANT:\n"
-    "- Ensure JSON is valid\n"
-    "- Do not include any text before or after JSON\n"
+    f"{QUIZ_FORMAT}\n"
 )
+
 
 
 
