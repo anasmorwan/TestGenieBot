@@ -27,7 +27,7 @@ def tracking_upsell_keyboard():
     keyboard = InlineKeyboardMarkup(row_width=1)
     
     buttons = [ 
-    InlineKeyboardButton("🔓 إفتح القائمة كاملة", callback_data="plans")
+    InlineKeyboardButton("🔓 إفتح القائمة كاملة", callback_data="plans:tracking")
         ]
     keyboard.add(*buttons)
     
