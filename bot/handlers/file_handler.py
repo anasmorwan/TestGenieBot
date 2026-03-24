@@ -69,9 +69,7 @@ def register(bot):
         try:
 
             if path:
-                bot.edit_message_text(chat_id=chat_id,
-                    message_id=waiting_msg.message_id,
-                    text="⏳ لحظة واحدة بعد...")
+                
                 content = extract_text_from_file(
                     user_id,
                     bot,
@@ -80,6 +78,10 @@ def register(bot):
                     chat_id,
                     message_id
                 )
+                bot.edit_message_text(chat_id=chat_id,
+                    message_id=waiting_msg.message_id,
+                    text="⏳ لحظة واحدة بعد...")
+                
                 if not content:
                     bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
                     return
