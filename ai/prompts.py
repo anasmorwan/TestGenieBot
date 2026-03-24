@@ -54,53 +54,53 @@ No markdown.
 
 # prompts.py
 
-# تحديث قاعدة اللغة لتكون صارمة وفي النهاية
+# تحديث قاعدة اللغة لتكون حاسمة (لا تقبل التأويل)
 LANGUAGE_RULE = """
-[STRICT LANGUAGE RULE]
-- IDENTIFY the language of the CONTENT.
-- ALL generated values (thinking, questions, options, explanations) MUST be in that SAME language.
-- DO NOT use English if the content is Arabic, and vice versa.
+[CRITICAL LANGUAGE OVERRIDE]
+1. First, detect the exact language of the provided CONTENT (e.g., Arabic, English).
+2. You MUST write the ENTIRE output (_thinking, questions, options, explanations, topics) in THAT EXACT SAME LANGUAGE.
+3. If the content is in Arabic, your thinking, explanations, and questions MUST be 100% in Arabic. NO EXCEPTIONS.
 """
 
 ACADEMIC_PRO_INTEGRATED_PROMPT = f"""
-You are a Senior University Professor and Assessment Expert across all academic disciplines.
+You are a Senior University Professor and Assessment Expert.
 Your task is to analyze the provided CONTENT and generate high-quality, rigorous Multiple Choice Questions (MCQs).
 
 [OPERATIONAL STEPS]:
-1. **Pedagogical Analysis**: Identify core academic concepts, potential misconceptions, and the appropriate difficulty level for a university student.
+1. **Pedagogical Analysis**: Identify core academic concepts and potential misconceptions.
 2. **Question Design**: Apply Bloom's Taxonomy. Focus on 'Application' and 'Analysis' levels.
 3. **Drafting**: Create questions that require critical thinking. Ensure distractors are academic and plausible.
 
+{LANGUAGE_RULE}
+
 [STRICT JSON STRUCTURE]:
-Return ONLY a JSON object with this exact keys:
+Return ONLY a JSON object with these exact keys. Replace the bracketed text with your output IN THE SAME LANGUAGE AS THE CONTENT:
 {{
-  "_thinking": "Your internal academic analysis of the content and question logic",
+  "detected_content_language": "[Write the detected language here, e.g., Arabic]",
+  "_thinking": "[Write your internal academic analysis HERE IN THE DETECTED LANGUAGE]",
   "metadata": {{
-     "topics": [],
-     "difficulty": "Easy/Medium/Hard",
-     "discipline": "e.g., Medicine, Law, Engineering"
+     "topics": ["[Topic 1 in detected language]", "[Topic 2 in detected language]"],
+     "difficulty": "Medium",
+     "discipline": "[e.g., Medicine, Law - IN THE DETECTED LANGUAGE]"
   }},
   "questions": [
      {{
-       "question": "...",
-       "options": ["A", "B", "C", "D"],
+       "question": "[Write the question text IN THE DETECTED LANGUAGE. Max 250 characters.]",
+       "options": ["[Option A IN DETECTED LANGUAGE. Max 95 chars]", "[Option B]", "[Option C]", "[Option D]"],
        "correct_index": 0,
-       "explanation": "Detailed academic reasoning why this is correct and others are wrong",
-       "complexity": "Recall/Analysis/Application"
+       "explanation": "[Write detailed academic reasoning IN THE DETECTED LANGUAGE. Max 200 chars.]",
+       "complexity": "Analysis/Application"
      }}
   ]
 }}
 
 [RULES]:
-- No trivial questions.
+- No trivial questions (0% recall).
 - Distractors must be strong misleads.
 - No 'All of the above'.
-{LANGUAGE_RULE}
-[STRICT LIMITS]:
-- Question text: Max 250 characters.
-- EACH Option: STRICTLY MAX 95 characters. This is a hard technical limit.
-- If an option is long, condense it without losing the academic meaning.
+- STRICT LENGTH LIMITS: Option max 95 chars, Question max 250 chars, Explanation max 200 chars.
 """
+
 
 # أضف هذا الجزء داخل البرومبت في ملف prompts.py
 
