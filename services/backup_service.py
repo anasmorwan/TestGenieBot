@@ -46,6 +46,38 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 # =========================
 # 3. دالة بناء الخدمة (التعديل المهم هنا)
 def get_drive_service():
+    # 1. جلب النص المشفر من إعدادات ريندر
+    encoded_token = os.environ.get('GDRIVE_TOKEN_BASE64')
+    
+    if not encoded_token:
+        print("❌ خطأ: لم يتم العثور على متغير GDRIVE_TOKEN_BASE64 في إعدادات ريندر")
+        return None
+
+    try:
+        # 2. فك التشفير (تحويل النص إلى بيانات بايتس)
+        creds_data = base64.b64decode(encoded_token)
+        
+        # 3. استعادة كائن الصلاحيات (التوكن)
+        creds = pickle.loads(creds_data)
+
+        # 4. التجديد التلقائي (هذا هو سر الحل الدائم)
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                # تحديث التوكن باستخدام المفتاح السحري Refresh Token
+                creds.refresh(Request())
+            else:
+                print("❌ التوكن غير صالح ولا يوجد مفتاح تجديد (Refresh Token)")
+                return None
+
+        # 5. بناء وإرجاع الخدمة (هذا الجزء كان ناقصاً في كودك)
+        return build('drive', 'v3', credentials=creds)
+
+    except Exception as e:
+        print(f"❌ خطأ أثناء الاتصال بجوجل درايف: {e}")
+        return None
+
+"""
+def get_drive_service():
     # جلب التوكن من متغيرات البيئة في ريندر
     encoded_token = os.environ.get('GDRIVE_TOKEN_BASE64')
     
@@ -68,7 +100,7 @@ def get_drive_service():
     except Exception as e:
         print(f"❌ خطأ في الاتصال بـ Drive: {e}")
         return None
-
+"""
 # =========================
 # 🔹 Upload Backup
 # =========================
