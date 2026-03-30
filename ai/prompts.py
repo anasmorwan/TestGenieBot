@@ -45,6 +45,61 @@ Output JSON format:
 Return ONLY valid JSON.
 No markdown.
 """
+# قواعد صارمة بالإنجليزية فقط (تستخدم عندما يكون المحتوى إنجليزي)
+STRICT_ENG_RULE = """
+[SYSTEM RULE: LANGUAGE ADHERENCE]
+- THE CONTENT IS IN ENGLISH.
+- YOU MUST GENERATE ALL TEXT (THINKING, QUESTIONS, OPTIONS, EXPLANATIONS) IN ENGLISH.
+- DO NOT USE ARABIC. DO NOT TRANSLATE TO ARABIC.
+"""
+
+# قواعد صارمة بالعربية فقط (تستخدم عندما يكون المحتوى عربي)
+STRICT_ARB_RULE = """
+[قاعدة النظام: الالتزام باللغة]
+- المحتوى باللغة العربية.
+- يجب كتابة جميع النصوص (التفكير، الأسئلة، الخيارات، الشروحات) باللغة العربية فقط.
+- يمنع استخدام الإنجليزية في القيم (Values) داخل الـ JSON.
+"""
+
+def get_dynamic_academic_prompt(lang):
+    """بناء برومبت نظيف تماماً من أي لغة أخرى غير لغة الهدف"""
+    rule = STRICT_ENG_RULE if lang == "English" else STRICT_ARB_RULE
+    
+    # لاحظ أننا أزلنا أي أمثلة عربية من هيكل الـ JSON لكي لا ينجذب لها النموذج
+    return f"""
+You are a Senior University Professor and Assessment Expert.
+{rule}
+
+[OPERATIONAL STEPS]:
+1. Pedagogical Analysis: Identify core concepts.
+2. Question Design: Focus on 'Application' and 'Analysis'.
+
+[STRICT JSON STRUCTURE]:
+Return ONLY a JSON object. All values MUST be in {lang.upper()}.
+{{
+  "detected_language": "{lang}",
+  "_thinking": "Analyze the content here in {lang}",
+  "metadata": {{
+     "topics": ["Topic in {lang}"],
+     "difficulty": "Medium",
+     "discipline": "Subject in {lang}"
+  }},
+  "questions": [
+     {{
+       "question": "Question text in {lang}",
+       "options": ["Option 1 in {lang}", "Option 2", "Option 3", "Option 4"],
+       "correct_index": 0,
+       "explanation": "Academic reasoning in {lang}",
+       "complexity": "Analysis"
+     }}
+  ]
+}}
+
+[RULES]:
+- No 'All of the above'.
+- Question max 250 chars.
+- Option max 95 chars.
+"""
 
 
 
@@ -191,10 +246,7 @@ Be specific and concise.
 import re
 
 def detect_text_language(text):
-    """
-    دالة تفحص النص وتحدد لغته بدقة عالية وسرعة.
-    إذا كان يحتوي على حروف عربية يعيده كـ 'Arabic'، وإلا 'English'.
-    """
+
     # البحث عن الحروف العربية في النص
     arabic_chars = re.findall(r'[\u0600-\u06FF]', text)
     
