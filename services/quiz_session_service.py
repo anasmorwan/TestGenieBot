@@ -215,36 +215,8 @@ class QuizManager:
 
 
             
-"""            
-    
-    def send_quiz_poll(self, bot, chat_id, question):
-        try:
-            # open_peroid = get_user_config(user_id, "quiz_period")
-            poll = bot.send_poll(
-                chat_id=chat_id,
-                question=str(question.question)[:300],
-                options=[str(opt) for opt in question.options if opt],
-                type="quiz",
-                correct_option_id=int(question.correct_index) if question.correct_index is not None else 0,
-                explanation=str(question.explanation or "")[:200],
-                is_anonymous=False
-                
-            )
 
-            self.poll_map[poll.poll.id] = chat_id
-
-            return poll.message_id
-
-        except Exception:
-            import logging
-            logging.exception("SEND POLL FAILED")
-            return None
-
-"""
     def send_quiz_poll(self, bot, chat_id, question_dict):
-        """
-        إرسال استطلاع رأي مع حماية كاملة من قيود تيليجرام
-        """
         try:
             # 1. الوصول للمفاتيح باستخدام القواميس (Dictionary Access)
             # مع استخدام .get() لتجنب KeyError
@@ -290,3 +262,29 @@ class QuizManager:
 quiz_manager = QuizManager()
 
 
+"""            
+    
+    def send_quiz_poll(self, bot, chat_id, question):
+        try:
+            # open_peroid = get_user_config(user_id, "quiz_period")
+            poll = bot.send_poll(
+                chat_id=chat_id,
+                question=str(question.question)[:300],
+                options=[str(opt) for opt in question.options if opt],
+                type="quiz",
+                correct_option_id=int(question.correct_index) if question.correct_index is not None else 0,
+                explanation=str(question.explanation or "")[:200],
+                is_anonymous=False
+                
+            )
+
+            self.poll_map[poll.poll.id] = chat_id
+
+            return poll.message_id
+
+        except Exception:
+            import logging
+            logging.exception("SEND POLL FAILED")
+            return None
+
+"""
