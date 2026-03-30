@@ -287,9 +287,7 @@ from ai.llm_client import generate_smart_response
 
 # جزء من ملف prompts.py (أو الملف الذي يحوي الدالة)
 # def pro_quiz_generator(content, num_questions=5):
-    """
-    المحرك الأكاديمي المطور: دمج التحليل والتوليد في مرحلة واحدة (Integrated CoT)
-    """
+
   #  try:
         # بناء المدخلات بطلب واحد قوي
    #     integrated_input = f"{ACADEMIC_PRO_INTEGRATED_PROMPT}\n\nNUMBER OF QUESTIONS: {num_questions}\n\nCONTENT:\n{content}"
