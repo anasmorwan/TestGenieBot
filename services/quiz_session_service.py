@@ -216,24 +216,25 @@ class QuizManager:
 
             
 
-    def send_quiz_poll(self, bot, chat_id, question_dict):
+    def send_quiz_poll(self, bot, chat_id, q):
+    """
+    نسخة معدلة تتعامل مع كائن QuizQuestion وتحميه من قيود تيليجرام
+    """
         try:
-            # 1. الوصول للمفاتيح باستخدام القواميس (Dictionary Access)
-            # مع استخدام .get() لتجنب KeyError
-            q_text = question_dict.get('question', 'سؤال بدون عنوان')
-            options = question_dict.get('options', [])
-            correct_idx = question_dict.get('correct_index', 0)
-            # التأكد من وجود المفتاح الجديد 'explanation'
-            explanation_text = question_dict.get('explanation', '')
+            # 1. الوصول للبيانات عبر الكائن (Object Attributes) وليس القاموس
+            # نستخدم getattr كإجراء أمان إضافي أو الوصول المباشر
+            q_text = getattr(q, 'question', 'سؤال بدون عنوان')
+            options = getattr(q, 'options', [])
+            correct_idx = getattr(q, 'correct_index', 0)
+            explanation_text = getattr(q, 'explanation', '')
 
-            # 2. الحماية: قص النصوص لتطابق قيود تيليجرام الصارمة
-            # السؤال: بحد أقصى 300 حرف
+            # 2. الحماية: قص النصوص لتطابق قيود تيليجرام (300 للسؤال، 100 للخيار، 200 للشرح)
             safe_question = str(q_text)[:300]
         
-            # الخيارات: بحد أقصى 100 حرف لكل خيار (حل مشكلة الخطأ 400)
+            # التأكد من أن كل خيار لا يتجاوز 100 حرف (حل خطأ 400 السابق)
             safe_options = [str(opt)[:100] for opt in options if opt]
         
-            # الشرح: بحد أقصى 200 حرف
+            # الشرح بحد أقصى 200 حرف
             safe_explanation = str(explanation_text)[:200]
 
             # 3. إرسال الـ Poll
@@ -254,8 +255,7 @@ class QuizManager:
             import logging
             logging.error(f"SEND POLL FAILED for chat {chat_id}: {e}")
             return None
-
-
+    
 
 
 
