@@ -257,61 +257,29 @@ def detect_text_language(text):
   
 def pro_quiz_generator(content, num_questions=5):
     try:
-        # 1. اكتشاف اللغة برمجياً (بعيداً عن غباء الذكاء الاصطناعي)
+        # 1. كشف اللغة برمجياً (هذا الجزء ممتاز عندك)
         target_lang = detect_text_language(content)
         
-        # 2. بناء البرومبت مع أمر حتمي ومباشر للغة المكتشفة
-        DYNAMIC_PROMPT = f"""
-You are a Senior University Professor and Assessment Expert.
-
-[CRITICAL LANGUAGE OVERRIDE]:
-THE PROVIDED CONTENT IS IN {target_lang.upper()}.
-YOU MUST WRITE THE ENTIRE JSON OUTPUT (_thinking, questions, options, explanations, topics) STRICTLY IN {target_lang.upper()}.
-ANY OTHER LANGUAGE IS STRICTLY FORBIDDEN.
-
-[OPERATIONAL STEPS]:
-1. Pedagogical Analysis: Identify core academic concepts.
-2. Question Design: Apply Bloom's Taxonomy. Focus on 'Application' and 'Analysis'.
-3. Drafting: Create questions requiring critical thinking. Plausible distractors.
-
-[STRICT JSON STRUCTURE]:
-Return ONLY a JSON object with these exact keys:
-{{
-  "_thinking": "[Write your analysis strictly in {target_lang.upper()}]",
-  "metadata": {{
-     "topics": ["[Topic 1 in {target_lang.upper()}]"],
-     "difficulty": "Medium",
-     "discipline": "[Subject in {target_lang.upper()}]"
-  }},
-  "questions": [
-     {{
-       "question": "[Question text in {target_lang.upper()} - Max 250 chars]",
-       "options": ["[Option A in {target_lang.upper()} - Max 95 chars]", "[Option B]", "[Option C]", "[Option D]"],
-       "correct_index": 0,
-       "explanation": "[Detailed reasoning in {target_lang.upper()} - Max 200 chars]",
-       "complexity": "Analysis/Application"
-     }}
-  ]
-}}
-"""
-        # بناء المدخلات
-        integrated_input = f"{DYNAMIC_PROMPT}\n\nNUMBER OF QUESTIONS: {num_questions}\n\nCONTENT:\n{content}"
+        # 2. جلب برومبت "نظيف" لا يحتوي إلا على لغة الهدف
+        clean_prompt = get_dynamic_academic_prompt(target_lang)
         
-        raw_response = generate_smart_response(integrated_input)
+        # 3. دمج المدخلات
+        final_input = f"{clean_prompt}\n\nNUMBER OF QUESTIONS: {num_questions}\n\nCONTENT TO ANALYZE:\n{content}"
+        
+        # 4. إرسال الطلب
+        raw_response = generate_smart_response(final_input)
         full_data = parse_llm_json(raw_response)
 
         if isinstance(full_data, list) and len(full_data) > 0:
             full_data = full_data[0]
 
-        final_questions = full_data.get("questions", [])
-        metadata = full_data.get("metadata", {"discipline": "General Academic"})
-        final_questions = final_questions[:num_questions]
+        final_questions = full_data.get("questions", [])[:num_questions]
 
         if not final_questions:
-            raise ValueError("Empty questions list from LLM")
+            raise ValueError("No questions generated")
 
         return {
-            "metadata": metadata, 
+            "metadata": full_data.get("metadata", {}), 
             "questions": final_questions
         }
         
