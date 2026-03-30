@@ -188,41 +188,71 @@ Be specific and concise.
 {LANGUAGE_RULE}
 """
 
+import re
 
-
-
-
-import json
-from utils.json_utils import parse_llm_json
-
-from ai.llm_client import generate_smart_response
-
-
-# جزء من ملف prompts.py (أو الملف الذي يحوي الدالة)
+def detect_text_language(text):
+    """
+    دالة تفحص النص وتحدد لغته بدقة عالية وسرعة.
+    إذا كان يحتوي على حروف عربية يعيده كـ 'Arabic'، وإلا 'English'.
+    """
+    # البحث عن الحروف العربية في النص
+    arabic_chars = re.findall(r'[\u0600-\u06FF]', text)
+    
+    # إذا كان هناك أكثر من 15 حرفاً عربياً، فالنص عربي
+    if len(arabic_chars) > 15:
+        return "Arabic"
+    return "English"
+  
 def pro_quiz_generator(content, num_questions=5):
-    """
-    المحرك الأكاديمي المطور: دمج التحليل والتوليد في مرحلة واحدة (Integrated CoT)
-    """
     try:
-        # بناء المدخلات بطلب واحد قوي
-        integrated_input = f"{ACADEMIC_PRO_INTEGRATED_PROMPT}\n\nNUMBER OF QUESTIONS: {num_questions}\n\nCONTENT:\n{content}"
+        # 1. اكتشاف اللغة برمجياً (بعيداً عن غباء الذكاء الاصطناعي)
+        target_lang = detect_text_language(content)
         
-        # طلب واحد فقط للذكاء الاصطناعي
+        # 2. بناء البرومبت مع أمر حتمي ومباشر للغة المكتشفة
+        DYNAMIC_PROMPT = f"""
+You are a Senior University Professor and Assessment Expert.
+
+[CRITICAL LANGUAGE OVERRIDE]:
+THE PROVIDED CONTENT IS IN {target_lang.upper()}.
+YOU MUST WRITE THE ENTIRE JSON OUTPUT (_thinking, questions, options, explanations, topics) STRICTLY IN {target_lang.upper()}.
+ANY OTHER LANGUAGE IS STRICTLY FORBIDDEN.
+
+[OPERATIONAL STEPS]:
+1. Pedagogical Analysis: Identify core academic concepts.
+2. Question Design: Apply Bloom's Taxonomy. Focus on 'Application' and 'Analysis'.
+3. Drafting: Create questions requiring critical thinking. Plausible distractors.
+
+[STRICT JSON STRUCTURE]:
+Return ONLY a JSON object with these exact keys:
+{{
+  "_thinking": "[Write your analysis strictly in {target_lang.upper()}]",
+  "metadata": {{
+     "topics": ["[Topic 1 in {target_lang.upper()}]"],
+     "difficulty": "Medium",
+     "discipline": "[Subject in {target_lang.upper()}]"
+  }},
+  "questions": [
+     {{
+       "question": "[Question text in {target_lang.upper()} - Max 250 chars]",
+       "options": ["[Option A in {target_lang.upper()} - Max 95 chars]", "[Option B]", "[Option C]", "[Option D]"],
+       "correct_index": 0,
+       "explanation": "[Detailed reasoning in {target_lang.upper()} - Max 200 chars]",
+       "complexity": "Analysis/Application"
+     }}
+  ]
+}}
+"""
+        # بناء المدخلات
+        integrated_input = f"{DYNAMIC_PROMPT}\n\nNUMBER OF QUESTIONS: {num_questions}\n\nCONTENT:\n{content}"
+        
         raw_response = generate_smart_response(integrated_input)
-        
-        # تحليل الـ JSON الناتج
         full_data = parse_llm_json(raw_response)
 
-        # التعامل مع احتمالية أن النتيجة قائمة أو قاموس
         if isinstance(full_data, list) and len(full_data) > 0:
             full_data = full_data[0]
 
-        # استخراج البيانات الأساسية
-        # نحن نأخذ 'questions' و 'metadata' فقط ونهمل '_thinking' لتوفير المساحة
         final_questions = full_data.get("questions", [])
         metadata = full_data.get("metadata", {"discipline": "General Academic"})
-
-        # تأكيد العدد المطلوب (قص الزيادة)
         final_questions = final_questions[:num_questions]
 
         if not final_questions:
@@ -246,6 +276,63 @@ def pro_quiz_generator(content, num_questions=5):
             "metadata": {"fallback": True, "error": str(e)},
             "questions": fallback_quizzes if isinstance(fallback_quizzes, list) else []
         }
+
+
+
+import json
+from utils.json_utils import parse_llm_json
+
+from ai.llm_client import generate_smart_response
+
+
+# جزء من ملف prompts.py (أو الملف الذي يحوي الدالة)
+# def pro_quiz_generator(content, num_questions=5):
+    """
+    المحرك الأكاديمي المطور: دمج التحليل والتوليد في مرحلة واحدة (Integrated CoT)
+    """
+  #  try:
+        # بناء المدخلات بطلب واحد قوي
+   #     integrated_input = f"{ACADEMIC_PRO_INTEGRATED_PROMPT}\n\nNUMBER OF QUESTIONS: {num_questions}\n\nCONTENT:\n{content}"
+        
+        # طلب واحد فقط للذكاء الاصطناعي
+  #      raw_response = generate_smart_response(integrated_input)
+        
+        # تحليل الـ JSON الناتج
+ #       full_data = parse_llm_json(raw_response)
+
+        # التعامل مع احتمالية أن النتيجة قائمة أو قاموس
+#        if isinstance(full_data, list) and len(full_data) > 0:
+#            full_data = full_data[0]
+
+        # استخراج البيانات الأساسية
+        # نحن نأخذ 'questions' و 'metadata' فقط ونهمل '_thinking' لتوفير المساحة
+ #       final_questions = full_data.get("questions", [])
+#        metadata = full_data.get("metadata", {"discipline": "General Academic"})
+
+        # تأكيد العدد المطلوب (قص الزيادة)
+   #     final_questions = final_questions[:num_questions]
+
+  #      if not final_questions:
+#            raise ValueError("Empty questions list from LLM")
+
+ #       return {
+  #          "metadata": metadata, 
+ #           "questions": final_questions
+     #   }
+        
+ #   except Exception as e:
+  #      print(f"⚠️ Integrated Pro Generator Error: {e}")
+        
+        # نظام الاحتياط (Fallback) في حالة فشل الطلب المعقد
+        # نعود للطريقة البسيطة لضمان عدم توقف الخدمة للمستخدم
+  #      prompt = build_quiz_prompt(content, num_questions)
+   #     fallback_raw = generate_smart_response(prompt)
+  #      fallback_quizzes = parse_llm_json(fallback_raw)
+
+   #     return {
+  #          "metadata": {"fallback": True, "error": str(e)},
+  #          "questions": fallback_quizzes if isinstance(fallback_quizzes, list) else []
+ #       }
 
 # def pro_quiz_generator(content, num_questions=5):
 #    """
