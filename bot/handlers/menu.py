@@ -25,7 +25,7 @@ def send_main_menu(chat_id, message_id=None):
         text = ux_text
         
         keyboard = None
-        parse_mode = "Markdown"
+        parse_mode = "HTML"
         
 
     else:    
