@@ -286,6 +286,9 @@ def pro_quiz_generator(content: str, num_questions: int = 5) -> Dict[str, Any]:
         # First attempt
         prompt = build_pro_quiz_prompt(content, num_questions, target_lang)
         raw_response = generate_smart_response(prompt)
+
+        if isinstance(raw_response, tuple):
+            raw_response = raw_response[0]
         full_data = normalize_llm_output(parse_llm_json(raw_response))
 
         # If parsing failed or structure is weak, try a repair pass
