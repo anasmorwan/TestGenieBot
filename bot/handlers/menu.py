@@ -22,8 +22,9 @@ def send_main_menu(chat_id, message_id=None):
 
     
     if is_user_exist(chat_id):
-        text = welcome_new_user + base_text
-        keyboard = main_menu_keyboard(bot_username)
+        text = ux_text
+        
+        keyboard = None
         parse_mode = "Markdown"
         
 
@@ -34,30 +35,21 @@ def send_main_menu(chat_id, message_id=None):
     
     
     if message_id:
+        
+        text = welcome_new_user + base_text
+        keyboard = main_menu_keyboard(bot_username)
+        
         mybot.edit_message_text(
             text=text,
             chat_id=chat_id,
-            message_id=message_id,
             reply_markup=keyboard,
+            message_id=message_id,
             parse_mode=parse_mode
         )
     else:
         mybot.send_message(
             chat_id=chat_id,
             text=text,
-            reply_markup=keyboard,
             parse_mode=parse_mode
         )
 
-
-"""
-text = (
-        "*👋 مرحباً بك في TestGenie*"
-        "\n\n"
-        "حوّل ملفاتك إلى اختبارات تفاعلية خلال 10 ثوانٍ.\n\n"
-        "📄 أرسل:\n"
-        "PDF • DOCX • نص\n\n"
-        "وسيحوّله البوت إلى اختبار تلقائياً.\n\n"
-        "👇 أو اختر:"
-    )
-"""
