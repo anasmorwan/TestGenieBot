@@ -179,20 +179,33 @@ RAW OUTPUT:
 # ============================================================
 #  Validation helpers
 # ============================================================
+def safe_generate(prompt: str) -> str:
+    """
+    دالة وسيطة لضمان استخراج النص فقط في حال كانت 
+    generate_smart_response تُرجع Tuple
+    """
+    response = generate_smart_response(prompt)
+    if isinstance(response, tuple):
+        return response[0]
+    return response
+
 
 def normalize_llm_output(full_data: Any) -> Dict[str, Any]:
     """
-    The parser may return a list or a dict.
-    Normalize to a dict.
+    إصلاح هيكل البيانات أياً كان شكل مخرجات النموذج
     """
-    if isinstance(full_data, list) and len(full_data) > 0:
-        first = full_data[0]
-        if isinstance(first, dict):
-            return first
-        return {}
+    # 1. إذا أرجع النموذج قائمة من الأسئلة مباشرة (تغليفها في قاموس)
+    if isinstance(full_data, list):
+        return {"metadata": {}, "questions": full_data}
+    
     if isinstance(full_data, dict):
+        # 2. إذا أرجع سؤالاً واحداً فقط غير مغلف
+        if "question" in full_data and "options" in full_data:
+            return {"metadata": {}, "questions": [full_data]}
+        # 3. الشكل الطبيعي والصحيح
         return full_data
-    return {}
+        
+    return {"metadata": {}, "questions": []}
 
 
 def extract_text_blob(data: Any) -> str:
@@ -272,35 +285,26 @@ def trim_questions(data: Dict[str, Any], num_questions: int) -> Dict[str, Any]:
 # ============================================================
 
 def pro_quiz_generator(content: str, num_questions: int = 5) -> Dict[str, Any]:
-    """
-    Robust pro quiz generator with:
-    - language detection
-    - strict prompt per language
-    - response validation
-    - repair retry
-    - language-safe fallback
-    """
     try:
         target_lang = detect_text_language(content)
 
-        # First attempt
+        # المحاولة الأولى
         prompt = build_pro_quiz_prompt(content, num_questions, target_lang)
-        raw_response = generate_smart_response(prompt)
-
-        if isinstance(raw_response, tuple):
-            raw_response = raw_response[0]
+        raw_response = safe_generate(prompt) # استخدام الدالة الآمنة
+        
         full_data = normalize_llm_output(parse_llm_json(raw_response))
 
-        # If parsing failed or structure is weak, try a repair pass
+        # محاولة الإصلاح إذا كان هناك خطأ بالهيكل أو اللغة
         if not question_structure_is_valid(full_data) or has_language_mismatch(full_data, target_lang):
+            print("⚠️ Invalid structure or language mismatch. Triggering Repair...")
             repair_prompt = build_repair_prompt(raw_response, target_lang, num_questions)
-            repaired_raw = generate_smart_response(repair_prompt)
+            repaired_raw = safe_generate(repair_prompt) # استخدام الدالة الآمنة
             repaired_data = normalize_llm_output(parse_llm_json(repaired_raw))
 
             if question_structure_is_valid(repaired_data) and not has_language_mismatch(repaired_data, target_lang):
                 full_data = repaired_data
 
-        # Final validation
+        # الفحص النهائي
         if not question_structure_is_valid(full_data):
             raise ValueError("Invalid quiz structure from model")
 
@@ -317,6 +321,7 @@ def pro_quiz_generator(content: str, num_questions: int = 5) -> Dict[str, Any]:
             "questions": full_data.get("questions", [])
         }
 
+                                                                                            
     except Exception as e:
         print(f"⚠️ Integrated Pro Generator Error: {e}")
 
