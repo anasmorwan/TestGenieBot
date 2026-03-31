@@ -14,23 +14,29 @@ ARABIC_RE = re.compile(r'[\u0600-\u06FF]')
 LATIN_RE = re.compile(r'[A-Za-z]')
 
 
-def detect_text_language(text: str) -> str:
+def detect_text_language(text: Any) -> str:
     """
-    Detect whether the input content is Arabic or English.
-    This is a heuristic, but better than counting Arabic letters only.
+    نسخة مضادة للأخطاء: تتعامل مع الـ Tuples وأي أنواع بيانات غريبة
     """
+    # 1. فك الـ Tuple إذا كان النص القادم من الملف عبارة عن Tuple
+    if isinstance(text, tuple):
+        text = text[0] # نأخذ النص فقط ونتجاهل الباقي
+        
+    # 2. تحويل أي كائن إلى نص (String) كإجراء أمان إضافي
+    text = str(text) if text else ""
+
+    # الآن يمكننا استخدام .strip() بأمان تام
     if not text or not text.strip():
         return "English"
 
     arabic_chars = len(ARABIC_RE.findall(text))
     latin_chars = len(LATIN_RE.findall(text))
 
-    # If Arabic clearly dominates, treat as Arabic.
-    # Otherwise default to English.
     if arabic_chars > latin_chars and arabic_chars >= 10:
         return "Arabic"
 
     return "English"
+
 
 
 def contains_arabic(text: str) -> bool:
@@ -284,7 +290,11 @@ def trim_questions(data: Dict[str, Any], num_questions: int) -> Dict[str, Any]:
 #  Main generator
 # ============================================================
 
-def pro_quiz_generator(content: str, num_questions: int = 5) -> Dict[str, Any]:
+def pro_quiz_generator(content: Any, num_questions: int = 5) -> Dict[str, Any]:
+    # --- إضافة الحماية هنا أيضاً ---
+    if isinstance(content, tuple):
+        content = content[0]
+    content = str(content) if content else ""
     try:
         target_lang = detect_text_language(content)
 
@@ -383,10 +393,13 @@ No markdown.
 """.strip()
 
 
-def build_quiz_prompt(content: str, num_questions: int, user_instruction: str = None) -> str:
-    """
-    Free-user prompt, but still language-aware.
-    """
+    
+def build_quiz_prompt(content: Any, num_questions: int, user_instruction: str = None) -> str:
+    # --- إضافة الحماية ---
+    if isinstance(content, tuple):
+        content = content[0]
+    content = str(content) if content else ""
+    
     target_lang = detect_text_language(content)
 
     user_part = f"User instruction:\n{user_instruction}" if user_instruction else ""
