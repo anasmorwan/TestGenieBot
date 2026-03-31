@@ -2,7 +2,7 @@ import os
 from services.usage import activate_subscription_manual, reset_or_set_daily_usage, get_user_full_info
 from analytics.metrics import get_metrics
 from services.backup_service import backup_all
-
+from bot.keyboard.more_options_keyboard import more_options_keyboard
 
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
@@ -116,4 +116,20 @@ def register(bot):
             bot.reply_to(msg, text, parse_mode="HTML")
         except Exception as e:
             bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
+
+
+
+    @bot.message_handler(commands=["menu"])
+    def user_info(msg):
+        user_id = msg.from_user.id
+        chat_id = msg.chat.id
+        
+        keyboard = more_options_keyboard()
+        
+        text1 = get_message("BASE_TEXT")
+        text2 = get_message("UX_TEXT")
+        bot.send_message(chat_id,
+        text=text,
+        reply_markup=keyboard,
+        parse_mode="HTML")
 
