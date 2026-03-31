@@ -1,35 +1,363 @@
-# prompts.py
-ENGLISH_QUIZ_PROMPT = "Generate quiz questions strictly from content, return JSON only."
-ARABIC_QUIZ_PROMPT = "قم بإنشاء أسئلة اختبار فقط من المحتوى المعطى، وأعد JSON صالح."
+import re
+import json
+from typing import Any, Dict, List, Union
+
+from utils.json_utils import parse_llm_json
+from ai.llm_client import generate_smart_response
 
 
-LANGUAGE_RULE = """
-[CRITICAL LANGUAGE INSTRUCTION]
-1. Analyze the exact language of the provided CONTENT.
-2. The ENTIRE JSON output (keys can be English, but all values: questions, options, explanations, topics) MUST STRICTLY be written in the EXACT SAME LANGUAGE as the CONTENT.
-3. NEVER translate the content. If the content is Arabic, output Arabic. If English, output English.
-"""
+# ============================================================
+#  Language detection
+# ============================================================
+
+ARABIC_RE = re.compile(r'[\u0600-\u06FF]')
+LATIN_RE = re.compile(r'[A-Za-z]')
+
+
+def detect_text_language(text: str) -> str:
+    """
+    Detect whether the input content is Arabic or English.
+    This is a heuristic, but better than counting Arabic letters only.
+    """
+    if not text or not text.strip():
+        return "English"
+
+    arabic_chars = len(ARABIC_RE.findall(text))
+    latin_chars = len(LATIN_RE.findall(text))
+
+    # If Arabic clearly dominates, treat as Arabic.
+    # Otherwise default to English.
+    if arabic_chars > latin_chars and arabic_chars >= 10:
+        return "Arabic"
+
+    return "English"
+
+
+def contains_arabic(text: str) -> bool:
+    return bool(ARABIC_RE.search(text or ""))
+
+
+def contains_latin(text: str) -> bool:
+    return bool(LATIN_RE.search(text or ""))
+
+
+# ============================================================
+#  Prompt builders
+# ============================================================
+
+def build_strict_language_prompt(lang: str) -> str:
+    """
+    Build a strict prompt in a clean single-language style.
+    lang must be 'English' or 'Arabic'
+    """
+    if lang == "Arabic":
+        return """
+أنت خبير أكاديمي دقيق في توليد أسئلة الاختيار من متعدد.
+
+[قاعدة اللغة الصارمة]
+- المحتوى باللغة العربية.
+- جميع القيم النصية داخل JSON يجب أن تكون بالعربية فقط.
+- ممنوع إدخال أي نص إنجليزي في:
+  question, options, explanation, topics, discipline, difficulty, complexity
+
+[القواعد الأساسية]
+- استخدم فقط المعلومات الموجودة في المحتوى.
+- لا تخترع معلومات.
+- إذا كانت المعلومات غير كافية، أنشئ عددًا أقل من الأسئلة بدلًا من التخمين.
+- ركز على الفهم والتحليل، وليس الحفظ المباشر فقط.
+- لا تستخدم: All of the above / None of the above.
+
+[تنسيق الإخراج]
+أعد JSON صالحًا فقط، بدون Markdown، وبدون شرح خارج JSON.
+        """.strip()
+
+    return """
+You are a precise academic quiz generator.
+
+[Strict language rule]
+- The content is in English.
+- All string values inside the JSON must be in English only.
+- Do not use Arabic anywhere in:
+  question, options, explanation, topics, discipline, difficulty, complexity
+
+[Core rules]
+- Use only the information in the content.
+- Do not invent facts.
+- If the content is insufficient, generate fewer questions instead of guessing.
+- Focus on understanding and analysis, not just direct recall.
+- Do not use: All of the above / None of the above.
+
+[Output format]
+Return valid JSON only, no markdown, no extra text.
+    """.strip()
+
+
+def build_pro_quiz_prompt(content: str, num_questions: int, lang: str) -> str:
+    """
+    Clean prompt for pro mode.
+    Keeps the schema minimal to reduce language drift.
+    """
+    language_instruction = build_strict_language_prompt(lang)
+
+    return f"""
+{language_instruction}
+
+[JSON SCHEMA]
+Return ONLY a JSON object in this structure:
+
+{{
+  "metadata": {{
+    "topics": ["..."],
+    "difficulty": "Medium",
+    "discipline": "..."
+  }},
+  "questions": [
+    {{
+      "question": "...",
+      "options": ["...", "...", "...", "..."],
+      "correct_index": 0,
+      "explanation": "...",
+      "complexity": "Analysis"
+    }}
+  ]
+}}
+
+[IMPORTANT RULES]
+- Generate exactly {num_questions} questions if possible.
+- Each question must have exactly 4 options.
+- correct_index must be between 0 and 3.
+- Keep questions concise and academically strong.
+- Do not include _thinking.
+- Do not include markdown.
+- Do not wrap the JSON in code fences.
+
+CONTENT:
+{content}
+    """.strip()
+
+
+def build_repair_prompt(raw_response: str, lang: str, num_questions: int) -> str:
+    """
+    Ask the model to repair malformed or wrong-language output.
+    """
+    if lang == "Arabic":
+        return f"""
+أعد كتابة JSON التالي فقط.
+
+[قواعد الإصلاح]
+- حافظ على نفس البنية.
+- اجعل جميع القيم بالعربية فقط.
+- لا تضف Markdown.
+- لا تضف أي نص خارج JSON.
+- أصلح أي خطأ في البنية أو اللغة.
+- أخرج فقط JSON صالحًا.
+
+الهدف: {num_questions} أسئلة.
+
+JSON:
+{raw_response}
+        """.strip()
+
+    return f"""
+Rewrite the following output as valid JSON only.
+
+[Repair rules]
+- Keep the same structure.
+- All string values must be in English only.
+- Do not add markdown.
+- Do not add any text outside JSON.
+- Fix any JSON or language errors.
+- Return only valid JSON.
+
+Target: {num_questions} questions.
+
+RAW OUTPUT:
+{raw_response}
+    """.strip()
+
+
+# ============================================================
+#  Validation helpers
+# ============================================================
+
+def normalize_llm_output(full_data: Any) -> Dict[str, Any]:
+    """
+    The parser may return a list or a dict.
+    Normalize to a dict.
+    """
+    if isinstance(full_data, list) and len(full_data) > 0:
+        first = full_data[0]
+        if isinstance(first, dict):
+            return first
+        return {}
+    if isinstance(full_data, dict):
+        return full_data
+    return {}
+
+
+def extract_text_blob(data: Any) -> str:
+    """
+    Serialize the object to inspect language usage.
+    """
+    try:
+        return json.dumps(data, ensure_ascii=False)
+    except Exception:
+        return str(data)
+
+
+def has_language_mismatch(data: Dict[str, Any], target_lang: str) -> bool:
+    """
+    Return True if output appears to violate the requested language.
+    For English: reject any Arabic characters anywhere in the JSON.
+    For Arabic: reject if Arabic content is missing from important text fields.
+    """
+    blob = extract_text_blob(data)
+
+    if target_lang == "English":
+        return contains_arabic(blob)
+
+    # Arabic mode:
+    # A few English fragments are acceptable technically, but if almost everything is Latin,
+    # it suggests the model ignored the target language.
+    arabic_chars = len(ARABIC_RE.findall(blob))
+    latin_chars = len(LATIN_RE.findall(blob))
+
+    return arabic_chars < latin_chars and arabic_chars < 10
+
+
+def question_structure_is_valid(data: Dict[str, Any]) -> bool:
+    """
+    Basic structure validation.
+    """
+    if not isinstance(data, dict):
+        return False
+
+    questions = data.get("questions")
+    if not isinstance(questions, list) or not questions:
+        return False
+
+    for q in questions:
+        if not isinstance(q, dict):
+            return False
+        if "question" not in q or "options" not in q or "correct_index" not in q:
+            return False
+        if not isinstance(q.get("options"), list) or len(q["options"]) != 4:
+            return False
+        if not isinstance(q.get("correct_index"), int):
+            return False
+        if not (0 <= q["correct_index"] <= 3):
+            return False
+
+    return True
+
+
+def trim_questions(data: Dict[str, Any], num_questions: int) -> Dict[str, Any]:
+    """
+    Keep only the requested number of questions.
+    """
+    if not isinstance(data, dict):
+        return {"metadata": {}, "questions": []}
+
+    questions = data.get("questions", [])
+    if isinstance(questions, list):
+        data["questions"] = questions[:num_questions]
+    else:
+        data["questions"] = []
+
+    return data
+
+
+# ============================================================
+#  Main generator
+# ============================================================
+
+def pro_quiz_generator(content: str, num_questions: int = 5) -> Dict[str, Any]:
+    """
+    Robust pro quiz generator with:
+    - language detection
+    - strict prompt per language
+    - response validation
+    - repair retry
+    - language-safe fallback
+    """
+    try:
+        target_lang = detect_text_language(content)
+
+        # First attempt
+        prompt = build_pro_quiz_prompt(content, num_questions, target_lang)
+        raw_response = generate_smart_response(prompt)
+        full_data = normalize_llm_output(parse_llm_json(raw_response))
+
+        # If parsing failed or structure is weak, try a repair pass
+        if not question_structure_is_valid(full_data) or has_language_mismatch(full_data, target_lang):
+            repair_prompt = build_repair_prompt(raw_response, target_lang, num_questions)
+            repaired_raw = generate_smart_response(repair_prompt)
+            repaired_data = normalize_llm_output(parse_llm_json(repaired_raw))
+
+            if question_structure_is_valid(repaired_data) and not has_language_mismatch(repaired_data, target_lang):
+                full_data = repaired_data
+
+        # Final validation
+        if not question_structure_is_valid(full_data):
+            raise ValueError("Invalid quiz structure from model")
+
+        if has_language_mismatch(full_data, target_lang):
+            raise ValueError(f"Language mismatch detected for target language: {target_lang}")
+
+        full_data = trim_questions(full_data, num_questions)
+
+        if not full_data.get("questions"):
+            raise ValueError("No questions generated")
+
+        return {
+            "metadata": full_data.get("metadata", {}),
+            "questions": full_data.get("questions", [])
+        }
+
+    except Exception as e:
+        print(f"⚠️ Integrated Pro Generator Error: {e}")
+
+        # Language-safe fallback: still use the same target language
+        try:
+            target_lang = detect_text_language(content)
+            fallback_prompt = build_pro_quiz_prompt(content, num_questions, target_lang)
+            fallback_raw = generate_smart_response(fallback_prompt)
+            fallback_data = normalize_llm_output(parse_llm_json(fallback_raw))
+
+            if question_structure_is_valid(fallback_data) and not has_language_mismatch(fallback_data, target_lang):
+                fallback_data = trim_questions(fallback_data, num_questions)
+                return {
+                    "metadata": {"fallback": True},
+                    "questions": fallback_data.get("questions", [])
+                }
+
+        except Exception as fallback_error:
+            print(f"⚠️ Fallback failed: {fallback_error}")
+
+        return {
+            "metadata": {
+                "fallback": True,
+                "error": str(e)
+            },
+            "questions": []
+        }
+
+
+# ============================================================
+#  Free quiz prompt
+# ============================================================
+
+SYSTEM_ROLE = """
+You are a precise AI quiz generator.
+Your task is to create quiz questions strictly from the provided content.
+""".strip()
 
 QUIZ_RULES = """
 Rules:
 - Use ONLY information in the content.
 - Do NOT invent or assume information.
 - Questions must test recall or understanding.
-"""
-
-SYSTEM_ROLE = """
-You are a precise AI quiz generator.
-Your task is to create quiz questions strictly from the provided content.
-"""
-
-
-
-ANTI_HALLUCINATION = """
-If the content is insufficient, generate fewer questions rather than inventing information.
-"""
-
-
-
+""".strip()
 
 QUIZ_FORMAT = """
 Output JSON format:
@@ -37,400 +365,45 @@ Output JSON format:
 [
   {
     "question": "...",
-    "options": ["A","B","C","D"],
+    "options": ["A", "B", "C", "D"],
     "correct_index": 0
   }
 ]
 
 Return ONLY valid JSON.
 No markdown.
-"""
-# قواعد صارمة بالإنجليزية فقط (تستخدم عندما يكون المحتوى إنجليزي)
-STRICT_ENG_RULE = """
-[SYSTEM RULE: LANGUAGE ADHERENCE]
-- THE CONTENT IS IN ENGLISH.
-- YOU MUST GENERATE ALL TEXT (THINKING, QUESTIONS, OPTIONS, EXPLANATIONS) IN ENGLISH.
-- DO NOT USE ARABIC. DO NOT TRANSLATE TO ARABIC.
-"""
+""".strip()
 
-# قواعد صارمة بالعربية فقط (تستخدم عندما يكون المحتوى عربي)
-STRICT_ARB_RULE = """
-[قاعدة النظام: الالتزام باللغة]
-- المحتوى باللغة العربية.
-- يجب كتابة جميع النصوص (التفكير، الأسئلة، الخيارات، الشروحات) باللغة العربية فقط.
-- يمنع استخدام الإنجليزية في القيم (Values) داخل الـ JSON.
-"""
 
-def get_dynamic_academic_prompt(lang):
-    """بناء برومبت نظيف تماماً من أي لغة أخرى غير لغة الهدف"""
-    rule = STRICT_ENG_RULE if lang == "English" else STRICT_ARB_RULE
-    
-    # لاحظ أننا أزلنا أي أمثلة عربية من هيكل الـ JSON لكي لا ينجذب لها النموذج
-    return f"""
-You are a Senior University Professor and Assessment Expert.
-{rule}
-
-[OPERATIONAL STEPS]:
-1. Pedagogical Analysis: Identify core concepts.
-2. Question Design: Focus on 'Application' and 'Analysis'.
-
-[STRICT JSON STRUCTURE]:
-Return ONLY a JSON object. All values MUST be in {lang.upper()}.
-{{
-  "detected_language": "{lang}",
-  "_thinking": "Analyze the content here in {lang}",
-  "metadata": {{
-     "topics": ["Topic in {lang}"],
-     "difficulty": "Medium",
-     "discipline": "Subject in {lang}"
-  }},
-  "questions": [
-     {{
-       "question": "Question text in {lang}",
-       "options": ["Option 1 in {lang}", "Option 2", "Option 3", "Option 4"],
-       "correct_index": 0,
-       "explanation": "Academic reasoning in {lang}",
-       "complexity": "Analysis"
-     }}
-  ]
-}}
-
-[RULES]:
-- No 'All of the above'.
-- Question max 250 chars.
-- Option max 95 chars.
-"""
-
-
-
-#----------------------------------------
-#         برومبت الاختبارات ل PRO                    
-#-----------------------------------------
-
-# prompts.py
-
-# تحديث قاعدة اللغة لتكون حاسمة (لا تقبل التأويل)
-LANGUAGE_RULE = """
-[CRITICAL LANGUAGE OVERRIDE]
-1. First, detect the exact language of the provided CONTENT (e.g., Arabic, English).
-2. You MUST write the ENTIRE output (_thinking, questions, options, explanations, topics) in THAT EXACT SAME LANGUAGE.
-3. If the content is in Arabic, your thinking, explanations, and questions MUST be 100% in Arabic. NO EXCEPTIONS.
-"""
-
-ACADEMIC_PRO_INTEGRATED_PROMPT = f"""
-You are a Senior University Professor and Assessment Expert.
-Your task is to analyze the provided CONTENT and generate high-quality, rigorous Multiple Choice Questions (MCQs).
-
-[OPERATIONAL STEPS]:
-1. **Pedagogical Analysis**: Identify core academic concepts and potential misconceptions.
-2. **Question Design**: Apply Bloom's Taxonomy. Focus on 'Application' and 'Analysis' levels.
-3. **Drafting**: Create questions that require critical thinking. Ensure distractors are academic and plausible.
-
-{LANGUAGE_RULE}
-
-[STRICT JSON STRUCTURE]:
-Return ONLY a JSON object with these exact keys. Replace the bracketed text with your output IN THE SAME LANGUAGE AS THE CONTENT:
-{{
-  "detected_content_language": "[Write the detected language here, e.g., Arabic]",
-  "_thinking": "[Write your internal academic analysis HERE IN THE DETECTED LANGUAGE]",
-  "metadata": {{
-     "topics": ["[Topic 1 in detected language]", "[Topic 2 in detected language]"],
-     "difficulty": "Medium",
-     "discipline": "[e.g., Medicine, Law - IN THE DETECTED LANGUAGE]"
-  }},
-  "questions": [
-     {{
-       "question": "[Write the question text IN THE DETECTED LANGUAGE. Max 250 characters.]",
-       "options": ["[Option A IN DETECTED LANGUAGE. Max 95 chars]", "[Option B]", "[Option C]", "[Option D]"],
-       "correct_index": 0,
-       "explanation": "[Write detailed academic reasoning IN THE DETECTED LANGUAGE. Max 200 chars.]",
-       "complexity": "Analysis/Application"
-     }}
-  ]
-}}
-
-[RULES]:
-- No trivial questions (0% recall).
-- Distractors must be strong misleads.
-- No 'All of the above'.
-- STRICT LENGTH LIMITS: Option max 95 chars, Question max 250 chars, Explanation max 200 chars.
-"""
-
-
-# أضف هذا الجزء داخل البرومبت في ملف prompts.py
-
-
-#----------------------------------------
-#               توليد الإختبارات للمستخدمين Pro                    
-#-----------------------------------------
-
-
-prompt1 = (
-    "You are an expert educator.\n\n"
-    "Analyze the following content and extract:\n\n"
-    "1. Main topics\n"
-    "2. Key concepts\n"
-    "3. Important facts\n"
-    "4. Difficulty level (easy, medium, hard)\n"
-    "5. Type of content (theory, definitions, processes, case-based)\n"
-    f"6 {LANGUAGE_RULE}\n\n"
-    "Return JSON only:\n"
-    "{\n"
-    '  "topics": [],\n'
-    '  "key_concepts": [],\n'
-    '  "facts": [],\n'
-    '  "difficulty": "",\n'
-    '  "content_type": ""\n'
-    "}\n"
-)
-
-prompt2 = (
-    "You are a strict University Professor and Board Examiner creating high-stakes academic MCQs.\n\n"
-    "Based on the analysis below and the original content, generate rigorous questions.\n\n"
-    "ACADEMIC RULES:\n"
-    "- 0% Recall: Do NOT ask for simple definitions or direct facts.\n"
-    "- 100% Cognitive Load: Questions MUST require Application, Analysis, or Evaluation of the concepts.\n"
-    "- Clinical/Scenario-based (if applicable): Frame questions as real-world problems or academic case studies where possible.\n"
-    "- Distractors (Wrong Options): MUST be highly plausible common misconceptions. No obvious or silly wrong answers.\n"
-    "- Do NOT use 'All of the above' or 'None of the above'.\n\n"
-    "Each question must include:\n"
-    "- question (Clear, academic tone)\n"
-    "- 4 options (Similar in length and grammatical structure)\n"
-    "- correct_index (0-3)\n"
-    "- explanation (Detailed academic rationale explaining why the correct answer is right AND why the distractors are wrong)\n"
-    "- difficulty (Medium, Hard, Expert)\n"
-    "- topic\n\n"
-    f"{LANGUAGE_RULE}\n\n"
-    "Output format (STRICT JSON ONLY):\n"
-    f"{QUIZ_FORMAT}\n"
-)
-
-
-prompt3 = (
-    "You are a rigorous Academic Peer-Reviewer.\n\n"
-    "Review the following MCQs generated from the content.\n\n"
-    "EVALUATION CRITERIA:\n"
-    "1. Plausibility: Are the distractors tricky enough to confuse an unprepared student?\n"
-    "2. Clarity: Is the wording grammatically perfect and academically formal?\n"
-    "3. Depth: Does it test deep understanding rather than surface-level memorization?\n\n"
-    "ACTION:\n"
-    "- Rewrite any question that fails these criteria.\n"
-    "- Strengthen weak distractors.\n"
-    "- Enhance the explanation to be highly educational.\n\n"
-    f"{LANGUAGE_RULE}\n\n"
-    "Output format (STRICT JSON ONLY):\n"
-    f"{QUIZ_FORMAT}\n"
-)
-
-
-
-
-prompt4 = f"""
-You are an intelligent tutor.
-
-Based on:
-- student answers
-- correct answers
-- topics
-
-Generate:
-
-1. Strengths
-2. Weaknesses
-3. Smart advice (1-2 lines)
-
-Be specific and concise.
-{LANGUAGE_RULE}
-"""
-
-import re
-
-def detect_text_language(text):
-
-    # البحث عن الحروف العربية في النص
-    arabic_chars = re.findall(r'[\u0600-\u06FF]', text)
-    
-    # إذا كان هناك أكثر من 15 حرفاً عربياً، فالنص عربي
-    if len(arabic_chars) > 15:
-        return "Arabic"
-    return "English"
-  
-def pro_quiz_generator(content, num_questions=5):
-    try:
-        # 1. كشف اللغة برمجياً (هذا الجزء ممتاز عندك)
-        target_lang = detect_text_language(content)
-        
-        # 2. جلب برومبت "نظيف" لا يحتوي إلا على لغة الهدف
-        clean_prompt = get_dynamic_academic_prompt(target_lang)
-        
-        # 3. دمج المدخلات
-        final_input = f"{clean_prompt}\n\nNUMBER OF QUESTIONS: {num_questions}\n\nCONTENT TO ANALYZE:\n{content}"
-        
-        # 4. إرسال الطلب
-        raw_response = generate_smart_response(final_input)
-        full_data = parse_llm_json(raw_response)
-
-        if isinstance(full_data, list) and len(full_data) > 0:
-            full_data = full_data[0]
-
-        final_questions = full_data.get("questions", [])[:num_questions]
-
-        if not final_questions:
-            raise ValueError("No questions generated")
-
-        return {
-            "metadata": full_data.get("metadata", {}), 
-            "questions": final_questions
-        }
-        
-    except Exception as e:
-        print(f"⚠️ Integrated Pro Generator Error: {e}")
-        
-        # نظام الاحتياط (Fallback) في حالة فشل الطلب المعقد
-        # نعود للطريقة البسيطة لضمان عدم توقف الخدمة للمستخدم
-        prompt = build_quiz_prompt(content, num_questions)
-        fallback_raw = generate_smart_response(prompt)
-        fallback_quizzes = parse_llm_json(fallback_raw)
-
-        return {
-            "metadata": {"fallback": True, "error": str(e)},
-            "questions": fallback_quizzes if isinstance(fallback_quizzes, list) else []
-        }
-
-
-
-import json
-from utils.json_utils import parse_llm_json
-
-from ai.llm_client import generate_smart_response
-
-
-# جزء من ملف prompts.py (أو الملف الذي يحوي الدالة)
-# def pro_quiz_generator(content, num_questions=5):
-
-  #  try:
-        # بناء المدخلات بطلب واحد قوي
-   #     integrated_input = f"{ACADEMIC_PRO_INTEGRATED_PROMPT}\n\nNUMBER OF QUESTIONS: {num_questions}\n\nCONTENT:\n{content}"
-        
-        # طلب واحد فقط للذكاء الاصطناعي
-  #      raw_response = generate_smart_response(integrated_input)
-        
-        # تحليل الـ JSON الناتج
- #       full_data = parse_llm_json(raw_response)
-
-        # التعامل مع احتمالية أن النتيجة قائمة أو قاموس
-#        if isinstance(full_data, list) and len(full_data) > 0:
-#            full_data = full_data[0]
-
-        # استخراج البيانات الأساسية
-        # نحن نأخذ 'questions' و 'metadata' فقط ونهمل '_thinking' لتوفير المساحة
- #       final_questions = full_data.get("questions", [])
-#        metadata = full_data.get("metadata", {"discipline": "General Academic"})
-
-        # تأكيد العدد المطلوب (قص الزيادة)
-   #     final_questions = final_questions[:num_questions]
-
-  #      if not final_questions:
-#            raise ValueError("Empty questions list from LLM")
-
- #       return {
-  #          "metadata": metadata, 
- #           "questions": final_questions
-     #   }
-        
- #   except Exception as e:
-  #      print(f"⚠️ Integrated Pro Generator Error: {e}")
-        
-        # نظام الاحتياط (Fallback) في حالة فشل الطلب المعقد
-        # نعود للطريقة البسيطة لضمان عدم توقف الخدمة للمستخدم
-  #      prompt = build_quiz_prompt(content, num_questions)
-   #     fallback_raw = generate_smart_response(prompt)
-  #      fallback_quizzes = parse_llm_json(fallback_raw)
-
-   #     return {
-  #          "metadata": {"fallback": True, "error": str(e)},
-  #          "questions": fallback_quizzes if isinstance(fallback_quizzes, list) else []
- #       }
-
-# def pro_quiz_generator(content, num_questions=5):
-#    """
-#    محرك توليد الأسئلة الاحترافي بنظام الطبقات (Layers)
- #   """"
-#    try:
-        # الطبقة الأولى: فهم السياق
-    #    analysis_input = f"{prompt1}\n\nCONTENT:\n{content}"
-   #     analysis_result = generate_smart_response(analysis_input)
-        
-        # استخراج القاموس بأمان (بما أن الدالة ترجع قائمة، نأخذ العنصر الأول)
-    #    extracted_analysis = parse_llm_json(analysis_result)
-  #      analysis_data = extracted_analysis[0] if isinstance(extracted_analysis, list) and len(extracted_analysis) > 0 else extracted_analysis
-        
-        # الطبقة الثانية: التوليد
-    #    generation_input = f"""
-  #      {prompt2}
- #       
-  #      ANALYSIS DATA:
-  #      {json.dumps(analysis_data, ensure_ascii=False)}
-#        
- #       CONTENT:
-#        {content}
-#        
-#        Generate exactly {num_questions} questions.
-#        """
-#        raw_questions = generate_smart_response(generation_input)
-#        parsed_questions = parse_llm_json(raw_questions)
-#        
-#        # الطبقة الثالثة: المراجعة
- #       # نرسل الأسئلة المبدئية للمراجعة
- #       review_input = f"{prompt3}\n\nQUESTIONS TO REVIEW:\n{json.dumps(parsed_questions, ensure_ascii=False)}"
- #       final_questions_raw = generate_smart_response(review_input)
-#        
- #       # النتيجة النهائية جاهزة (وهي قائمة List جاهزة)
-    #    final_quizzes = parse_llm_json(final_questions_raw)
-  #      
-  #      # التأكد من أن النتيجة النهائية قائمة صالحة
-  #      if not isinstance(final_quizzes, list):
- #           final_quizzes = parsed_questions # استخدام نتيجة الطبقة الثانية كاحتياط
-#            
-#        return {
- #           "metadata": analysis_data, 
-#            "questions": final_quizzes
-#        }
-        
-#    except Exception as e:
- #       print(f"Pro Generator Error: {e}")
-   #     # نظام الاحتياط (Fallback)
-#        prompt = build_quiz_prompt(content, num_questions)
-#        fallback_raw = generate_smart_response(prompt)
-  #      fallback_quizzes = parse_llm_json(fallback_raw)
-
- #       return {
-#            "metadata": {"fallback": True, "error": str(e)},
-  #          "questions": fallback_quizzes if isinstance(fallback_quizzes, list) else []
-  #      }
-
-
-
-
-
-
-
-
-
-
-# --------------------------
-#      توليد الأختبار ل free users   
-#--------------------------
-def build_quiz_prompt(content, num_questions, user_instruction=None):
+def build_quiz_prompt(content: str, num_questions: int, user_instruction: str = None) -> str:
+    """
+    Free-user prompt, but still language-aware.
+    """
+    target_lang = detect_text_language(content)
 
     user_part = f"User instruction:\n{user_instruction}" if user_instruction else ""
+
+    if target_lang == "Arabic":
+        language_rule = """
+[قاعدة اللغة]
+- المحتوى باللغة العربية.
+- يجب أن تكون جميع القيم النصية داخل JSON بالعربية فقط.
+- ممنوع استخدام الإنجليزية في النصوص.
+        """.strip()
+    else:
+        language_rule = """
+[Language rule]
+- The content is in English.
+- All string values inside JSON must be in English only.
+- Do not use Arabic in the output.
+        """.strip()
 
     prompt = f"""
 {SYSTEM_ROLE}
 
 {QUIZ_RULES}
 
-{LANGUAGE_RULE}
+{language_rule}
 
 Generate {num_questions} quiz questions.
 
@@ -440,12 +413,11 @@ Generate {num_questions} quiz questions.
 
 Content:
 {content}
+
 [STRICT LIMITS]:
 - Question text: Max 250 characters.
-- EACH Option: STRICTLY MAX 95 characters. This is a hard technical limit.
-- If an option is long, condense it without losing the academic meaning.
-"""
+- EACH Option: Strictly max 95 characters.
+- If an option is long, condense it without losing academic meaning.
+    """.strip()
 
     return prompt
-
-
