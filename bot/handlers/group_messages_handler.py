@@ -3,47 +3,59 @@ from models.pattern_detection import detect_quiz_pattern # استيراد الد
 
 
 def register(bot):
-    # 2. هاندلر المجموعات (Groups Only)
-
     @bot.message_handler(func=lambda msg: msg.chat.type in ['group', 'supergroup'], content_types=["text"])
     def handle_group_messages(message):
-        # 1. التأكد أن الرسالة من مجموعة أو سوبر جروب
-        if message.chat.type not in ['group', 'supergroup']:
-            return
-    
+        print(f"📥 [New Message] From: {message.from_user.username} in Chat: {message.chat.id}", flush=True)
+        
         text = message.text or message.caption
         if not text:
+            print("❌ [Skip] Message has no text or caption.", flush=True)
             return
 
-        # 2. تشغيل المحرك الذكي الخاص بك
-        result = detect_quiz_pattern(text)
-    
-        # 3. إذا كانت النتيجة "سؤال" وبثقة أعلى من العتبة المحددة
-        if result:
-            # استخراج بيانات الأدمن (اختياري: يمكنك إرسالها لشخص محدد بـ ID ثابت)
-            chat_id = message.chat.id
-            user_name = message.from_user.first_name
-        
-            # تنسيق الإجابة لإرسالها للآدمن
-            response_text = (
-                f"✅ **تم اكتشاف سؤال جديد!**\n"
-                f"👤 بواسطة: {user_name}\n"
-                f"📊 درجة الثقة: {result.get('score', 0):.2f}\n"
-                f"--- \n"
-                f"❓ **السؤال:** {result['question']}\n"
-                f"📝 **الخيارات:**\n" + 
-                "\n".join([f"- {opt}" for opt in result['options']])
-            )
+        print(f"📝 [Processing] Text Length: {len(text)} characters.", flush=True)
 
-            # إرسال النتيجة للأدمن (هنا نرسلها لنفس الشات كمثال، أو يمكنك وضع ID ثابت)
-            # لإرسالها للآدمن الخاص بالمجموعة برمجياً:
-            try:
+        # محاولة تشغيل المحرك
+        try:
+            # تنبيه: إذا كان النص يحتوي على أسئلة كثيرة، يفضل معالجته سطراً بسطر 
+            # أو إرساله كما هو للمحرك وتخفيض العتبة مؤقتاً للفحص
+            result = detect_quiz_pattern(text)
+            
+            if not result:
+                print("⚠️ [Pattern] No quiz pattern detected by the engine (Score too low or invalid structure).", flush=True)
+                # فحص سريع لطباعة النتيجة حتى لو فشلت (لأغراض التصحيح)
+                return
+
+            score = result.get('score', 0)
+            print(f"🎯 [Match Found] Question: {result['question'][:30]}... | Score: {score}", flush=True)
+
+            if score >= 0.70: # خفضناها قليلاً للتجربة
+                chat_id = message.chat.id
+                user_name = message.from_user.first_name
+            
+                response_text = (
+                    f"✅ **تم اكتشاف سؤال جديد!**\n"
+                    f"📊 درجة الثقة: {score:.2f}\n"
+                    f"❓ **السؤال:** {result['question']}\n"
+                    f"📝 **الخيارات:**\n" + 
+                    "\n".join([f"- {opt}" for opt in result['options']])
+                )
+
+                # إرسال للأدمن
+                print(f"🔗 [Action] Sending to admins of chat {chat_id}", flush=True)
                 admins = bot.get_chat_administrators(chat_id)
+                sent_count = 0
                 for admin in admins:
                     if not admin.user.is_bot:
-                        bot.send_message(admin.user.id, response_text, parse_mode="Markdown")
-            except Exception as e:
-                print(f"Error sending to admin: {e}")
-                # fallback: إرسال رد في المجموعة إذا فشل الإرسال الخاص
-                bot.reply_to(message, "تم رصد سؤال اختبار وإبلاغ الإدارة.")
+                        try:
+                            bot.send_message(admin.user.id, response_text, parse_mode="Markdown")
+                            sent_count += 1
+                        except Exception as e:
+                            print(f"❌ [Error] Could not send to admin {admin.user.id}: {e}", flush=True)
+                
+                print(f"✅ [Done] Sent to {sent_count} admins.", flush=True)
 
+        except Exception as e:
+            print(f"🔥 [Critical Error] Inside Handler: {e}", flush=True)
+            import traceback
+            traceback.print_exc()
+            
