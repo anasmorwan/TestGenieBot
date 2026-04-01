@@ -39,7 +39,7 @@ def register(bot):
             
                 response_text = (
                     f"✅ **تم اكتشاف سؤال جديد!**\n"
-                    f"📊 درجة الثقة: {score:.2f}\n"
+                    f"📊 درجة الثقة: {confidence:.2f}\n"
                     f"❓ **السؤال:** {result['question']}\n"
                     f"📝 **الخيارات:**\n" + 
                     "\n".join([f"- {opt}" for opt in result['options']])
