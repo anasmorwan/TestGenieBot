@@ -590,8 +590,6 @@ def split_quiz_blocks(lines: List[str]) -> List[List[str]]:
 
     return blocks
 
-
-
 def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
     """
     يحلل كتلة سؤال واحد داخل اختبار متعدد الأسئلة.
@@ -619,7 +617,6 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
             if first_option_idx is None:
                 first_option_idx = i
 
-    # 1) خيارات أفقية داخل نفس الكتلة
     inline_text = question_head + "\n" + "\n".join(block_lines[1:])
     inline_options = extract_inline_options(inline_text, min_options=min_options)
     inline_segments = extract_inline_option_segments(inline_text, min_options=min_options)
@@ -627,7 +624,6 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
     if inline_options:
         options = inline_options[:MAX_OPTIONS]
         question = extract_question_from_inline(inline_text) or question_head
-
         prefix_info = check_prefix_consistency(inline_segments[:len(options)]) if inline_segments else None
         mode = "inline"
     elif len(explicit_option_lines) >= min_options:
@@ -655,7 +651,6 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
     if len(options) < min_options or not question or len(question) < MIN_QUESTION_LEN:
         return None
 
-    # ===== scoring =====
     score = 0.0
     layers = []
 
@@ -670,6 +665,10 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
         add("structure", 2.20, "inline_options_found")
     else:
         add("structure", 2.00, "unlabeled_option_block_found")
+
+    # سؤال مرقم + خيارات واضحة = دعم إضافي
+    if is_question_start_line(block_lines[0]):
+        add("question_header", 0.55, "numbered_question_header_detected")
 
     if has_question_signal(question):
         add("question_signal", 1.30, "question_like_language_or_punctuation")
@@ -765,7 +764,6 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
         "mode": mode,
     }
 
-
 def detect_quiz_pattern(text: str) -> Optional[Dict]:
     """
     يكتشف:
@@ -783,37 +781,42 @@ def detect_quiz_pattern(text: str) -> Optional[Dict]:
     if len(lines) < 2:
         return None
 
-    # 1) إذا كان النص يبدو مجموعة أسئلة مرقمة، حلله كحزم
+    # أولاً: جرّب تقسيمه إلى أسئلة مرقمة
     blocks = split_quiz_blocks(lines)
     parsed_blocks = []
 
     if len(blocks) >= 2:
         for block in blocks:
             parsed = parse_quiz_block(block)
-            if parsed and parsed["confidence"] >= 0.70:
+            if parsed and parsed["confidence"] >= 0.65:
                 parsed_blocks.append(parsed)
 
+        # لا تجعل الحكم صارمًا جدًا على المتوسط فقط
+        # المهم: وجود عدد كافٍ من الكتل القوية
         if parsed_blocks:
             avg_conf = sum(b["confidence"] for b in parsed_blocks) / len(parsed_blocks)
-            strongest = max(parsed_blocks, key=lambda x: x["confidence"])
+            strong_count = sum(1 for b in parsed_blocks if b["confidence"] >= 0.80)
 
-            return {
-                "is_quiz": avg_conf >= 0.75,
-                "quiz_type": "multi_question",
-                "confidence": round(avg_conf, 2),
-                "questions_count": len(parsed_blocks),
-                "blocks": parsed_blocks,
-                "question": strongest["question"],
-                "options": strongest["options"],
-                "count": strongest["count"],
-                "question_language": strongest["question_language"],
-                "option_language": strongest["option_language"],
-                "mixed_language": strongest["mixed_language"],
-            }
+            if strong_count >= 2 or len(parsed_blocks) >= 3:
+                strongest = max(parsed_blocks, key=lambda x: x["confidence"])
+                return {
+                    "is_quiz": avg_conf >= 0.70,
+                    "quiz_type": "multi_question",
+                    "confidence": round(avg_conf, 2),
+                    "questions_count": len(parsed_blocks),
+                    "strong_blocks": strong_count,
+                    "blocks": parsed_blocks,
+                    "question": strongest["question"],
+                    "options": strongest["options"],
+                    "count": strongest["count"],
+                    "question_language": strongest["question_language"],
+                    "option_language": strongest["option_language"],
+                    "mixed_language": strongest["mixed_language"],
+                }
 
-    # 2) fallback: عالج النص كله كسؤال واحد
+    # ثانياً: جرّب النص كله كسؤال واحد
     single = parse_quiz_block(lines)
-    if single and single["is_quiz"]:
+    if single and single["confidence"] >= 0.80:
         single["quiz_type"] = "single_question"
         return single
 
