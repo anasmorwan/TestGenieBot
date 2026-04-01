@@ -3,7 +3,9 @@ from models.pattern_detection import detect_quiz_pattern # استيراد الد
 
 
 def register(bot):
-    @bot.message_handler(func=lambda message: True)
+    # 2. هاندلر المجموعات (Groups Only)
+
+    @bot.message_handler(func=lambda msg: msg.chat.type in ['group', 'supergroup'], content_types=["text"])
     def handle_group_messages(message):
         # 1. التأكد أن الرسالة من مجموعة أو سوبر جروب
         if message.chat.type not in ['group', 'supergroup']:
