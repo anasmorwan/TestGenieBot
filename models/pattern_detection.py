@@ -59,6 +59,16 @@ OPTION_PATTERNS = [
     r'^\s*[\(\[]?[{letters}][\)\]]?[\.\)\:\-]?\s+'.format(letters=ARABIC_LETTERS),
 ]
 
+
+INLINE_OPTION_MARKER = (
+    r'(?<!\S)(?:'
+    r'[\(\[]?[A-Da-d][\)\]]?[\.\)\:\-]?\s+|'
+    r'[\(\[]?[1-9][\)\]]?[\.\)\:\-]?\s+|'
+    r'[\(\[]?[٠-٩][\)\]]?[\.\)\:\-]?\s+|'
+    r'[\-\*\•]\s+'
+    r')'
+)
+
 # سؤال مرقّم مثل: 1. ... أو 2) ... أو ٣. ...
 QUESTION_START_PATTERN = re.compile(r'^\s*(\d{1,3}|[٠-٩]{1,3})[\.\)\:\-]\s+')
 
@@ -103,6 +113,12 @@ def has_negative_imperative(text: str) -> bool:
 
 def is_option_line(line: str) -> bool:
     return any(re.match(pattern, line) for pattern in OPTION_PATTERNS)
+
+def strip_question_prefix(line: str) -> str:
+    s = compact_whitespace(line)
+    s = re.sub(r'^\s*(?:س/|سؤال[:：]?)\s*', '', s)
+    s = QUESTION_START_PATTERN.sub('', s, count=1)
+    return compact_whitespace(s)
 
 
 def strip_option_marker(line: str) -> str:
@@ -406,16 +422,7 @@ def negative_signal_score(text: str, lines: List[str]) -> Dict:
 
 
 def extract_inline_option_segments(text: str, min_options: int = MIN_OPTIONS) -> Optional[List[str]]:
-    marker = (
-        r'(?:[A-Da-d][\.\)\:\-]\s+|'
-        r'[1-9][\.\)\:\-]\s+|'
-        r'[٠-٩][\.\)\:\-]\s+|'
-        r'[\-\*\•]\s+|'
-        r'\([A-Da-d1-9٠-٩]\)\s+|'
-        r'[' + ARABIC_LETTERS + r'][\.\)\:\-]\s+)'
-    )
-
-    matches = list(re.finditer(marker, text))
+    matches = list(re.finditer(INLINE_OPTION_MARKER, text))
     if len(matches) < min_options:
         return None
 
@@ -437,10 +444,7 @@ def extract_inline_options(text: str, min_options: int = MIN_OPTIONS) -> Optiona
 
     options = []
     for seg in segments:
-        if re.match(
-            r'^\s*[\(\[]?[A-Da-d1-9٠-٩][\)\]]?[\.\)\:\-]?\s+|^\s*[\-\*\•]\s+|^\s*[\(\[]?[' + ARABIC_LETTERS + r'][\)\]]?[\.\)\:\-]?\s+',
-            seg
-        ):
+        if re.match(INLINE_OPTION_MARKER, seg):
             options.append(strip_option_marker(seg))
         else:
             options.append(compact_whitespace(seg))
@@ -543,52 +547,54 @@ def language_bundle(question: str, options: List[str]) -> Dict:
 
 
 def is_question_start_line(line: str) -> bool:
-    """
-    يكتشف سطر السؤال المرقّم مثل:
-    1. ما أهمية...
-    2) ...
-    ٣- ...
-    """
-    m = QUESTION_START_PATTERN.match(line)
+    s = compact_whitespace(line)
+    if not s:
+        return False
+
+    # صيغ مباشرة مثل: س/ ما هي...
+    if re.match(r'^\s*(?:س/|سؤال[:：])\s*', s):
+        return True
+
+    # سؤال منتهي بعلامة استفهام
+    if s.endswith(("?", "؟")) and option_word_count(s) >= 4:
+        return True
+
+    # سؤال مرقم مثل: 1. ما أهمية... / 2) ...
+    m = QUESTION_START_PATTERN.match(s)
     if not m:
         return False
 
-    rest = strip_question_number(line)
-    if len(rest) < MIN_QUESTION_LEN:
-        return False
+    rest = strip_question_prefix(s)
 
-    if is_option_line(rest):
-        return False
-
-    # مهم: السؤال غالباً يحتوي على بصمة سؤال أو يكون طويلاً نسبياً
+    # نعتبره بداية سؤال فقط إذا كان فعلاً يبدو كسؤال
     if has_question_signal(rest):
         return True
 
-    return option_word_count(rest) >= 4
+    # أو كان طويلاً بما يكفي ويبدو كسؤال حقيقي
+    if option_word_count(rest) >= 5 and len(rest) >= 25:
+        return True
 
+    return False
 
 def split_quiz_blocks(lines: List[str]) -> List[List[str]]:
     """
-    يجزّئ النص إلى كتل أسئلة إذا كان النص عبارة عن اختبار متعدد الأسئلة.
+    يجزئ الرسالة إلى كتل أسئلة فقط عندما يظهر سؤال جديد حقيقي.
     """
     blocks = []
     current = []
-    started = False
 
     for line in lines:
-        if is_question_start_line(line):
-            if current:
-                blocks.append(current)
+        if is_question_start_line(line) and current:
+            blocks.append(current)
             current = [line]
-            started = True
         else:
-            if started:
-                current.append(line)
+            current.append(line)
 
     if current:
         blocks.append(current)
 
     return blocks
+
 
 def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
     """
@@ -606,8 +612,8 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
     min_options = 2 if binary_context else MIN_OPTIONS
 
     first_line = block_lines[0]
-    question_head = strip_question_number(first_line) if is_question_start_line(first_line) else compact_whitespace(first_line)
-
+    question_head = strip_question_prefix(first_line)
+    
     explicit_option_lines = []
     first_option_idx = None
 
@@ -781,7 +787,13 @@ def detect_quiz_pattern(text: str) -> Optional[Dict]:
     if len(lines) < 2:
         return None
 
-    # أولاً: جرّب تقسيمه إلى أسئلة مرقمة
+    # 1) جرّب أولاً كأنه سؤال واحد
+    single = parse_quiz_block(lines)
+    if single and single["confidence"] >= 0.80:
+        single["quiz_type"] = "single_question"
+        return single
+
+    # 2) ثم جرّب إن كان مجموعة أسئلة
     blocks = split_quiz_blocks(lines)
     parsed_blocks = []
 
@@ -791,8 +803,6 @@ def detect_quiz_pattern(text: str) -> Optional[Dict]:
             if parsed and parsed["confidence"] >= 0.65:
                 parsed_blocks.append(parsed)
 
-        # لا تجعل الحكم صارمًا جدًا على المتوسط فقط
-        # المهم: وجود عدد كافٍ من الكتل القوية
         if parsed_blocks:
             avg_conf = sum(b["confidence"] for b in parsed_blocks) / len(parsed_blocks)
             strong_count = sum(1 for b in parsed_blocks if b["confidence"] >= 0.80)
@@ -813,11 +823,5 @@ def detect_quiz_pattern(text: str) -> Optional[Dict]:
                     "option_language": strongest["option_language"],
                     "mixed_language": strongest["mixed_language"],
                 }
-
-    # ثانياً: جرّب النص كله كسؤال واحد
-    single = parse_quiz_block(lines)
-    if single and single["confidence"] >= 0.80:
-        single["quiz_type"] = "single_question"
-        return single
 
     return None
