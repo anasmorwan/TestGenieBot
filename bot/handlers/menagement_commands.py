@@ -134,7 +134,7 @@ def register(bot):
             
             
             base_text = get_message("BASE_TEXT")
-            ux_text = get_message("UX_TEXT")
+            menu_text = get_message("MORE")
     
             # النص المتغير (التحية أو مقدمة مخصصة)
             welcome_new_user = "<b>👋 مرحباً بك في TestGenie</b>\n\n"
@@ -147,7 +147,7 @@ def register(bot):
             #else:    
             #   text = ux_text
 
-            text = ux_text
+            text = menu_text
                 
     
             bot.send_message(chat_id,
