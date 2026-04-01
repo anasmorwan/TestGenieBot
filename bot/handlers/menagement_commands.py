@@ -136,7 +136,14 @@ def register(bot):
             welcome_new_user = "<b>👋 مرحباً بك في TestGenie</b>\n\n"
             welcome_returning_user = "<b>👋 مرحباً بك مجددًا في TestGenie</b>\n\nما الذي ترغب في القيام به اليوم؟\n\n"
         
-            
+            #if is_user_exist(chat_id):
+            #    text = ux_text          
+        
+        
+            #else:    
+            #   text = ux_text
+                
+    
             bot.send_message(chat_id,
             text=text,
             reply_markup=keyboard,
