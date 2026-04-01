@@ -25,10 +25,15 @@ def register(bot):
                 # فحص سريع لطباعة النتيجة حتى لو فشلت (لأغراض التصحيح)
                 return
 
-            score = result.get('score', 0)
-            print(f"🎯 [Match Found] Question: {result['question'][:30]}... | Score: {score}", flush=True)
+            confidence = result.get("confidence", 0)
+            print(f"🎯 [Match Found] Question: {result['question'][:30]}... | Confidence: {confidence}", flush=True)
 
-            if score >= 0.70: # خفضناها قليلاً للتجربة
+            if not result.get("is_quiz", False):
+                print("⚠️ [Pattern] Result returned but not confident enough.", flush=True)
+                return
+
+                
+            if confidence >= 0.70: # خفضناها قليلاً للتجربة
                 chat_id = message.chat.id
                 user_name = message.from_user.first_name
             
