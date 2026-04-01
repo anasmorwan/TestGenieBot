@@ -20,8 +20,9 @@ def register(bot):
         reply_markup=keyboard,
         parse_mode="HTML"
     )
-    
-    @bot.message_handler(content_types=["text"])
+
+
+    @bot.message_handler(func=lambda msg: msg.chat.type == "private", content_types=["text"])
     def handle_text_message(msg):
         if msg.chat.type != "private":
         
