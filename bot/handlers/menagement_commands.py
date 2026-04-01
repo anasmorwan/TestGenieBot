@@ -145,6 +145,8 @@ def register(bot):
         
             #else:    
             #   text = ux_text
+
+            text = ux_text
                 
     
             bot.send_message(chat_id,
