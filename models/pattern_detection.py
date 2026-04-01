@@ -677,4 +677,117 @@ def detect_quiz_pattern(text: str) -> Optional[Dict]:
 
     # Question signal
     if has_question_signal(question):
-     
+        add("question_signal", 1.30, "question_like_language_or_punctuation")
+
+    # Number of options
+    if len(result_options) >= 4:
+        add("option_count", 1.00, "four_or_more_options")
+    elif len(result_options) == 3:
+        add("option_count", 0.70, "three_options")
+    elif len(result_options) == 2 and binary_context:
+        add("option_count", 1.10, "binary_context_with_two_options")
+
+    # Prefix consistency
+    if explicit_mode and prefix_info:
+        if prefix_info["sequence_ok"]:
+            add("prefix_consistency", 1.20, f"sequential_prefixes_{prefix_info['style']}")
+        elif prefix_info["score"] >= 0.7:
+            add("prefix_consistency", 0.80, f"strong_same_style_prefixes_{prefix_info['style']}")
+        elif prefix_info["score"] >= 0.5:
+            add("prefix_consistency", 0.40, f"partial_prefix_consistency_{prefix_info['style']}")
+
+    # Structural similarity
+    sim = structural_similarity_score(result_options)
+    if sim["score"] >= 0.80:
+        add("structural_similarity", 1.00, "very_similar_option_lengths_and_shapes")
+    elif sim["score"] >= 0.60:
+        add("structural_similarity", 0.70, "similar_option_lengths_and_shapes")
+    elif sim["score"] >= 0.40:
+        add("structural_similarity", 0.35, "moderate_similarity")
+    else:
+        add("structural_similarity", -0.20, "weak_similarity")
+
+    # Mixed-language handling
+    lang = language_bundle(question, result_options)
+    if lang["mixed_language"]:
+        add("language_support", 0.35, "mixed_language_detected_but_accepted")
+    else:
+        add("language_support", 0.20, "single_language_detected")
+
+    # Question multiline bonus
+    if len(lines) >= 4 and first_option_idx is not None and first_option_idx >= 3:
+        add("multiline_question", 0.45, "question_spans_multiple_lines_before_options")
+
+    # Option compactness
+    lengths = [len(o) for o in result_options]
+    word_counts = [option_word_count(o) for o in result_options]
+    cv_words = coefficient_of_variation(word_counts)
+    cv_chars = coefficient_of_variation(lengths)
+
+    if cv_words <= 0.20:
+        add("option_shape_cv", 0.70, "very_low_word_count_variation")
+    elif cv_words <= 0.40:
+        add("option_shape_cv", 0.45, "low_word_count_variation")
+    elif cv_words <= 0.60:
+        add("option_shape_cv", 0.20, "moderate_word_count_variation")
+    else:
+        add("option_shape_cv", -0.35, "high_word_count_variation")
+
+    if cv_chars <= 0.20:
+        add("char_count_cv", 0.35, "very_low_char_variation")
+    elif cv_chars <= 0.40:
+        add("char_count_cv", 0.20, "low_char_variation")
+    elif cv_chars <= 0.60:
+        add("char_count_cv", 0.10, "moderate_char_variation")
+    else:
+        add("char_count_cv", -0.25, "high_char_variation")
+
+    # Negative signals
+    neg = negative_signal_score(text, lines)
+    if neg["penalty"] > 0:
+        add("negative_signals", -2.75 * neg["penalty"], ",".join(neg["reasons"]) or "negative_signals")
+
+    # Prose penalty
+    if not explicit_mode and len(lines) >= 3:
+        endings = sum(1 for line in lines if line.endswith(("،", ",", ";", "؛")))
+        ratio = endings / len(lines)
+        if ratio >= 0.50:
+            add("prose_penalty", -0.30, "too_many_lines_end_with_comma_like_punctuation")
+
+    # Length penalty
+    if max(lengths) > 180:
+        add("length_penalty", -0.25, "one_or_more_options_are_too_long")
+
+    # Unlabeled mode penalty without a question signal
+    if unlabeled_mode and not has_question_signal(question):
+        add("question_signal_penalty", -0.45, "unlabeled_options_without_question_signal")
+
+    # -------------------------
+    # 5) الحساب النهائي
+    # -------------------------
+    confidence = max(0.0, min(1.0, score / 7.0))
+    is_quiz = confidence >= CONFIDENCE_THRESHOLD
+
+    result = {
+        "is_quiz": is_quiz,
+        "confidence": round(confidence, 2),
+        "question": question,
+        "options": result_options,
+        "count": len(result_options),
+        "question_language": lang["question_language"],
+        "option_language": lang["option_language"],
+        "mixed_language": lang["mixed_language"],
+        "prefix_consistency": prefix_info if explicit_mode else None,
+        "structural_similarity": {
+            "cv_words": sim["cv_words"],
+            "cv_chars": sim["cv_chars"],
+            "same_category_ratio": sim["same_category_ratio"],
+            "score": sim["score"],
+        },
+        "validation_layers": layers,
+        "negative_signals": neg["reasons"],
+        "binary_context": binary_context,
+    }
+
+    return result if is_quiz else None
+    
