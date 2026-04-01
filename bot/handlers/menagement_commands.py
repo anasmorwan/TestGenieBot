@@ -126,9 +126,16 @@ def register(bot):
             chat_id = msg.chat.id
         
             keyboard = more_options_keyboard()
+            
+            bot_username = mybot.get_me().username
+    
+            base_text = get_message("BASE_TEXT")
+            ux_text = get_message("UX_TEXT")
+    
+            # النص المتغير (التحية أو مقدمة مخصصة)
+            welcome_new_user = "<b>👋 مرحباً بك في TestGenie</b>\n\n"
+            welcome_returning_user = "<b>👋 مرحباً بك مجددًا في TestGenie</b>\n\nما الذي ترغب في القيام به اليوم؟\n\n"
         
-            text1 = get_message("BASE_TEXT")
-            text2 = get_message("UX_TEXT")
             
             bot.send_message(chat_id,
             text=text,
