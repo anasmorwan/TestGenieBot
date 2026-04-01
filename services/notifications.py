@@ -1,7 +1,9 @@
 
 
 
-
+#---------------------
+#    دوال التحقق    
+#---------------------
 
 def should_send_viral_message():
     stats = get_quiz_stats(quiz_code)
@@ -11,7 +13,21 @@ def should_send_viral_message():
 
     return False
 
+def should_send_analytics():
+    
+    stats = get_quiz_stats(quiz_code)
+    
+    if stats["users"] >= 3 and stats["completed"] >= 5:
+        return True
+    return False
 
+
+
+
+
+#---------------------
+#    إشعارات البوت
+#---------------------
 def send_viral_message():
     stats = get_quiz_stats(quiz_code)
     
@@ -24,13 +40,7 @@ def send_viral_message():
     bot.send_message(chat_id=creator_id, text=message, reply_markup=keyboard)
 
 
-def should_send_analytics():
-    
-    stats = get_quiz_stats(quiz_code)
-    
-    if stats["users"] >= 3 and stats["completed"] >= 5:
-        return True
-    return False
+
 
 
 def send_analytics():
