@@ -128,7 +128,7 @@ def register(bot):
             user_id = msg.from_user.id
             chat_id = msg.chat.id
             
-            bot_username = mybot.get_me().username
+            bot_username = bot.get_me().username
     
             keyboard = more_options_keyboard(bot_username)
             
