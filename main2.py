@@ -1,7 +1,7 @@
 # main.py (مهم: وضع طباعات للتتبع)
 import os
 from bot.bot_instance import mybot, set_webhook
-from bot.handlers import start, text_handler, file_handler, image_handler, callback_handler, pre_checkout_query_handler, payment_handler
+from bot.handlers import start, text_handler, file_handler, image_handler, group_messages_handler, callback_handler, pre_checkout_query_handler, payment_handler
 from storage.sqlite_db import init_db
 from bot.handlers import poll_answer_handler
 from bot import flask
@@ -57,6 +57,7 @@ image_handler.register(mybot)
 menagement_commands.register(mybot); print("commands.register done", flush=True)
 start.register(mybot); print("start.register done", flush=True)
 text_handler.register(mybot); print("text_handler.register done", flush=True)
+group_messages_handler.register(mybot); print("group_messages_handler.register done", flush=True)
 file_handler.register(mybot); print("file_handler.register done", flush=True)
 callback_handler.register(mybot); print("callback_handler.register done", flush=True)
 pre_checkout_query_handler.register_payment(mybot); print("pre_checkout_query_handler.register done", flush=True)
