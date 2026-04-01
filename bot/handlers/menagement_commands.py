@@ -2,7 +2,7 @@ import os
 from services.usage import activate_subscription_manual, reset_or_set_daily_usage, get_user_full_info
 from analytics.metrics import get_metrics
 from services.backup_service import backup_all
-from bot.keyboard.more_options_keyboard import more_options_keyboard
+from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.main_menu import main_menu_keyboard
 from storage.messages import get_message
 
