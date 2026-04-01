@@ -1,4 +1,4 @@
-import telebot
+
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 
 
