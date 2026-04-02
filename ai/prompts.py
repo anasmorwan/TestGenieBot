@@ -452,7 +452,7 @@ Content:
 # ============================================================
 #  برومبت الاستطلاعات
 # ============================================================
-Ar_polls_prompt = f"""
+Ar_polls_prompt = """
 أنت خبير في صياغة استطلاعات الرأي (Polls) التفاعلية لمنصة تلجرام.
 مهمتك هي تحليل نص المستخدم وتحويله إلى استطلاع رأي احترافي بصيغة JSON.
 
@@ -472,7 +472,8 @@ Ar_polls_prompt = f"""
 {user_input}
 """
 
-en_polls_prompt = f"""
+
+en_polls_prompt = """
 Act as an expert Telegram Poll Architect. Your task is to analyze the user's input and structure it into a professional poll format.
 
 Guidelines:
@@ -486,29 +487,35 @@ Output MUST be a valid JSON object with these keys:
 - "poll": (String) The final question text.
 - "answers": (Array of Strings) The options for the poll.
 
+{context_clause}
+
 User Input:
 {user_input}
 """
 
 
+
 def build_poll_prompt(content, channel_name=None):
-     # --- إضافة الحماية ---
+    # --- إضافة الحماية ---
     if isinstance(content, tuple):
         content = content[0]
     content = str(content) if content else ""
     
-    
     target_lang = detect_text_language(content)
-    context_clause = ""
     
     if channel_name:
         if target_lang == "Arabic":
             context_clause = f"\nملاحظة: هذا الاستطلاع مخصص لمجتمع/قناة باسم '{channel_name}'. يجب تعديل النبرة والمفردات لتناسب هذا الجمهور."
-            prompt = Ar_polls_prompt
-        
+            # استخدام .format() بدلاً من f-string لأننا نريد تمرير المتغيرات لاحقاً
+            prompt = Ar_polls_prompt.format(context_clause=context_clause, user_input=content)
         else:
             context_clause = f"\nNote: This poll is intended for a community/channel named '{channel_name}'. Adjust the tone and vocabulary to suit this audience."
-            prompt = en_polls_prompt
-
+            prompt = en_polls_prompt.format(context_clause=context_clause, user_input=content)
+    else:
+        # بدون channel_name، نمرر context_clause فارغاً
+        if target_lang == "Arabic":
+            prompt = Ar_polls_prompt.format(context_clause="", user_input=content)
+        else:
+            prompt = en_polls_prompt.format(context_clause="", user_input=content)
     
     return prompt
