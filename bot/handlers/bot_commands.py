@@ -55,13 +55,12 @@ def register(bot):
             
             poll_message = get_message("POLL")
             
-    
             bot.send_message(chat_id,
             text=poll_message,
             reply_markup=keyboard,
             parse_mode="HTML")
 
-            user_states[user_id] = "poll"
+            user_states[user_id] = "awaiting_poll_text"
 
         except Exception as e:
             bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
