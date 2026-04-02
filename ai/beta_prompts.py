@@ -55,12 +55,19 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     domain_name = metadata.get('domain', 'medicine')
     detected_subject = metadata['subject']
     user_stage = metadata['estimated_difficulty']
-    
-    # 2. تحميل القواعد من الملف
-    with open('domain_profile.json', 'r', encoding='utf-8') as f:
-        full_json = json.load(f)
-        config = full_json[domain_name] # الدخول لقسم medicine
 
+    json_path = os.path.join(current_dir, 'domain_profile.json')
+    try:
+        with open(json_path, 'r', encoding='utf-8') as f:
+        full_json = json.load(f)
+        config = full_json[domain_name]
+    except FileNotFoundError:
+        print(f"❌ لم يتم العثور على الملف في المسار: {json_path}")
+        # يمكنك هنا وضع قيمة افتراضية أو رفع الخطأ بشكل أوضح
+        raise
+    
+    
+        
     # 3. تحضير نسب الأسئلة (Weights) كـ نص مقروء للبرومبت
     stage_weights = config["stages"][user_stage]["weights"]
     # تحويل { "recall": 0.4 } إلى "recall: 40%"
