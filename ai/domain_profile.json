@@ -30,15 +30,54 @@
       }
     }
   },
+
+  "subject_type_matrix": {
+  "anatomy": {
+    "high": ["recall", "interpretation", "clinical_reasoning"],
+    "medium": ["diagnosis"],
+    "low": ["mechanism", "contraindication"]
+  },
+  "physiology": {
+    "high": ["mechanism", "interpretation"],
+    "medium": ["clinical_reasoning"],
+    "low": ["contraindication", "next_step"]
+  },
+  "biochemistry": {
+    "high": ["mechanism", "recall"],
+    "medium": ["clinical_reasoning"],
+    "low": ["next_step", "contraindication"]
+  },
+  "pathology": {
+    "high": ["diagnosis", "mechanism"],
+    "medium": ["interpretation", "clinical_reasoning"],
+    "low": ["contraindication"]
+  },
+  "pharmacology": {
+    "high": ["contraindication", "side_effect", "mechanism"],
+    "medium": ["next_step", "clinical_reasoning"],
+    "low": ["interpretation"]
+  },
+  "microbiology": {
+    "high": ["recall", "mechanism", "diagnosis"],
+    "medium": ["clinical_reasoning"],
+    "low": ["next_step"]
+  },
+  "clinical_medicine": {
+    "high": ["diagnosis", "next_step", "management_strategy"],
+    "medium": ["interpretation", "contraindication"],
+    "low": ["recall"]
+  }
+  }
   
   "question_types": [
   "recall",
+  "mechanism",
   "diagnosis",
   "next_step",
-  "mechanism",
   "interpretation",
   "contraindication",
   "complication",
+  "management",
   "side_effect",
   "risk_factor"
   ],
@@ -53,6 +92,69 @@
   "microbiology",
   "clinical_medicine"
   ],
+
+  "generate_distractors": [
+  "1. Identify correct answer",
+  "2. Extract key features (symptoms, age, risk factors)",
+  "3. Find similar conditions (same presentation)",
+  "4. Add one contraindicated option",
+  "5. Add one partially correct option",
+  "6. Ensure all options are نفس الفئة (diagnoses or drugs etc.)",
+  "7. Remove obvious wrong answers"
+  ],
+  
+  "Recall Patterns": [
+  "Which of the following is TRUE regarding X?",
+  "All of the following are correct EXCEPT:",
+  "Which of the following is NOT associated with X?",
+  "X is characterized by which of the following?",
+  "The life cycle of X includes:"
+  ],
+  
+  "Diagnosis Patterns": [
+  "What is the most likely diagnosis?",
+  "Which condition best explains this presentation?",
+  "This patient most likely has:"
+    ],
+  "Next Step / Management": [
+  "What is the next best step in management?",
+  "What is the most appropriate initial treatment?",
+  "What should be done first?",
+  "What is the best management strategy?"
+  ],
+
+  "Mechanism Patterns": [
+  "What is the underlying mechanism?",
+  "Which pathway is most likely affected?",
+  "This condition is caused by:",
+  "What is the primary defect?"
+  ]
+  "Interpretation Patterns": [
+  "What does this lab finding indicate?",
+  "Interpret the following results:",
+  "Which of the following best explains these findings?",
+  "What is the significance of this ECG/lab?"
+  ],
+  "Contraindication": [
+  "Which of the following is contraindicated?",
+  "Which drug should be avoided?",
+  "What is the most dangerous option?",
+  "Which of the following is NOT appropriate?"
+  ],
+  "Complications": [
+  "What is the most likely complication?",
+  "Which side effect is most associated with this drug?",
+  "What is the most serious adverse effect?"
+  ],
+
+  "pattern_mapping": {
+  "recall": "recall_patterns",
+  "diagnosis": "diagnosis_patterns",
+  "next_step": "management_patterns",
+  "mechanism": "mechanism_patterns",
+  "interpretation": "interpretation_patterns",
+  "contraindication": "safety_patterns"
+  },
 
   "difficulty_levels": ["easy", "moderate", "hard"],
 
