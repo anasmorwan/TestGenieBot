@@ -52,6 +52,8 @@ def register(bot):
         shared_by = message.from_user.first_name
         chat_id_to_publish = message.chat_shared.chat_id
         request_id = message.chat_shared.request_id  # 🔥 هذا المهم
+        
+        
 
         # تحديد النوع بناءً على الزر
         if request_id == 1:
@@ -62,15 +64,29 @@ def register(bot):
             chat_type = "الشات"
 
 
+
+        try:
+            chat_details = bot.get_chat(chat_id_to_publish)
+            chat_title = chat_details.title
         
-        state = user_states.get("user_id")
+            state = user_states.get("user_id")
 
 
-        if state == "poll":
-            text = get_message("POLL")
-            bot.send_message(chat_id, text)
-            user_stats[uid] = "generate_poll"
-            return
+            if state == "poll":
+
+                # حفظ الحالة مع سياق اسم القناة
+                user_stats[user_id] = {
+                "state": "generate_poll",
+                "chat_title": chat_title,
+                "chat_id": chat_id_to_publish
+                }
+                return
+                       
+        except Exception as e:
+            bot.send_message(message.chat.id, "❌ عذراً، لا يمكنني الوصول لبيانات هذه المجموعة. تأكد أنني عضو فيها.")
+            
+        
+        
             
 
 
@@ -100,10 +116,4 @@ def register(bot):
         
                  # تلميح للترقية (Soft Sell)
                  # bot.send_message(message.chat.id, text=get_message("SHARED_QUIZ_REACTIONS"))
-
-
-
-
-
-
 
