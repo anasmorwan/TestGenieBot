@@ -45,6 +45,30 @@ def store_quiz(user_id, quizzes):
 
     return code
 
+def store_content(user_id, content_data, content_type="quiz"):
+    conn = get_connection()
+    c = conn.cursor()
+
+    code = generate_quiz_code()
+    is_paid = 1 if is_paid_user_active(user_id) else 0
+
+    c.execute("""
+    INSERT INTO user_quizzes 
+    (user_id, quiz_data, quiz_code, quiz_type, created_at, is_paid) 
+    VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        user_id, 
+        json.dumps(content_data), 
+        code, 
+        content_type, # هنا نحدد هل هو poll أم quiz
+        datetime.now().isoformat(), 
+        is_paid
+    ))
+    
+    conn.commit()
+    conn.close()
+    return code
+    
 #----------------------------
 #  🔹 cleanup old quizzes
 #----------------------------
