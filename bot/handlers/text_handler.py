@@ -68,7 +68,7 @@ def register(bot):
                 text = get_message("POST_POLL_TEXT")
 
                 
-                if text.len() < 200
+                if text.len() < 200:
                     keybord = send_poll_keyboard()
                     bot.send_message(chat_id, poll_text, parse_mode="HTML")
                     poll = generate_poll_question(text)
