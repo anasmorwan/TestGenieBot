@@ -79,7 +79,18 @@ def register(bot):
                     chat_id,
                     message_id
                 )
-                results = detect_quiz_pattern(content)
+                try:
+                    results = detect_quiz_pattern(content)
+                    confidence = result.get("confidence", 0)
+                    decision = result.get("decision", "review")
+            
+                except SomeError:
+                    pass
+                if not result:
+                    pass
+
+                
+                
                 
                 bot.edit_message_text(chat_id=chat_id,
                     message_id=waiting_msg.message_id,
