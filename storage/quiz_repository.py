@@ -235,12 +235,31 @@ def is_quiz_expired(quiz_code):
     return False
 
 
-"""
-def run_cleanup():
-    while True:
-        cleanup_old_quizzes()
-        time.sleep(3600)  # كل ساعة
+def has_previous_poll(user_id):
 
-threading.Thread(target=run_cleanup, daemon=True).start()
+    try:
+        # الاتصال بقاعدة البيانات باستخدام الدالة المتوفرة لديك
+        conn = get_connection()
+        cursor = conn.cursor()
 
-"""
+        # البحث عن أي سجل للمستخدم يكون فيه نوع الكويز 'poll'
+        # ملاحظة: تم استخدام LIMIT 1 لتحسين الأداء لأننا نحتاج فقط لمعرفة الوجود
+        query = """
+            SELECT 1 
+            FROM user_quizzes 
+            WHERE user_id = ? AND quiz_type = 'poll' 
+            LIMIT 1
+        """
+        
+        cursor.execute(query, (user_id,))
+        result = cursor.fetchone()
+
+        # إذا وجدنا نتيجة، فهذا يعني أن المستخدم لديه سجل سابق
+        return result is not None
+
+    except Exception as e:
+        print(f"Error checking for previous poll: {e}")
+        return False
+    finally:
+        if conn:
+            conn.close()
