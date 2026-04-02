@@ -59,7 +59,6 @@ def register(bot):
             
             bot.send_message(chat_id,
             text=poll_message,
-            reply_markup=keyboard,
             parse_mode="HTML")
 
             user_states[user_id] = "awaiting_poll_text"
