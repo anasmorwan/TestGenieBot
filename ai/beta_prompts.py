@@ -85,6 +85,13 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     # 5. تحضير المشتتات (Distractors)
     distractors_text = "\n".join([f"- {rule}" for rule in config['generate_distractors']])
 
+    # أضف هذا المنطق قبل بناء الـ final_prompt
+    if user_stage == "early":
+        target_structure = "Direct Academic Question (Clear and concise, focusing on facts)"
+    else:
+        target_structure = config['response_style']['structure'] # سيأخذ clinical_vignette من الـ JSON
+  
+
     # 6. بناء البرومبت النهائي الموجه للذكاء الاصطناعي
     final_prompt = f"""
     SYSTEM ROLE: You are an expert {config['title']} Education Specialist.
@@ -110,10 +117,12 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     {distractors_text}
 
     FORMAT & STYLE:
+    - Structure: {target_structure}
     - Tone: {config['response_style']['tone']}
     - Structure: Every question MUST use a {config['response_style']['structure']}.
     - Explanation Depth: {config['response_style']['explanation_depth']}. Explain why the correct answer is right AND strictly explain why each distractor is wrong.
-
+    - Adherence: Use ONLY information derived from the SOURCE TEXT below.
+    
     SOURCE TEXT:
     {text_content}
     
@@ -122,4 +131,4 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     """
     
     return final_prompt
-    
+
