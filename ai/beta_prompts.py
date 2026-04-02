@@ -1,6 +1,10 @@
 
 import json
 import random
+from ai.llm_client import generate_smart_response
+
+
+
 
 def analyze_text_metadata(text_content):
     """
