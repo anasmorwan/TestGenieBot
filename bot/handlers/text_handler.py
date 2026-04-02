@@ -78,27 +78,26 @@ def register(bot):
                 if text.len() < 200:
                     
                     bot.send_message(chat_id, group_selection, parse_mode="HTML")
-                    user_state[user_id] = "poll"
+                    
 
                     poll_code, poll = generate_poll(text)
 
                     keybord = get_chat_request_keyboard()
                        
-                    bot.send_poll(
+                    bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
+                    user_state[user_id] = "poll"
+                    return
+
+
+
+                bot.send_poll(
                         chat_id=chat_id,
                         question=str(poll.question)[:300],
                         options=[str(opt) for opt in poll.options if opt],
                         type="regular",
                         explanation=str(question.explanation or "")[:200],
                         is_anonymous=False
-                    )
-                
-
-                
-                    bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
-                    return
-
-        
+                )
                 else:
                     cancel_keyboard = escape_action_keyboard()  
                     bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
