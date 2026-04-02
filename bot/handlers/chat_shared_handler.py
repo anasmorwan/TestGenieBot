@@ -73,6 +73,7 @@ def register(bot):
 
 
             if state == "poll":
+                receive_text = get_message("POLL_TEXT")
 
                 # حفظ الحالة مع سياق اسم القناة
                 user_states[user_id] = {
@@ -80,6 +81,7 @@ def register(bot):
                 "chat_title": chat_title,
                 "chat_id": chat_id_to_publish
                 }
+                bot.send_message(chat_id, receive_text)
                 return
                 
 
