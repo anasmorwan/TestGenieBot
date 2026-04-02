@@ -118,7 +118,8 @@ def register(bot):
                         explanation=str(question.explanation or "")[:200],
                         is_anonymous=False
                 )
-                bot.send_message(chat_id, text, reply_markup=action_keybord, parse_mode="HTML")
+                bot.send_message(chat_id, share_msg, reply_markup=action_keybord, parse_mode="HTML")
+                return
                 
                 
 
