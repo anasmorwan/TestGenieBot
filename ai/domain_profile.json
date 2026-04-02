@@ -69,29 +69,7 @@
   }
   }
   
-  "question_types": [
-  "recall",
-  "mechanism",
-  "diagnosis",
-  "next_step",
-  "interpretation",
-  "contraindication",
-  "complication",
-  "management",
-  "side_effect",
-  "risk_factor"
-  ],
 
-
-  "subjects": [
-  "anatomy",
-  "physiology",
-  "biochemistry",
-  "pathology",
-  "pharmacology",
-  "microbiology",
-  "clinical_medicine"
-  ],
 
   "generate_distractors": [
   "1. Identify correct answer",
