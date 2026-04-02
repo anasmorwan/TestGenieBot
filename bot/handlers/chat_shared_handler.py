@@ -3,7 +3,7 @@ from services.usage import is_paid_user_active
 from storage.quiz_repository import get_user_current_quiz
 from storage.messages import get_message
 from storage.session_store import user_states, get_state_safe
-from services.poll.service import generate_poll
+from services.poll_service import generate_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
 
 
