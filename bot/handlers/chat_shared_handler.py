@@ -2,7 +2,7 @@ from telebot import types
 from services.usage import is_paid_user_active
 from storage.quiz_repository import get_user_current_quiz
 from storage.messages import get_message
-from storage.session_store import user_states, get_state_safe, temp_texts
+from storage.session_store import user_states, get_state_safe
 from services.poll.service import generate_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
 
@@ -89,7 +89,7 @@ def register(bot):
                     print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
                     poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
                 
-                    temp_texts[user_id] = text
+                    
                 
                     action_keyboard = send_poll_keyboard(user_id, poll_code) 
                 
