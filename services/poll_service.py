@@ -6,17 +6,19 @@ from services.usage import is_paid_user_active
 from storage.quiz_repository import store_content
 
 
-def generate_poll_question(prompt):
+def generate_and_store_question(user_id, prompt):
     result = generate_smart_response(prompt)
-    poll_code = store_content(result)
-    return poll_code, result
+    poll = parse_llm_json(raw_poll)
+        
+    poll_code = store_content(user_id, result, content_type="poll")
+    
+    return poll_code, poll
 
 
-def generate_poll(content):
+def generate_poll(user_id, content):
     try:
         prompt = build_poll_prompt(content)
-        poll_code, raw_poll = generate_poll_question(prompt)
-        poll = parse_llm_json(raw_poll)
+        poll_code, poll = generate_and_store_question(user_id, prompt)
         
         if not isinstance(poll, list):
             return []
