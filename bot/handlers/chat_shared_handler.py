@@ -2,9 +2,9 @@ from telebot import types
 from services.usage import is_paid_user_active
 from storage.quiz_repository import get_user_current_quiz
 from storage.messages import get_message
-from storage.session_store import user_states, get_state_safe
-
-
+from storage.session_store import user_states, get_state_safe, temp_texts
+from services.poll.service import generate_poll
+from bot.keyboards.actions_keyboards import send_poll_keyboard
 
 
 
@@ -89,6 +89,40 @@ def register(bot):
                 "chat_id": chat_id_to_publish
                 }
                 bot.send_message(user_id, text)
+                
+                try:
+                    print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
+                    poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
+                
+                    temp_texts[user_id] = text
+                
+                    action_keyboard = send_poll_keyboard(user_id, poll_code) 
+                
+                    # استخراج البيانات
+                    q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
+                    q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
+                
+                    bot.delete_message(user_id, waiting_msg.message_id)
+
+                    bot.send_poll(
+                        chat_id=user_id,
+                        question=str(q_text)[:300],
+                        options=[str(opt) for opt in q_options if opt],
+                        type="regular",
+                        is_anonymous=False
+                    )
+                
+                    bot.send_message(user_id, share_msg, reply_markup=action_keyboard, parse_mode="HTML")
+                    user_states[user_id] = None 
+                    print(f"DEBUG: [User: {user_id}] generate_poll COMPLETED", flush=True)
+                    return
+                    
+                except Exception as e:
+                    bot.send_message(chat_id, f"فشل إنشاء إستطلاع.\n\n {str(e)}")
+                    user_states.pop(user_id, None)
+                finally:
+                    user_states.pop(user_id, None)
+                    
 
                 return
                 
