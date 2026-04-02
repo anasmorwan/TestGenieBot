@@ -12,6 +12,7 @@ from services.usage import consume_quiz, can_generate, check_subscription_valid
 from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
+from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 
 
 def register(bot):
@@ -78,6 +79,8 @@ def register(bot):
                     chat_id,
                     message_id
                 )
+                results = detect_quiz_pattern(content)
+                
                 bot.edit_message_text(chat_id=chat_id,
                     message_id=waiting_msg.message_id,
                     text="⏳ لحظة واحدة بعد...")
