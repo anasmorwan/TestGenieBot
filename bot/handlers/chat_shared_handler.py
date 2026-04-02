@@ -87,7 +87,7 @@ def register(bot):
                 "chat_title": chat_title,
                 "chat_id": chat_id_to_publish
                 }
-                bot.send_message(chat_id, receive_text)
+                bot.send_message(user_id, receive_text)
 
                 return
                 
