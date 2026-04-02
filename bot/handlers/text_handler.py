@@ -8,7 +8,7 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
 from bot.keyboards.quiz_buttons import quiz_keyboard
-
+from storage.session_store import user_states
 
 def register(bot):
 
@@ -56,30 +56,66 @@ def register(bot):
             bot.send_message(chat_id, "⚠️ الرجاء إرسال نص لتوليد الاختبار.")
             return
 
+
+
+        
         try:
+            state = user_states.get("user_id")
             
-            waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
-            # توليد الأسئلة
-            quizzes = generate_quizzes_from_text(text, user_id)
+            if state == "poll":
+                poll_text = get_message("POLL_INST")
+                error_text = get_message("REGECTED_POLL_TXT")
+                text = get_message("POST_POLL_TEXT")
 
-            if not quizzes or len(quizzes) == 0:
-                bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
-                return
+                
+                if text.len() < 200
+                    keybord = send_poll_keyboard()
+                    bot.send_message(chat_id, poll_text, parse_mode="HTML")
+                    poll = generate_poll_question(text)
+                    bot.send_poll(
+                    bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
+                    return
 
-            # تخزين الاختبار
-            quiz_code = store_quiz(user_id, quizzes)
-            maybe_cleanup()
-            # backup_all()
-            quiz_len = len(quizzes)
+        
+                else:
+                    cancel_keyboard = escape_action_keyboard()
+                    action_keybord = send_poll_keyboard()
+                    
+                    bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
+                    time.sleep(2)
+                    poll = generate_poll_question(text)
+                    bot.send_poll(
+                    
+                    bot.send_message(chat_id, text, reply_markup=action_keybord, parse_mode="HTML")
+                    return
+                
 
 
-            bot.edit_message_text(
-                    chat_id=chat_id,
-                    message_id=waiting_msg.message_id,
-                    text=get_message("QUIZ_CREATED", count=quiz_len),
-                    reply_markup=quiz_keyboard(quiz_code),
-                    parse_mode="HTML"
-                )
+            else:
+            
+                waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
+                # توليد الأسئلة
+                quizzes = generate_quizzes_from_text(text, user_id)
+
+                if not quizzes or len(quizzes) == 0:
+                    bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
+                    return
+
+                # تخزين الاختبار
+                quiz_code = store_quiz(user_id, quizzes)
+                maybe_cleanup()
+                # backup_all()
+                quiz_len = len(quizzes)
+
+
+                bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=waiting_msg.message_id,
+                        text=get_message("QUIZ_CREATED", count=quiz_len),
+                        reply_markup=quiz_keyboard(quiz_c
+                                                ode),
+                        parse_mode="HTML"
+                    )
             
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
