@@ -123,7 +123,7 @@ def register(bot):
 
                      # 3. إرسال الاستطلاع
                      bot.send_poll(
-                         chat_id=chat_id, # تأكد من أن chat_id هو المعرف الصحيح للمستقبل
+                         chat_id=user_id, # تأكد من أن chat_id هو المعرف الصحيح للمستقبل
                          question=str(q_text)[:300],
                          options=[str(opt) for opt in q_options if opt][:10], # التليجرام يقبل 10 خيارات كحد أقصى
                          type="regular",
