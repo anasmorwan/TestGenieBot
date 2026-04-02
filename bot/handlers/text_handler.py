@@ -79,7 +79,7 @@ def register(bot):
                 share_msg = get_message("POST_POLL_TEXT")
                 wait_text = get_message("GENERATE_POLL")
                 
-                bot.send_message(chat_id, wait_text, parse_mode="HTML")
+                waiting_msg = bot.send_message(chat_id, wait_text, parse_mode="HTML")
                 
                 print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
                 poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
@@ -91,6 +91,8 @@ def register(bot):
                 # استخراج البيانات
                 q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
                 q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
+                
+                bot.delete_message(chat_id, waiting_msg.message_id)
 
                 bot.send_poll(
                     chat_id=chat_id,
