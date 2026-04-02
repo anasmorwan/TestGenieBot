@@ -69,34 +69,35 @@ def register(bot):
             
             if state == "awaiting_poll_text":
                 group_selection = get_message("POLL_TO_CHAT")
-            
-                poll_text = get_message("POLL_INST")
-                error_text = get_message("REGECTED_POLL_TXT")
-                
+          
                 
                 if text.len() < 200:
                     
-                    bot.send_message(chat_id, group_selection, parse_mode="HTML")
+                    
                     keybord = get_chat_request_keyboard()    
-                    bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
+                    bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
                     
                     user_state[user_id] = "poll"
                     
                     return
 
                 else:
-                    cancel_keyboard = escape_action_keyboard()  
-                    bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
-                    time.sleep(2)
+                    #error_text = get_message("REGECTED_POLL_TXT")
+                
+                    # cancel_keyboard = escape_action_keyboard()  
+                    # bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
+                    #time.sleep(2)
                     
-                    poll_code, poll = generate_poll(text)
-
-                    action_keybord = get_chat_request_keyboard()
+                    # action_keybord = get_chat_request_keyboard()
                     
+                    keybord = get_chat_request_keyboard()    
+                    bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
                     
-                    
+                    user_state[user_id] = "poll"
                     
                     return
+                    
+                    
 
             elif state == "generate_poll":
                 text = get_message("POST_POLL_TEXT")
