@@ -10,7 +10,7 @@ from services.backup_service import smart_restore, is_db_valid
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.session_store import user_states
 from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
-
+from services.poll_service import generate_poll_question
 
 def register(bot):
 
@@ -71,15 +71,18 @@ def register(bot):
 
                 
                 if text.len() < 200:
-                    keybord = send_poll_keyboard()
+                    
                     bot.send_message(chat_id, poll_text, parse_mode="HTML")
-                    poll = generate_poll_question(text)
+
+                    poll_code, poll = generate_poll_question(text)
+
+                    keybord = send_poll_keyboard(poll_code, text)
+                       
                     bot.send_poll(
                         chat_id=chat_id,
-                        question=str(question.question)[:300],
-                        options=[str(opt) for opt in question.options if opt],
+                        question=str(poll.question)[:300],
+                        options=[str(opt) for opt in poll.options if opt],
                         type="regular",
-                        correct_option_id=int(question.correct_index) if question.correct_index is not None else 0,
                         explanation=str(question.explanation or "")[:200],
                         is_anonymous=False
                     )
@@ -91,19 +94,19 @@ def register(bot):
 
         
                 else:
-                    cancel_keyboard = escape_action_keyboard()
-                    action_keybord = send_poll_keyboard()
-                    
+                    cancel_keyboard = escape_action_keyboard()  
                     bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
                     time.sleep(2)
-                    poll = generate_poll_question(text)
+                    
+                    poll_code, poll = generate_poll_question(text)
+
+                    action_keybord = send_poll_keyboard(poll_code, text)
+                    
                     bot.send_poll(
                         chat_id=chat_id,
-                        question=str(question.question)[:300],
-                        options=[str(opt) for opt in question.options if opt],
+                        question=str(poll.question)[:300],
+                        options=[str(opt) for opt in poll.options if opt],
                         type="regular",
-                        correct_option_id=int(question.correct_index) if question.correct_index is not None else 0,
-                        explanation=str(question.explanation or "")[:200],
                         is_anonymous=False
                     )
                     
