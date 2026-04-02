@@ -11,7 +11,10 @@ MIN_TEXT_LEN = 12
 MIN_QUESTION_LEN = 8
 MIN_OPTIONS = 3
 MAX_OPTIONS = 10
-CONFIDENCE_THRESHOLD = 0.80
+
+# Tier thresholds
+CONFIDENCE_HIGH = 0.85
+CONFIDENCE_LOW = 0.40
 
 ARABIC_LETTERS = "أبجدهوزحطيكلمنسعفصقرشتثخذضظغ"
 ARABIC_SEQ_COMMON_1 = ["أ", "ب", "ج", "د", "هـ", "و", "ز", "ح", "ط", "ي"]
@@ -59,19 +62,18 @@ OPTION_PATTERNS = [
     r'^\s*[\(\[]?[{letters}][\)\]]?[\.\)\:\-]?\s+'.format(letters=ARABIC_LETTERS),
 ]
 
-
 INLINE_OPTION_MARKER = (
     r'(?<!\S)(?:'
     r'[\(\[]?[A-Da-d][\)\]]?[\.\)\:\-]?\s+|'
     r'[\(\[]?[1-9][\)\]]?[\.\)\:\-]?\s+|'
     r'[\(\[]?[٠-٩][\)\]]?[\.\)\:\-]?\s+|'
-    r'[\-\*\•]\s+'
+    r'[\-\*\•]\s+|'
+    r'[\(\[]?[' + ARABIC_LETTERS + r'][\)\]]?[\.\)\:\-]?\s+'
     r')'
 )
 
-# سؤال مرقّم مثل: 1. ... أو 2) ... أو ٣. ...
 QUESTION_START_PATTERN = re.compile(r'^\s*(\d{1,3}|[٠-٩]{1,3})[\.\)\:\-]\s+')
-
+QUESTION_PREFIX_RE = re.compile(r'^\s*(?:س/|السؤال|سؤال|question|q)\s*[:：\-]?\s*', re.IGNORECASE)
 
 # =========================
 # أدوات مساعدة
@@ -95,30 +97,23 @@ def compact_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def safe_preview(text: str, limit: int = 120) -> str:
+    text = compact_whitespace(text)
+    return text if len(text) <= limit else text[:limit - 1] + "…"
+
+
 def is_bad_message(text: str) -> bool:
     lowered = text.lower()
-    for pattern in BAD_PATTERNS:
-        if re.search(pattern, lowered, re.IGNORECASE):
-            return True
-    return False
+    return any(re.search(pattern, lowered, re.IGNORECASE) for pattern in BAD_PATTERNS)
 
 
 def has_negative_imperative(text: str) -> bool:
     lowered = text.lower()
-    for pattern in NEGATIVE_IMPERATIVE_PATTERNS:
-        if re.search(pattern, lowered, re.IGNORECASE):
-            return True
-    return False
+    return any(re.search(pattern, lowered, re.IGNORECASE) for pattern in NEGATIVE_IMPERATIVE_PATTERNS)
 
 
 def is_option_line(line: str) -> bool:
     return any(re.match(pattern, line) for pattern in OPTION_PATTERNS)
-
-def strip_question_prefix(line: str) -> str:
-    s = compact_whitespace(line)
-    s = re.sub(r'^\s*(?:س/|سؤال[:：]?)\s*', '', s)
-    s = QUESTION_START_PATTERN.sub('', s, count=1)
-    return compact_whitespace(s)
 
 
 def strip_option_marker(line: str) -> str:
@@ -136,8 +131,11 @@ def strip_option_marker(line: str) -> str:
     return compact_whitespace(cleaned)
 
 
-def strip_question_number(line: str) -> str:
-    return compact_whitespace(QUESTION_START_PATTERN.sub('', line, count=1))
+def strip_question_prefix(line: str) -> str:
+    s = compact_whitespace(line)
+    s = QUESTION_PREFIX_RE.sub('', s, count=1)
+    s = QUESTION_START_PATTERN.sub('', s, count=1)
+    return compact_whitespace(s)
 
 
 def looks_like_date_or_number_line(line: str) -> bool:
@@ -287,7 +285,7 @@ def check_prefix_consistency(options_raw: List[str]) -> Dict:
     parsed = []
     for opt in options_raw:
         info = extract_prefix_info(opt)
-        if info and info[0] != "bullet":
+        if info:
             parsed.append(info)
 
     if len(parsed) < 2:
@@ -311,6 +309,15 @@ def check_prefix_consistency(options_raw: List[str]) -> Dict:
         }
 
     n = len(prefixes)
+
+    # Bullet groups are common in natural messages; reward consistency lightly.
+    if style == "bullet":
+        return {
+            "score": 0.70 if len(prefixes) >= 3 else 0.35,
+            "style": "bullet",
+            "sequence_ok": False,
+            "prefixes": prefixes,
+        }
 
     if style == "en_alpha":
         seq = [chr(ord("A") + i) for i in range(10)]
@@ -392,7 +399,7 @@ def negative_signal_score(text: str, lines: List[str]) -> Dict:
     reasons = []
 
     if has_negative_imperative(text):
-        penalty += 0.35
+        penalty += 0.30
         reasons.append("imperative_or_chat_request")
 
     if lines:
@@ -402,23 +409,73 @@ def negative_signal_score(text: str, lines: List[str]) -> Dict:
         )
         ratio = endings / len(lines)
         if ratio >= 0.60 and len(lines) >= 3:
-            penalty += 0.25
+            penalty += 0.20
             reasons.append("prose_like_line_endings")
 
-    long_lines = sum(1 for line in lines if len(line) > 120)
+    long_lines = sum(1 for line in lines if len(line) > 140)
     if long_lines >= 2:
-        penalty += 0.20
+        penalty += 0.15
         reasons.append("too_many_long_lines")
-
-    if len(lines) >= 4 and all(not is_option_line(l) for l in lines[:4]):
-        if not has_question_signal(text):
-            penalty += 0.15
-            reasons.append("no_question_signal_in_multiline_text")
 
     return {
         "penalty": min(0.80, penalty),
         "reasons": reasons,
     }
+
+
+def is_question_heading_line(line: str) -> bool:
+    s = compact_whitespace(line)
+    if not s:
+        return False
+
+    # Explicit question prefixes
+    if QUESTION_PREFIX_RE.match(s):
+        return True
+
+    # Numeric question heading like: 1. What is ...
+    m = QUESTION_START_PATTERN.match(s)
+    if m:
+        rest = strip_question_prefix(s)
+        if has_question_signal(rest):
+            return True
+        if option_word_count(rest) >= 5 and len(rest) >= 25:
+            return True
+
+    # Plain question line
+    if not QUESTION_START_PATTERN.match(s):
+        if has_question_signal(s) and option_word_count(s) >= 3:
+            return True
+
+    return False
+
+
+def split_quiz_blocks(lines: List[str]) -> List[List[str]]:
+    """
+    Splits a long message into blocks of questions.
+    A new block starts only when a true question heading is detected.
+    """
+    blocks = []
+    current = []
+
+    for line in lines:
+        if is_question_heading_line(line):
+            if current and (any(is_option_line(x) for x in current) or has_question_signal(" ".join(current))):
+                blocks.append(current)
+                current = [line]
+            elif not current:
+                current = [line]
+            else:
+                current = [line]
+        else:
+            if current:
+                current.append(line)
+            else:
+                current = [line]
+
+    if current:
+        blocks.append(current)
+
+    return blocks
 
 
 def extract_inline_option_segments(text: str, min_options: int = MIN_OPTIONS) -> Optional[List[str]]:
@@ -444,7 +501,10 @@ def extract_inline_options(text: str, min_options: int = MIN_OPTIONS) -> Optiona
 
     options = []
     for seg in segments:
-        if re.match(INLINE_OPTION_MARKER, seg):
+        if re.match(
+            r'^\s*[\(\[]?[A-Da-d1-9٠-٩][\)\]]?[\.\)\:\-]?\s+|^\s*[\-\*\•]\s+|^\s*[\(\[]?[' + ARABIC_LETTERS + r'][\)\]]?[\.\)\:\-]?\s+',
+            seg
+        ):
             options.append(strip_option_marker(seg))
         else:
             options.append(compact_whitespace(seg))
@@ -454,18 +514,14 @@ def extract_inline_options(text: str, min_options: int = MIN_OPTIONS) -> Optiona
 
 
 def extract_question_from_inline(text: str) -> str:
-    segments = extract_inline_option_segments(text, min_options=2)
-    if not segments:
-        return ""
-
-    first_marker = re.search(
-        r'[\(\[]?[A-Da-d1-9٠-٩][\)\]]?[\.\)\:\-]?\s+|[\-\*\•]\s+|[\(\[]?[' + ARABIC_LETTERS + r'][\)\]]?[\.\)\:\-]?\s+',
+    m = re.search(
+        r'(?<!\S)(?:[\(\[]?[A-Da-d1-9٠-٩][\)\]]?[\.\)\:\-]?\s+|[\-\*\•]\s+|[\(\[]?[' + ARABIC_LETTERS + r'][\)\]]?[\.\)\:\-]?\s+)',
         text
     )
-    if not first_marker:
+    if not m:
         return ""
 
-    pre = text[:first_marker.start()].strip()
+    pre = text[:m.start()].strip()
     if not pre:
         return ""
 
@@ -480,17 +536,11 @@ def extract_question_from_inline(text: str) -> str:
 
 def is_unlabeled_option_candidate(line: str) -> bool:
     s = line.strip()
-    if not s:
+    if not s or len(s) > 140:
         return False
-
-    if len(s) > 120:
-        return False
-
-    wc = option_word_count(s)
-    if wc > 12:
-        return False
-
     if looks_like_date_or_number_line(s):
+        return False
+    if option_word_count(s) > 14:
         return False
 
     comma_count = sum(s.count(ch) for ch in [",", "،", "؛", ";"])
@@ -519,9 +569,9 @@ def find_unlabeled_option_block(lines: List[str], min_options: int = MIN_OPTIONS
 
         if len(block) >= min_options:
             sim = structural_similarity_score(block)
-            candidate_score = sim["score"] + (0.05 if len(block) <= 6 else 0.0)
-            if best is None or candidate_score > best["score"]:
-                best = {"start": start, "block": block, "score": candidate_score, "sim": sim}
+            cand = sim["score"] + (0.05 if len(block) <= 6 else 0.0)
+            if best is None or cand > best["score"]:
+                best = {"start": start, "block": block, "score": cand, "sim": sim}
 
     if best:
         return best["start"], best["block"]
@@ -530,15 +580,12 @@ def find_unlabeled_option_block(lines: List[str], min_options: int = MIN_OPTIONS
 
 def language_bundle(question: str, options: List[str]) -> Dict:
     q_lang = detect_language(question)
-    opt_text = " ".join(options)
-    o_lang = detect_language(opt_text)
-
+    o_lang = detect_language(" ".join(options))
     mixed = (
         q_lang == "mixed" or
         o_lang == "mixed" or
-        (q_lang != "unknown" and o_lang != "unknown" and q_lang != o_lang)
+        (q_lang not in ("unknown",) and o_lang not in ("unknown",) and q_lang != o_lang)
     )
-
     return {
         "question_language": q_lang,
         "option_language": o_lang,
@@ -546,60 +593,7 @@ def language_bundle(question: str, options: List[str]) -> Dict:
     }
 
 
-def is_question_start_line(line: str) -> bool:
-    s = compact_whitespace(line)
-    if not s:
-        return False
-
-    # صيغ مباشرة مثل: س/ ما هي...
-    if re.match(r'^\s*(?:س/|سؤال[:：])\s*', s):
-        return True
-
-    # سؤال منتهي بعلامة استفهام
-    if s.endswith(("?", "؟")) and option_word_count(s) >= 4:
-        return True
-
-    # سؤال مرقم مثل: 1. ما أهمية... / 2) ...
-    m = QUESTION_START_PATTERN.match(s)
-    if not m:
-        return False
-
-    rest = strip_question_prefix(s)
-
-    # نعتبره بداية سؤال فقط إذا كان فعلاً يبدو كسؤال
-    if has_question_signal(rest):
-        return True
-
-    # أو كان طويلاً بما يكفي ويبدو كسؤال حقيقي
-    if option_word_count(rest) >= 5 and len(rest) >= 25:
-        return True
-
-    return False
-
-def split_quiz_blocks(lines: List[str]) -> List[List[str]]:
-    """
-    يجزئ الرسالة إلى كتل أسئلة فقط عندما يظهر سؤال جديد حقيقي.
-    """
-    blocks = []
-    current = []
-
-    for line in lines:
-        if is_question_start_line(line) and current:
-            blocks.append(current)
-            current = [line]
-        else:
-            current.append(line)
-
-    if current:
-        blocks.append(current)
-
-    return blocks
-
-
 def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
-    """
-    يحلل كتلة سؤال واحد داخل اختبار متعدد الأسئلة.
-    """
     if not block_lines:
         return None
 
@@ -613,10 +607,9 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
 
     first_line = block_lines[0]
     question_head = strip_question_prefix(first_line)
-    
+
     explicit_option_lines = []
     first_option_idx = None
-
     for i, line in enumerate(block_lines[1:], start=1):
         if is_option_line(line):
             explicit_option_lines.append(line)
@@ -627,11 +620,15 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
     inline_options = extract_inline_options(inline_text, min_options=min_options)
     inline_segments = extract_inline_option_segments(inline_text, min_options=min_options)
 
+    mode = None
+    prefix_info = None
+
     if inline_options:
         options = inline_options[:MAX_OPTIONS]
         question = extract_question_from_inline(inline_text) or question_head
         prefix_info = check_prefix_consistency(inline_segments[:len(options)]) if inline_segments else None
         mode = "inline"
+
     elif len(explicit_option_lines) >= min_options:
         options = [strip_option_marker(x) for x in explicit_option_lines[:MAX_OPTIONS]]
         options = [compact_whitespace(o) for o in options if compact_whitespace(o)]
@@ -643,6 +640,7 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
 
         prefix_info = check_prefix_consistency(explicit_option_lines[:len(options)])
         mode = "explicit"
+
     else:
         unlabeled = find_unlabeled_option_block(block_lines, min_options=min_options)
         if unlabeled is None:
@@ -651,106 +649,132 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
         start_idx, block = unlabeled
         options = [compact_whitespace(x) for x in block[:MAX_OPTIONS] if compact_whitespace(x)]
         question = compact_whitespace(" ".join(block_lines[:start_idx])) if start_idx > 0 else question_head
-        prefix_info = None
         mode = "unlabeled"
 
     if len(options) < min_options or not question or len(question) < MIN_QUESTION_LEN:
         return None
 
     score = 0.0
+    evidence = 0
     layers = []
 
     def add(layer: str, points: float, reason: str):
-        nonlocal score
+        nonlocal score, evidence
         score += points
         layers.append({"layer": layer, "points": round(points, 3), "reason": reason})
+        if points > 0:
+            evidence += 1
 
+    # core structure
     if mode == "explicit":
-        add("structure", 2.30, "explicit_option_prefixes_found")
+        add("structure", 0.30, "explicit_option_prefixes_found")
     elif mode == "inline":
-        add("structure", 2.20, "inline_options_found")
+        add("structure", 0.30, "inline_options_found")
     else:
-        add("structure", 2.00, "unlabeled_option_block_found")
+        add("structure", 0.24, "unlabeled_option_block_found")
 
-    # سؤال مرقم + خيارات واضحة = دعم إضافي
-    if is_question_start_line(block_lines[0]):
-        add("question_header", 0.55, "numbered_question_header_detected")
+    # question signal
+    if QUESTION_PREFIX_RE.match(first_line) or is_question_heading_line(first_line):
+        add("question_header", 0.10, "question_heading_detected")
 
     if has_question_signal(question):
-        add("question_signal", 1.30, "question_like_language_or_punctuation")
+        add("question_signal", 0.18, "question_like_language_or_punctuation")
 
+    # option count
     if len(options) >= 4:
-        add("option_count", 1.00, "four_or_more_options")
+        add("option_count", 0.12, "four_or_more_options")
     elif len(options) == 3:
-        add("option_count", 0.70, "three_options")
+        add("option_count", 0.09, "three_options")
     elif len(options) == 2 and binary_context:
-        add("option_count", 1.10, "binary_context_with_two_options")
+        add("option_count", 0.12, "binary_context_with_two_options")
 
+    # prefix consistency
     if prefix_info:
         if prefix_info["sequence_ok"]:
-            add("prefix_consistency", 1.20, f"sequential_prefixes_{prefix_info['style']}")
+            add("prefix_consistency", 0.12, f"sequential_prefixes_{prefix_info['style']}")
+        elif prefix_info["style"] == "bullet":
+            add("prefix_consistency", prefix_info["score"] * 0.10, "bullet_style_consistency")
         elif prefix_info["score"] >= 0.7:
-            add("prefix_consistency", 0.80, f"strong_same_style_prefixes_{prefix_info['style']}")
+            add("prefix_consistency", 0.08, f"strong_same_style_prefixes_{prefix_info['style']}")
         elif prefix_info["score"] >= 0.5:
-            add("prefix_consistency", 0.40, f"partial_prefix_consistency_{prefix_info['style']}")
+            add("prefix_consistency", 0.05, f"partial_prefix_consistency_{prefix_info['style']}")
 
+    # similarity
     sim = structural_similarity_score(options)
     if sim["score"] >= 0.80:
-        add("structural_similarity", 1.00, "very_similar_option_lengths_and_shapes")
+        add("structural_similarity", 0.12, "very_similar_option_lengths_and_shapes")
     elif sim["score"] >= 0.60:
-        add("structural_similarity", 0.70, "similar_option_lengths_and_shapes")
+        add("structural_similarity", 0.08, "similar_option_lengths_and_shapes")
     elif sim["score"] >= 0.40:
-        add("structural_similarity", 0.35, "moderate_similarity")
+        add("structural_similarity", 0.04, "moderate_similarity")
     else:
-        add("structural_similarity", -0.20, "weak_similarity")
+        add("structural_similarity", -0.08, "weak_similarity")
 
+    # language
     lang = language_bundle(question, options)
     if lang["mixed_language"]:
-        add("language_support", 0.35, "mixed_language_detected_but_accepted")
+        add("language_support", 0.03, "mixed_language_detected_but_accepted")
     else:
-        add("language_support", 0.20, "single_language_detected")
+        add("language_support", 0.02, "single_language_detected")
 
+    # multiline bonus
     if len(block_lines) >= 4 and first_option_idx is not None and first_option_idx >= 2:
-        add("multiline_question", 0.45, "question_spans_multiple_lines_before_options")
+        add("multiline_question", 0.05, "question_spans_multiple_lines_before_options")
 
+    # structural stability
     lengths = [len(o) for o in options]
     word_counts = [option_word_count(o) for o in options]
     cv_words = coefficient_of_variation(word_counts)
     cv_chars = coefficient_of_variation(lengths)
 
     if cv_words <= 0.20:
-        add("option_shape_cv", 0.70, "very_low_word_count_variation")
+        add("option_shape_cv", 0.10, "very_low_word_count_variation")
     elif cv_words <= 0.40:
-        add("option_shape_cv", 0.45, "low_word_count_variation")
+        add("option_shape_cv", 0.06, "low_word_count_variation")
     elif cv_words <= 0.60:
-        add("option_shape_cv", 0.20, "moderate_word_count_variation")
+        add("option_shape_cv", 0.03, "moderate_word_count_variation")
     else:
-        add("option_shape_cv", -0.35, "high_word_count_variation")
+        add("option_shape_cv", -0.06, "high_word_count_variation")
 
     if cv_chars <= 0.20:
-        add("char_count_cv", 0.35, "very_low_char_variation")
+        add("char_count_cv", 0.05, "very_low_char_variation")
     elif cv_chars <= 0.40:
-        add("char_count_cv", 0.20, "low_char_variation")
+        add("char_count_cv", 0.03, "low_char_variation")
     elif cv_chars <= 0.60:
-        add("char_count_cv", 0.10, "moderate_char_variation")
+        add("char_count_cv", 0.01, "moderate_char_variation")
     else:
-        add("char_count_cv", -0.25, "high_char_variation")
+        add("char_count_cv", -0.04, "high_char_variation")
 
+    # negative signals
     neg = negative_signal_score(block_text, block_lines)
     if neg["penalty"] > 0:
-        add("negative_signals", -2.75 * neg["penalty"], ",".join(neg["reasons"]) or "negative_signals")
+        add("negative_signals", -neg["penalty"], ",".join(neg["reasons"]) or "negative_signals")
 
     if max(lengths) > 180:
-        add("length_penalty", -0.25, "one_or_more_options_are_too_long")
+        add("length_penalty", -0.05, "one_or_more_options_are_too_long")
 
     if not has_question_signal(question) and mode == "unlabeled":
-        add("question_signal_penalty", -0.45, "unlabeled_options_without_question_signal")
+        add("question_signal_penalty", -0.12, "unlabeled_options_without_question_signal")
 
-    confidence = max(0.0, min(1.0, score / 7.0))
+    confidence = max(0.0, min(1.0, score))
+
+    if confidence >= CONFIDENCE_HIGH:
+        decision = "accept"
+    elif confidence >= CONFIDENCE_LOW:
+        decision = "review"
+    else:
+        decision = "reject"
+
+    if decision == "reject":
+        return None
 
     return {
-        "is_quiz": confidence >= CONFIDENCE_THRESHOLD,
+        "decision": decision,
+        "tier": "high" if decision == "accept" else "gray",
+        "api_recommended": decision == "review",
+        "is_quiz": True,
         "confidence": round(confidence, 2),
+        "score": round(confidence, 2),  # backward compatibility
         "question": question,
         "options": options,
         "count": len(options),
@@ -759,8 +783,8 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
         "mixed_language": lang["mixed_language"],
         "prefix_consistency": prefix_info,
         "structural_similarity": {
-            "cv_words": sim["cv_words"],
-            "cv_chars": sim["cv_chars"],
+            "cv_words": round(cv_words, 3),
+            "cv_chars": round(cv_chars, 3),
             "same_category_ratio": sim["same_category_ratio"],
             "score": sim["score"],
         },
@@ -770,11 +794,17 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
         "mode": mode,
     }
 
+
+
 def detect_quiz_pattern(text: str) -> Optional[Dict]:
     """
-    يكتشف:
-    - سؤال واحد مع خيارات
-    - أو اختبار متعدد الأسئلة داخل نفس الرسالة
+    Detects:
+    - a single question with options
+    - or a multi-question quiz in one message
+    Returns:
+        None        -> reject immediately
+        dict(review)-> gray zone, send to API later
+        dict(accept)-> high confidence, accept now
     """
     if not text or len(text.strip()) < MIN_TEXT_LEN:
         return None
@@ -784,35 +814,45 @@ def detect_quiz_pattern(text: str) -> Optional[Dict]:
         return None
 
     lines = split_lines(text)
-    if len(lines) < 2:
+    if len(lines) < 1:
         return None
 
-    # 1) جرّب أولاً كأنه سؤال واحد
-    single = parse_quiz_block(lines)
-    if single and single["confidence"] >= 0.80:
-        single["quiz_type"] = "single_question"
-        return single
+    # If there are multiple question headings, prefer multi-block parsing.
+    heading_count = sum(1 for l in lines if is_question_heading_line(l))
 
-    # 2) ثم جرّب إن كان مجموعة أسئلة
+    if heading_count < 2:
+        single = parse_quiz_block(lines)
+        if single:
+            return single
+
     blocks = split_quiz_blocks(lines)
-    parsed_blocks = []
-
     if len(blocks) >= 2:
+        parsed_blocks = []
         for block in blocks:
             parsed = parse_quiz_block(block)
-            if parsed and parsed["confidence"] >= 0.65:
+            if parsed:
                 parsed_blocks.append(parsed)
 
         if parsed_blocks:
             avg_conf = sum(b["confidence"] for b in parsed_blocks) / len(parsed_blocks)
-            strong_count = sum(1 for b in parsed_blocks if b["confidence"] >= 0.80)
+            strong_count = sum(1 for b in parsed_blocks if b["decision"] == "accept")
 
-            if strong_count >= 2 or len(parsed_blocks) >= 3:
+            decision = (
+                "accept" if (avg_conf >= CONFIDENCE_HIGH and strong_count >= 2)
+                else "review" if avg_conf >= CONFIDENCE_LOW
+                else "reject"
+            )
+
+            if decision != "reject":
                 strongest = max(parsed_blocks, key=lambda x: x["confidence"])
                 return {
-                    "is_quiz": avg_conf >= 0.70,
+                    "decision": decision,
+                    "tier": "high" if decision == "accept" else "gray",
+                    "api_recommended": decision == "review",
+                    "is_quiz": True,
                     "quiz_type": "multi_question",
                     "confidence": round(avg_conf, 2),
+                    "score": round(avg_conf, 2),  # backward compatibility
                     "questions_count": len(parsed_blocks),
                     "strong_blocks": strong_count,
                     "blocks": parsed_blocks,
@@ -823,5 +863,10 @@ def detect_quiz_pattern(text: str) -> Optional[Dict]:
                     "option_language": strongest["option_language"],
                     "mixed_language": strongest["mixed_language"],
                 }
+
+    # fallback: try as a single block if multi split did not help
+    single = parse_quiz_block(lines)
+    if single:
+        return single
 
     return None
