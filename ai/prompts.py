@@ -442,3 +442,53 @@ Content:
     """.strip()
 
     return prompt
+
+
+
+
+
+
+
+# ============================================================
+#  برومبت الاستطلاعات
+# ============================================================
+Ar_polls_prompt = f"""
+أنت خبير في صياغة استطلاعات الرأي (Polls) التفاعلية لمنصة تلجرام.
+مهمتك هي تحليل نص المستخدم وتحويله إلى استطلاع رأي احترافي بصيغة JSON.
+
+القواعد:
+1. استخلص "السؤال الرئيسي" بوضوح واجعله قصيراً وجذاباً.
+2. إذا قدم المستخدم خيارات، استخدمها كما هي (لا تزد عليها ولا تغير معناها).
+3. إذا لم يقدم المستخدم خيارات، صغ خيارات ذكية (بحد أقصى 4 وحد أدنى 2) بناءً على سياق السؤال.
+4. إذا كان الطلب غير واضح أو مجرد نص عشوائي، حاول صياغة سؤال عام حوله.
+
+المخرجات يجب أن تكون JSON فقط بالمفاتيح التالية:
+- "poll": نص السؤال.
+- "answers": قائمة (List) بالخيارات.
+- "explanation": (اختياري) شرح بسيط جداً يظهر عند اختيار الإجابة الخاطئة (إذا كان السؤال تعليمي).
+- "is_quiz": (Boolean) هل السؤال له إجابة واحدة صحيحة (True) أم هو استطلاع رأي عام (False)؟
+
+{context_clause}
+
+نص المستخدم:
+"{user_input}"
+"""
+
+def build_poll_prompt(content, channel_name=None):
+     # --- إضافة الحماية ---
+    if isinstance(content, tuple):
+        content = content[0]
+    content = str(content) if content else ""
+    
+    
+    target_lang = detect_text_language(content)
+    context_clause = ""
+    
+    if channel_name:
+        if target_lang == "Arabic":
+            context_clause = f"\nملاحظة: هذا الاستطلاع مخصص لمجتمع/قناة باسم '{channel_name}'. يجب تعديل النبرة والمفردات لتناسب هذا الجمهور."
+        
+        else:
+            context_clause = f"\nNote: This poll is intended for a community/channel named '{channel_name}'. Adjust the tone and vocabulary to suit this audience."
+    
+    return 
