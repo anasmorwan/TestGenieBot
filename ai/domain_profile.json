@@ -30,14 +30,19 @@
       }
     }
   },
-
+  
   "question_types": [
-    "diagnosis",
-    "next_step",
-    "mechanism",
-    "interpretation",
-    "contraindication"
+  "recall",
+  "diagnosis",
+  "next_step",
+  "mechanism",
+  "interpretation",
+  "contraindication",
+  "complication",
+  "side_effect",
+  "risk_factor"
   ],
+
 
   "subjects": [
   "anatomy",
