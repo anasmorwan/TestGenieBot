@@ -7,7 +7,7 @@ from storage.quiz_repository import store_content
 
 
 def generate_and_store_question(user_id, prompt):
-    result = generate_smart_response(prompt)
+    raw_poll = generate_smart_response(prompt)
     poll = parse_llm_json(raw_poll)
         
     poll_code = store_content(user_id, result, content_type="poll")
