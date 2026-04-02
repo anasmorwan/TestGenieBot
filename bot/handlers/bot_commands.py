@@ -45,7 +45,7 @@ def register(bot):
 
 
 
-    @bot.message_handler(commands=["send_poll"])
+    @bot.message_handler(commands=["post_poll"])
     def user_info(msg):
         try:
             user_id = msg.from_user.id
