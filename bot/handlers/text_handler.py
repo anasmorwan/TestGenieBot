@@ -73,7 +73,7 @@ def register(bot):
           
                 
                     if len(text) < 200:
-                        keybord = get_chat_request_keyboard()    
+                        keyboard = get_chat_request_keyboard()    
                         bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
                         user_states[user_id] = "poll"
                         return
@@ -144,15 +144,15 @@ def register(bot):
 
 
                 bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=waiting_msg.message_id,
-                        text=get_message("QUIZ_CREATED", count=quiz_len),
-                        reply_markup=quiz_keyboard(quiz_c
-                                                ode),
-                        parse_mode="HTML"
-                    )
+                chat_id=chat_id,
+                message_id=waiting_msg.message_id,
+                text=get_message("QUIZ_CREATED", count=quiz_len),
+                reply_markup=quiz_keyboard(quiz_code),
+                parse_mode="HTML"
+                )
             
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}")
-    
+
+
