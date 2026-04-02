@@ -26,7 +26,7 @@ def analyze_text_metadata(text_content):
     """
     تحليل النص لمعرفة التخصص والمرحلة
     """
-        analysis_prompt = f"""
+    analysis_prompt = f"""
     Analyze the following content and recognize the main domain, return ONLY a JSON object with this exact structure:
     {{
       "domain": "medicine",
