@@ -72,19 +72,23 @@ def extract_json_objects_safely(text: str):
 
 
 def parse_llm_json(text):
-    # 1️⃣ حاول parsing بسيط (سريع)
+    # 1. تنظيف علامات المارك داون أولاً
+    text = re.sub(r'```json\s*|```', '', text).strip()
+
+    # 2. محاولة القراءة المباشرة (إذا كان الرد JSON صافي)
     try:
         return json.loads(text)
-    except:
+    except json.JSONDecodeError:
         pass
 
-    # 2️⃣ حاول تنظيف markdown
-    cleaned = re.sub(r'```json|```', '', text)
-
+    # 3. استخراج المصفوفة (Array) حصراً
+    # نبحث عن أول [ وآخر ] ونأخذ ما بينهما
     try:
-        return json.loads(cleaned)
-    except:
-        pass
+        match = re.search(r'\[[\s\S]*\]', text)
+        if match:
+            return json.loads(match.group(0))
+    except Exception as e:
+        print(f"⚠️ Failed to extract JSON Array: {e}")
 
-    # 3️⃣ fallback (النسخة القديمة)
+    # 4. إذا فشل، نستخدم دالتك القديمة كـ Fallback نهائي
     return extract_json_objects_safely(text)
