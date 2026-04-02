@@ -9,7 +9,7 @@ from services.backup_service import restore_if_needed, start_auto_backup
 from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import safe_add_column, safe_add_table
 from bot.handlers import chat_shared_handler 
-from bot.handlers import menagement_commands
+from bot.handlers import admin_commands, bot_commands
 
 print("main starting...", flush=True)
 
@@ -54,7 +54,8 @@ scheduler.start()
 
 # تسجيل الهاندلرز
 image_handler.register(mybot)
-menagement_commands.register(mybot); print("commands.register done", flush=True)
+admin_commands.register(mybot); print("commands.register done", flush=True)
+bot_commands.register(mybot)
 start.register(mybot); print("start.register done", flush=True)
 text_handler.register(mybot); print("text_handler.register done", flush=True)
 group_messages_handler.register(mybot); print("group_messages_handler.register done", flush=True)
