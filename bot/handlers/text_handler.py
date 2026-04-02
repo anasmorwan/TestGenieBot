@@ -11,6 +11,9 @@ from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.session_store import user_states
 from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
 from services.poll_service import generate_poll
+from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
+
+
 
 def register(bot):
 
@@ -79,7 +82,7 @@ def register(bot):
 
                     poll_code, poll = generate_poll(text)
 
-                    keybord = send_poll_keyboard(poll_code, text)
+                    keybord = get_chat_request_keyboard()
                        
                     bot.send_poll(
                         chat_id=chat_id,
