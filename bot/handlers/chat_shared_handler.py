@@ -82,12 +82,8 @@ def register(bot):
                 text = f"تم تحديد القناة: {chat_title}\n\nيتم إنشاء استطلاع الان..."
                 receive_text = get_message("POLL_TEXT")
 
-                # حفظ الحالة مع سياق اسم القناة
-                user_states[user_id] = {
-                "state": "generate_poll",
-                "chat_title": chat_title,
-                "chat_id": chat_id_to_publish
-                }
+
+                
                 bot.send_message(user_id, text)
                 
                 try:
