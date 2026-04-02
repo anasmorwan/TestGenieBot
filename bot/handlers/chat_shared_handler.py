@@ -112,7 +112,7 @@ def register(bot):
 
                        
         except Exception as e:
-            bot.send_message(message.chat.id, "❌ عذراً، لا يمكنني الوصول لبيانات هذه المجموعة. تأكد أنني عضو فيها.")
+            bot.send_message(message.chat.id, f"❌ عذراً، لا يمكنني الوصول لبيانات هذه المجموعة. تأكد أنني عضو فيها.\n\n {str(e)}")
             
         
         
