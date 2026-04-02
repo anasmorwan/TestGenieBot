@@ -141,10 +141,4 @@ def register(bot):
         except Exception as e:
             print(f"CRITICAL ERROR [User: {user_id}]: {e}", flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}")
-            user_states.pop(user_id, None)
-
-        finally:
-            user_states.pop(user_id, None)  # None يمنع الخطأ إذا لم يكن المفتاح موجودًا
-
-
-
+            
