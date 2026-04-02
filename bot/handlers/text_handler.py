@@ -72,24 +72,39 @@ def register(bot):
             
                 poll_text = get_message("POLL_INST")
                 error_text = get_message("REGECTED_POLL_TXT")
-                text = get_message("POST_POLL_TEXT")
-
+                
                 
                 if text.len() < 200:
                     
                     bot.send_message(chat_id, group_selection, parse_mode="HTML")
-                    
-
-                    poll_code, poll = generate_poll(text)
-
-                    keybord = get_chat_request_keyboard()
-                       
+                    keybord = get_chat_request_keyboard()    
                     bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
+                    
                     user_state[user_id] = "poll"
+                    
                     return
 
+                else:
+                    cancel_keyboard = escape_action_keyboard()  
+                    bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
+                    time.sleep(2)
+                    
+                    poll_code, poll = generate_poll(text)
 
+                    action_keybord = get_chat_request_keyboard()
+                    
+                    
+                    
+                    
+                    return
 
+            elif state == "generate_poll":
+                text = get_message("POST_POLL_TEXT")
+                
+                bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
+                
+                poll_code, poll = generate_poll(text)
+                
                 bot.send_poll(
                         chat_id=chat_id,
                         question=str(poll.question)[:300],
@@ -98,25 +113,8 @@ def register(bot):
                         explanation=str(question.explanation or "")[:200],
                         is_anonymous=False
                 )
-                else:
-                    cancel_keyboard = escape_action_keyboard()  
-                    bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
-                    time.sleep(2)
-                    
-                    poll_code, poll = generate_poll(text)
-
-                    action_keybord = send_poll_keyboard(poll_code, text)
-                    
-                    bot.send_poll(
-                        chat_id=chat_id,
-                        question=str(poll.question)[:300],
-                        options=[str(opt) for opt in poll.options if opt],
-                        type="regular",
-                        is_anonymous=False
-                    )
-                    
-                    bot.send_message(chat_id, text, reply_markup=action_keybord, parse_mode="HTML")
-                    return
+                bot.send_message(chat_id, text, reply_markup=action_keybord, parse_mode="HTML")
+                
                 
 
 
