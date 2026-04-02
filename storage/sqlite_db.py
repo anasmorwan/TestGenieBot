@@ -152,6 +152,11 @@ def safe_add_column():
     conn = get_connection()
     c = conn.cursor()
 
+    if not column_exists("user_quizzes", "quiz_type"):
+        c.execute("""
+        ALTER TABLE user_quizzes ADD COLUMN quiz_type TEXT DEFAULT 'standard'
+        """)
+        
     if not column_exists("users", "current_quiz_selection"):
         c.execute("""
         ALTER TABLE users ADD COLUMN current_quiz_selection TEXT DEFAULT 'sample_quiz'
