@@ -26,7 +26,10 @@ def register(bot):
                 return
 
             confidence = result.get("confidence", 0)
+            decision = result.get("decision", "review")
+            
             print(f"🎯 [Match Found] Question: {result['question'][:30]}... | Confidence: {confidence}", flush=True)
+
 
             if not result.get("is_quiz", False):
                 print("⚠️ [Pattern] Result returned but not confident enough.", flush=True)
@@ -54,13 +57,36 @@ def register(bot):
                         try:
                             bot.send_message(admin.user.id, response_text, parse_mode="Markdown")
                             sent_count += 1
+                            
+                
                         except Exception as e:
                             print(f"❌ [Error] Could not send to admin {admin.user.id}: {e}", flush=True)
                 
                 print(f"✅ [Done] Sent to {sent_count} admins.", flush=True)
 
+            
+            if decision == "accept":
+                admins = bot.get_chat_administrators(chat_id)
+                sent_count = 0
+                for admin in admins:
+                    if not admin.user.is_bot:
+                        bot.send_message(chat_id=admin.user.id, text="تم اعتماد السؤال", parse_mode="Markdown")
+
+            
+            elif decision == "review":
+                admins = bot.get_chat_administrators(chat_id)
+                sent_count = 0
+                for admin in admins:
+                    if not admin.user.is_bot:
+                
+                         bot.send_message(chat_id=admin.user.id, text="السؤال يحتاج مراجعة", parse_mode="Markdown")
+
+        
         except Exception as e:
             print(f"🔥 [Critical Error] Inside Handler: {e}", flush=True)
             import traceback
             traceback.print_exc()
+
+
+    
             
