@@ -83,8 +83,24 @@ def register(bot):
                     results = detect_quiz_pattern(content)
                     confidence = result.get("confidence", 0)
                     decision = result.get("decision", "review")
+                    
+                    if decision == "accept":
+                        pass
+                      #  keyboard = 
+                      #  bot.edit_message_text(chat_id, message_id=waiting_msg.message_id, text="💡 هذا النص الملف يحتوي على أسئلة بالفعل، إذا أحببت يمكنني صياغتها لك بتنسيق أسئلة سريعة ؟", reply_markup=keyboard)
+                        
+                        
             
-                except SomeError:
+                    elif decision == "review":
+                        pass
+                        # final_detection = smart_quiz_detection(content)
+                        # if final_detection:
+                            
+                       #     bot.send_message()
+                       # else:
+                            
+            
+                except:
                     pass
                 if not result:
                     pass
