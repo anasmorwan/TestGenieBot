@@ -73,6 +73,17 @@ def register(bot):
                     bot.send_message(chat_id, poll_text, parse_mode="HTML")
                     poll = generate_poll_question(text)
                     bot.send_poll(
+                        chat_id=chat_id,
+                        question=str(question.question)[:300],
+                        options=[str(opt) for opt in question.options if opt],
+                        type="regular",
+                        correct_option_id=int(question.correct_index) if question.correct_index is not None else 0,
+                        explanation=str(question.explanation or "")[:200],
+                        is_anonymous=False
+                    )
+                
+)
+                
                     bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
                     return
 
@@ -85,6 +96,14 @@ def register(bot):
                     time.sleep(2)
                     poll = generate_poll_question(text)
                     bot.send_poll(
+                        chat_id=chat_id,
+                        question=str(question.question)[:300],
+                        options=[str(opt) for opt in question.options if opt],
+                        type="regular",
+                        correct_option_id=int(question.correct_index) if question.correct_index is not None else 0,
+                        explanation=str(question.explanation or "")[:200],
+                        is_anonymous=False
+                    )
                     
                     bot.send_message(chat_id, text, reply_markup=action_keybord, parse_mode="HTML")
                     return
