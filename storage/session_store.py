@@ -2,7 +2,7 @@
 user_states = {}
 
 def get_state_safe(user_id):
-    data = user_stats.get(user_id)
+    data = user_states.get(user_id)
     if isinstance(data, dict):
         return data.get('state')
     elif isinstance(data, str):
@@ -20,7 +20,7 @@ def get_chat_title(user_id):
     Returns:
         str: اسم الشات إذا وجد، None إذا لم يوجد أو كان الهيكل نصاً بسيطاً
     """
-    user_data = user_stats.get(user_id)
+    user_data = user_states.get(user_id)
     
     # إذا كان user_data قاموساً، حاول جلب chat_title
     if isinstance(user_data, dict):
