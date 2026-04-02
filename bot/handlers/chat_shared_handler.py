@@ -75,7 +75,7 @@ def register(bot):
             if state == "poll":
 
                 # حفظ الحالة مع سياق اسم القناة
-                user_stats[user_id] = {
+                user_states[user_id] = {
                 "state": "generate_poll",
                 "chat_title": chat_title,
                 "chat_id": chat_id_to_publish
