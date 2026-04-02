@@ -2,6 +2,25 @@ import json
 from ai.llm_client import generate_smart_response
 from utils.json_utils import extract_json_objects_safely, parse_llm_json
 
+
+
+example_json_format = """
+Output JSON format:
+
+[
+  {
+    "question": "...",
+    "options": ["A", "B", "C", "D"],
+    "correct_index": 0
+    "explanation": "Step-by-step reasoning...",
+    "type": "Recall/Clinical/etc"
+  }
+]
+"""
+
+
+
+
 def analyze_text_metadata(text_content):
     """
     تحليل النص لمعرفة التخصص والمرحلة
@@ -88,6 +107,7 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     {text_content}
     
     OUTPUT FORMAT: Return ONLY a valid JSON array of question objects.
+    {example_json_format}
     """
     
     return final_prompt
