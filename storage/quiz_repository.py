@@ -45,7 +45,7 @@ def store_quiz(user_id, quizzes):
 
     return code
 
-def store_content(user_id, content_data, content_type="quiz"):
+def store_content(user_id, content_data, content_type):
     conn = get_connection()
     c = conn.cursor()
 
