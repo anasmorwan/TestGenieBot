@@ -8,7 +8,7 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
 from bot.keyboards.quiz_buttons import quiz_keyboard
-from storage.session_store import user_states, get_state_safe, get_chat_title
+from storage.session_store import user_states, get_state_safe, get_chat_title, temp_texts
 from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
 from services.poll_service import generate_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
@@ -84,7 +84,9 @@ def register(bot):
                 print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
                 poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
                 
-                action_keyboard = send_poll_keyboard(text, poll_code) 
+                temp_texts[user_id] = text
+                
+                action_keyboard = send_poll_keyboard(user_id, poll_code) 
                 
                 # استخراج البيانات
                 q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
