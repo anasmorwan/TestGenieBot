@@ -81,6 +81,7 @@ def register(bot):
             if state == "poll":
                 text = f"تم تحديد القناة: {chat_title}\n\nيتم إنشاء استطلاع الان..."
                 receive_text = get_message("POLL_TEXT")
+                share_msg = get_message("SEND_POLL")
 
 
                 
@@ -90,6 +91,8 @@ def register(bot):
                     print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
                     poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
                     print(f"DEBUG: poll type is {type(poll)}", flush=True)
+
+                    bot.delete_message(user_id, waiting_msg.message_id)
 
                     
                 
