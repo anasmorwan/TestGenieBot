@@ -507,17 +507,17 @@ def build_poll_prompt(content, channel_name=None):
     
     if channel_name:
         if target_lang == "Arabic":
-            context_clause = f"\nملاحظة: هذا الاستطلاع مخصص لمجتمع/قناة باسم '{channel_name}'. يجب تعديل النبرة والمفردات لتناسب هذا الجمهور."
-            # استخدام .format() بدلاً من f-string لأننا نريد تمرير المتغيرات لاحقاً
+            context_clause = f"\nملاحظة: هذا الاستطلاع مخصص لمجتمع/قناة باسم '{channel_name}'. يجب تعديل النبرة والمفردات لتناسب هذا الجمهور.\nمهم: يجب أن يكون السؤال وجميع الخيارات باللغة العربية فقط."
             prompt = Ar_polls_prompt.format(context_clause=context_clause, user_input=content)
         else:
-            context_clause = f"\nNote: This poll is intended for a community/channel named '{channel_name}'. Adjust the tone and vocabulary to suit this audience."
+            context_clause = f"\nNote: This poll is intended for a community/channel named '{channel_name}'. Adjust the tone and vocabulary to suit this audience.\nImportant: The question and all answer options must be in English only."
             prompt = en_polls_prompt.format(context_clause=context_clause, user_input=content)
     else:
-        # بدون channel_name، نمرر context_clause فارغاً
         if target_lang == "Arabic":
-            prompt = Ar_polls_prompt.format(context_clause="", user_input=content)
+            context_clause = "\nمهم: يجب أن يكون السؤال وجميع الخيارات باللغة العربية فقط."
+            prompt = Ar_polls_prompt.format(context_clause=context_clause, user_input=content)
         else:
-            prompt = en_polls_prompt.format(context_clause="", user_input=content)
-    
+            context_clause = "\nImportant: The question and all answer options must be in English only."
+            prompt = en_polls_prompt.format(context_clause=context_clause, user_input=content)
+            
     return prompt
