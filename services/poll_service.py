@@ -20,8 +20,11 @@ def generate_poll(content):
         
         if not isinstance(poll, list):
             return []
+
+    except Exception as e:
+        raise ValueError(f"خطا توليد الاستطلاع: {str(e)}")
             
-        return poll_code, poll
+    return poll_code, poll
 
 
     
