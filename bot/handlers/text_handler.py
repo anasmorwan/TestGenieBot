@@ -69,6 +69,7 @@ def register(bot):
                 else:
                     print(f"DEBUG: [User: {user_id}] No previous polls. Moving to generate_poll state.", flush=True)
                     user_states[user_id] = "generate_poll"
+                    state = "generate_poll"
                     # يمكنك إضافة رسالة توضيحية هنا إذا لزم الأمر
                     
                         
