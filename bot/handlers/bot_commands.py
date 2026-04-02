@@ -53,7 +53,9 @@ def register(bot):
             
                 
             
-            poll_message = get_message("POLL")
+            
+            poll_message = get_message("POLL_INST")
+                
             
             bot.send_message(chat_id,
             text=poll_message,
