@@ -82,7 +82,7 @@ def register(bot):
                         is_anonymous=False
                     )
                 
-)
+
                 
                     bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
                     return
