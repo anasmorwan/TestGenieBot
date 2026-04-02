@@ -138,6 +138,8 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     - Adherence: Use ONLY information derived from the SOURCE TEXT below.
     - explanation Language: Hybrid (English for Medical Terms, Arabic for explanation and logic).
     
+    {explanation_style_guidelines}
+    
     SOURCE TEXT:
     {text_content}
     
