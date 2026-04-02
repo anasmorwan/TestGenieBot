@@ -1,3 +1,7 @@
+
+
+
+
 def build_prompt(user_stage, detected_subject, text_content):
     # 1. سحب الإعدادات من ملف الـ JSON
     domain_data = json_file["medicine"]
