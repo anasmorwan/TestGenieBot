@@ -57,7 +57,7 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     detected_subject = metadata['subject']
     user_stage = metadata['estimated_difficulty']
 
-  current_dir = os.path.dirname(os.path.abspath(__file__))
+    current_dir = os.path.dirname(os.path.abspath(__file__))
 
     json_path = os.path.join(current_dir, 'domain_profile.json')
     try:
