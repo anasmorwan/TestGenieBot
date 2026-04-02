@@ -10,7 +10,7 @@ from services.backup_service import smart_restore, is_db_valid
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.session_store import user_states
 from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
-from services.poll_service import generate_poll_question
+from services.poll_service import generate_poll
 
 def register(bot):
 
@@ -74,7 +74,7 @@ def register(bot):
                     
                     bot.send_message(chat_id, poll_text, parse_mode="HTML")
 
-                    poll_code, poll = generate_poll_question(text)
+                    poll_code, poll = generate_poll(text)
 
                     keybord = send_poll_keyboard(poll_code, text)
                        
@@ -98,7 +98,7 @@ def register(bot):
                     bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
                     time.sleep(2)
                     
-                    poll_code, poll = generate_poll_question(text)
+                    poll_code, poll = generate_poll(text)
 
                     action_keybord = send_poll_keyboard(poll_code, text)
                     
