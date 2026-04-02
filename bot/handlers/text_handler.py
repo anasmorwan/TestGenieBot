@@ -109,7 +109,7 @@ def register(bot):
                 bot.send_message(chat_id, text, parse_mode="HTML")
                 
                 
-                poll_code, poll = generate_poll(text, )
+                poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
                 action_keyboard = send_poll_keyboard(text, poll_code)
                 
                 bot.send_poll(
