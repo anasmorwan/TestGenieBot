@@ -107,8 +107,9 @@ def register(bot):
                 
                 bot.send_message(chat_id, text, parse_mode="HTML")
                 
-                action_keyboard = send_poll_keyboard()
+                
                 poll_code, poll = generate_poll(text)
+                action_keyboard = send_poll_keyboard(text, poll_code)
                 
                 bot.send_poll(
                         chat_id=chat_id,
