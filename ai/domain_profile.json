@@ -1,17 +1,60 @@
 "medicine": {
   "title": "Medicine",
-  "questions_priorities": ["recall", "interpretation", "pathophysiology", "initial_management", "clinical_reasoning", "management_strategy"],
+
+  "stages": {
+    "early": {
+      "weights": {
+        "recall": 0.4,
+        "basic_concepts": 0.25,
+        "simple_clinical_links": 0.2,
+        "clinical_reasoning_light": 0.1,
+        "interpretation_basic": 0.05
+      }
+    },
+    "mid": {
+      "weights": {
+        "recall": 0.2,
+        "interpretation": 0.2,
+        "clinical_reasoning": 0.25,
+        "pathophysiology": 0.2,
+        "initial_management": 0.15
+      }
+    },
+    "advanced": {
+      "weights": {
+        "clinical_reasoning": 0.3,
+        "management_strategy": 0.25,
+        "interpretation": 0.2,
+        "pathophysiology": 0.15,
+        "contraindications": 0.1
+      }
+    }
+  },
+
+  "question_types": [
+    "diagnosis",
+    "next_step",
+    "mechanism",
+    "interpretation",
+    "contraindication"
+  ],
+
+  "difficulty_levels": ["easy", "moderate", "hard"],
+
   "response_style": {
     "tone": "professional",
-    "structure": "clinical_vignette"
+    "structure": "clinical_vignette",
+    "explanation_depth": "stepwise"
   },
+
   "excluded_methods": [
-        "unclear_generalizations"
-      ],
-  "prompt_instructions": "Create USMLE-style multiple-choice questions. Start with a patient presentation (age, gender, symptoms), followed by vital signs, and ask for the most likely diagnosis or next best step.",
+    "unclear_generalizations",
+    "tricky_without_concept"
+  ],
+
+  "prompt_instructions": "Generate USMLE-style MCQs. Always include a clinical context, even for basic questions, but adjust complexity based on stage. Ensure one clear best answer and plausible distractors.",
+
   "few_shot_examples": [
-    "Q: A 45-year-old man presents with right upper quadrant pain... What is the most likely diagnosis?\nA) ... B) ... C) ...\nExplanation: Option A is correct because..."
+    "Q: A 45-year-old man presents with right upper quadrant pain...\nWhat is the most likely diagnosis?\nA) ... B) ... C) ...\nExplanation: Step 1: Identify key symptom...\nStep 2: Eliminate distractors...\nFinal: Option A."
   ]
 }
-
-
