@@ -59,8 +59,8 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     json_path = os.path.join(current_dir, 'domain_profile.json')
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
-        full_json = json.load(f)
-        config = full_json[domain_name]
+            full_json = json.load(f)
+            config = full_json[domain_name]
     except FileNotFoundError:
         print(f"❌ لم يتم العثور على الملف في المسار: {json_path}")
         # يمكنك هنا وضع قيمة افتراضية أو رفع الخطأ بشكل أوضح
