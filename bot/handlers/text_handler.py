@@ -72,7 +72,7 @@ def register(bot):
                     # يمكنك إضافة رسالة توضيحية هنا إذا لزم الأمر
                     
                         
-            elif state == "generate_poll":
+            if state == "generate_poll":
                 print(f"DEBUG: [User: {user_id}] Started generate_poll logic", flush=True)
                 chat_title = get_chat_title(user_id)
                 share_msg = get_message("POST_POLL_TEXT")
@@ -105,7 +105,7 @@ def register(bot):
                 print(f"DEBUG: [User: {user_id}] generate_poll sequence COMPLETED", flush=True)
                 return
 
-            else:
+            elif state is None or state == "" or state == "idle":
                 # الحالة الافتراضية توليد اختبار عادي
                 print(f"DEBUG: [User: {user_id}] No specific state found. Starting standard Quiz generation.", flush=True)
                 waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
