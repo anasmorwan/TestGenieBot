@@ -102,8 +102,7 @@ def register(bot):
             
                 except:
                     pass
-                if not result:
-                    pass
+                
 
                 
                 
