@@ -42,3 +42,28 @@ def register(bot):
         except Exception as e:
             bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
         
+
+
+
+    @bot.message_handler(commands=["send_poll"])
+    def user_info(msg):
+        try:
+            user_id = msg.from_user.id
+            chat_id = msg.chat.id
+            
+                
+            
+            poll_message = get_message("POLL")
+            
+    
+            bot.send_message(chat_id,
+            text=poll_message,
+            reply_markup=keyboard,
+            parse_mode="HTML")
+
+            user_states[user_id] = "poll"
+
+        except Exception as e:
+            bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
+
+      
