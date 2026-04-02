@@ -49,22 +49,22 @@
   },
   "pathology": {
     "high": ["diagnosis", "mechanism"],
-    "medium": ["interpretation", "clinical_reasoning", "complication"],
+    "medium": ["interpretation", "clinical_reasoning", "risk_factor", "complication"],
     "low": ["contraindication"]
   },
   "pharmacology": {
     "high": ["contraindication", "side_effect", "mechanism"],
-    "medium": ["next_step", "clinical_reasoning"],
+    "medium": ["next_step", "clinical_reasoning", "risk_factor"],
     "low": ["interpretation"]
   },
   "microbiology": {
     "high": ["recall", "mechanism", "diagnosis"],
-    "medium": ["clinical_reasoning"],
+    "medium": ["clinical_reasoning", "risk_factor"],
     "low": ["next_step"]
   },
   "clinical_medicine": {
     "high": ["diagnosis", "next_step", "management_strategy"],
-    "medium": ["interpretation", "contraindication"],
+    "medium": ["interpretation", "contraindication", "risk_factor"],
     "low": ["recall"]
   }
   }
