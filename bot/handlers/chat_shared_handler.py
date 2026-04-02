@@ -2,7 +2,7 @@ from telebot import types
 from services.usage import is_paid_user_active
 from storage.quiz_repository import get_user_current_quiz
 from storage.messages import get_message
-from storage.session_store import user_states
+from storage.session_store import user_states, get_user_state
 
 
 
@@ -69,7 +69,7 @@ def register(bot):
             chat_details = bot.get_chat(chat_id_to_publish)
             chat_title = chat_details.title
         
-            state = user_states.get("user_id")
+            state = get_user_state(user_id)
 
 
             if state == "poll":
