@@ -4,8 +4,7 @@ from storage.quiz_repository import get_user_current_quiz
 from storage.messages import get_message
 from storage.session_store import user_states, get_state_safe, temp_texts
 from services.poll.service import generate_poll
-from bot.keyboards.actions_keyboards import send_poll_keyboard
-
+from bot.keyboards.actions_keyboard import send_poll_keyboard
 
 
 
