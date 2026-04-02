@@ -7,13 +7,16 @@ def analyze_text_metadata(text_content):
     إرسال طلب سريع لمعرفة التخصص والمفاهيم الأساسية للنص
     """
     analysis_prompt = f"""
-    Analyze the following medical text and return ONLY a JSON object with this structure:
+    Analyze the following content and recognize the main domain, return ONLY a JSON object with this example structure:
+    
     {{
+      "domain": "medicine",
       "subject": "one of (anatomy, physiology, biochemistry, pathology, pharmacology, microbiology, clinical_medicine)",
       "concepts": ["list of 3-5 key medical concepts"],
       "estimated_difficulty": "easy/moderate/hard"
     }}
-    Text: {text_content[:2000]} # نكتفي بأول 2000 حرف للسرعة
+    content:
+    {text_content[:1000]}
     """
     
     # هنا تضع طلب الـ API الخاص بك (Gemini أو OpenAI)
