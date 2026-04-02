@@ -73,22 +73,19 @@ def register(bot):
                     
                         
             if state == "generate_poll":
-                print(f"DEBUG: [User: {user_id}] Started generate_poll logic", flush=True)
+                print(f"DEBUG: [User: {user_id}] Logic: Executing generation sequence", flush=True)
                 chat_title = get_chat_title(user_id)
                 share_msg = get_message("POST_POLL_TEXT")
-                wait_text = get_message("GENERATE_POLL") # تم تغيير الاسم لتجنب مسح نص المستخدم 'text'
+                wait_text = get_message("GENERATE_POLL")
                 
                 bot.send_message(chat_id, wait_text, parse_mode="HTML")
                 
-                print(f"DEBUG: [User: {user_id}] Generating AI Poll for chat: {chat_title}", flush=True)
+                print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
                 poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
                 
-                # تصحيح مرجعية المتغيرات هنا
                 action_keyboard = send_poll_keyboard(text, poll_code) 
                 
-                print(f"DEBUG: [User: {user_id}] Poll generated. Sending to chat.", flush=True)
-                
-                # استخراج البيانات بأمان سواء كان poll قاموساً أو كائناً
+                # استخراج البيانات
                 q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
                 q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
 
@@ -101,8 +98,8 @@ def register(bot):
                 )
                 
                 bot.send_message(chat_id, share_msg, reply_markup=action_keyboard, parse_mode="HTML")
-                user_states[user_id] = None # تصفير الحالة
-                print(f"DEBUG: [User: {user_id}] generate_poll sequence COMPLETED", flush=True)
+                user_states[user_id] = None 
+                print(f"DEBUG: [User: {user_id}] generate_poll COMPLETED", flush=True)
                 return
 
             elif state is None or state == "" or state == "idle":
@@ -133,4 +130,5 @@ def register(bot):
         except Exception as e:
             print(f"CRITICAL ERROR [User: {user_id}]: {e}", flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}")
+
 
