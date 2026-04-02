@@ -102,33 +102,33 @@ def register(bot):
                          q_text = poll.get('poll') or poll.get('question') or "Poll"
                          q_options = poll.get('answers') or poll.get('options') or []
     
-                     elif isinstance(poll, list) and len(poll) > 0:
-                         # إذا عاد كقائمة (بعض المكتبات تعيد الاستطلاع كأول عنصر في قائمة)
-                         first_item = poll[0]
-                         if isinstance(first_item, dict):
-                             q_text = first_item.get('poll') or first_item.get('question')
-                             q_options = first_item.get('answers') or first_item.get('options')
+                    elif isinstance(poll, list) and len(poll) > 0:
+                        # إذا عاد كقائمة (بعض المكتبات تعيد الاستطلاع كأول عنصر في قائمة)
+                        first_item = poll[0]
+                        if isinstance(first_item, dict):
+                            q_text = first_item.get('poll') or first_item.get('question')
+                            q_options = first_item.get('answers') or first_item.get('options')
     
-                     else:
-                         # إذا كان كائناً (Object/Class instance)
-                         # نستخدم getattr لتجنب AttributeError
-                         q_text = getattr(poll, 'poll', getattr(poll, 'question', "Poll"))
-                         q_options = getattr(poll, 'answers', getattr(poll, 'options', []))
+                    else:
+                        # إذا كان كائناً (Object/Class instance)
+                        # نستخدم getattr لتجنب AttributeError
+                        q_text = getattr(poll, 'poll', getattr(poll, 'question', "Poll"))
+                        q_options = getattr(poll, 'answers', getattr(poll, 'options', []))
 
-                     # 2. التحقق النهائي قبل الإرسال
-                     if not q_options:
-                         raise ValueError("لم يتم العثور على خيارات في الاستطلاع المولد")
+                    # 2. التحقق النهائي قبل الإرسال
+                    if not q_options:
+                        raise ValueError("لم يتم العثور على خيارات في الاستطلاع المولد")
 
-                     print(f"DEBUG: Question extracted: {q_text[:20]}...", flush=True)
+                    print(f"DEBUG: Question extracted: {q_text[:20]}...", flush=True)
 
-                     # 3. إرسال الاستطلاع
-                     bot.send_poll(
-                         chat_id=user_id, # تأكد من أن chat_id هو المعرف الصحيح للمستقبل
-                         question=str(q_text)[:300],
-                         options=[str(opt) for opt in q_options if opt][:10], # التليجرام يقبل 10 خيارات كحد أقصى
-                         type="regular",
-                         is_anonymous=False
-                     )
+                    # 3. إرسال الاستطلاع
+                    bot.send_poll(
+                        chat_id=user_id, # تأكد من أن chat_id هو المعرف الصحيح للمستقبل
+                        question=str(q_text)[:300],
+                        options=[str(opt) for opt in q_options if opt][:10], # التليجرام يقبل 10 خيارات كحد أقصى
+                        type="regular",
+                        is_anonymous=False
+                    )
                 
                     action_keyboard = send_poll_keyboard(user_id, poll_code) 
                 
