@@ -2,7 +2,7 @@ from telebot import types
 from services.usage import is_paid_user_active
 from storage.quiz_repository import get_user_current_quiz
 from storage.messages import get_message
-
+from storage.session_store import user_states
 
 
 
@@ -60,65 +60,50 @@ def register(bot):
             chat_type = "المجموعة"
         else:
             chat_type = "الشات"
-        # 1. استرجاع الكويز الذي كان المستخدم يعمل عليه
-        quiz_code = get_user_current_quiz(user_id) 
-    
-        if not quiz_code:
-            bot.send_message(message.chat.id, "❌ حدث خطأ، لم نجد الاختبار المطلوب. حاول مرة أخرى.")
+
+
+        
+        state = user_states.get("user_id")
+
+
+        if state == "poll":
+            text = get_message("POLL")
+            bot.send_message(chat_id, text)
+            user_stats[uid] = "generate_poll"
             return
+            
 
-        # 2. التحقق: هل المستخدم مشترك (Paid) أم مجاني؟
-        if is_paid_user_active(user_id):
-            # المستخدم برو: نعطيه خيار "كيف تريد النشر؟" لأننا نحترم وقته
-            keyboard = types.InlineKeyboardMarkup()
-            keyboard.add(types.InlineKeyboardButton("📊 استطلاعات مباشرة (Native)", callback_data=f"pub:native:{quiz_code}:{chat_id_to_publish}:{chat_type}"))
-            keyboard.add(types.InlineKeyboardButton("🔗 رابط تفاعلي (Interactive)", callback_data=f"pub:link:{quiz_code}:{chat_id_to_publish}:{chat_type}"))
-        
-            bot.send_message(message.chat.id, "✨ أنت مستخدم Pro! كيف تريد ظهور الاختبار في قناتك؟", reply_markup=keyboard)
+
+
         else:
-            # المستخدم مجاني: ننشر فوراً بـ "الطريقة التفاعلية" (التي تفيدك أنت)
-            publish_interactive_link(bot, chat_id_to_publish, quiz_code, shared_by, watermark=True)
-        
-            # رسالة نجاح في شات البوت الخاص
-            bot.send_message(message.chat.id, "✅ تم نشر الاختبار في قناتك بنجاح باستخدام الرابط التفاعلي!")
-        
-            # تلميح للترقية (Soft Sell)
-            # bot.send_message(message.chat.id, text=get_message("SHARED_QUIZ_REACTIONS"))
-
-
-
-
-
-
-
-
-"""
-# الهاندلر النهائي لاستقبال القناة المختارة
-@bot.message_handler(content_types=['chat_shared'])
-def handle_chat_shared(message):
-    user_id = message.from_user.id
-    chat_id_to_publish = message.chat_shared.chat_id
+            # 1. استرجاع الكويز الذي كان المستخدم يعمل عليه
+            quiz_code = get_user_current_quiz(user_id) 
     
-    # 1. استرجاع الكود المحفوظ (الذاكرة المؤقتة)
-    quiz_code = get_user_current_quiz(user_id)
-    
-    # 2. إخفاء كيبورد الاختيار من شات المستخدم
-    bot.send_message(message.chat.id, "⌛ جاري النشر في قناتك...", reply_markup=types.ReplyKeyboardRemove())
-    
-    # 3. التنفيذ الفوري (للمجاني)
-    try:
-        publish_interactive_link(bot, chat_id_to_publish, quiz_code, message.from_user.first_name)
+             if not quiz_code:
+                 bot.send_message(message.chat.id, "❌ حدث خطأ، لم نجد الاختبار المطلوب. حاول مرة أخرى.")
+                 return
+
+             # 2. التحقق: هل المستخدم مشترك (Paid) أم مجاني؟
+             if is_paid_user_active(user_id):
+                 # المستخدم برو: نعطيه خيار "كيف تريد النشر؟" لأننا نحترم وقته
+                 keyboard = types.InlineKeyboardMarkup()
+                 keyboard.add(types.InlineKeyboardButton("📊 استطلاعات مباشرة (Native)", callback_data=f"pub:native:{quiz_code}:{chat_id_to_publish}:{chat_type}"))
+                 keyboard.add(types.InlineKeyboardButton("🔗 رابط تفاعلي (Interactive)", callback_data=f"pub:link:{quiz_code}:{chat_id_to_publish}:{chat_type}"))
         
-        # 4. رسالة تأكيد للمستخدم
-        bot.send_message(
-            message.chat.id, 
-            f"✅ تم النشر بنجاح!\n\n"
-            f"💡 **نصيحة:** الطلاب الذين يضغطون على الزر سيتم توجيههم للبوت، وهذا يزيد من نقاطك في برنامج الإحالة!"
-        )
+                 bot.send_message(message.chat.id, "✨ أنت مستخدم Pro! كيف تريد ظهور الاختبار في قناتك؟", reply_markup=keyboard)
+             else:
+                 # المستخدم مجاني: ننشر فوراً بـ "الطريقة التفاعلية" (التي تفيدك أنت)
+                 publish_interactive_link(bot, chat_id_to_publish, quiz_code, shared_by, watermark=True)
         
-        # تسجيل العملية في الإحصائيات
-        log_quiz_share(quiz_code, user_id, message.from_user.first_name)
+                 # رسالة نجاح في شات البوت الخاص
+                 bot.send_message(message.chat.id, "✅ تم نشر الاختبار في قناتك بنجاح باستخدام الرابط التفاعلي!")
         
-    except Exception as e:
-        bot.send_message(message.chat.id, "❌ فشل النشر. تأكد أن البوت 'مشرف' (Admin) في القناة.")
-"""
+                 # تلميح للترقية (Soft Sell)
+                 # bot.send_message(message.chat.id, text=get_message("SHARED_QUIZ_REACTIONS"))
+
+
+
+
+
+
+
