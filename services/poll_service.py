@@ -3,12 +3,12 @@ from ai.llm_client import generate_smart_response
 from ai.prompts import build_poll_prompt
 from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
-from storage.quiz_repository import generate_quiz_code
+from storage.quiz_repository import store_content
 
 
 def generate_poll_question(prompt):
     result = generate_smart_response(prompt)
-    poll_code = generate_quiz_code(result)
+    poll_code = store_content(result)
     return poll_code, result
 
 
