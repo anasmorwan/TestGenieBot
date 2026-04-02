@@ -11,3 +11,14 @@ def send_poll_keyboard(text, poll_code):
 
     markup.add(btn_status, btn_upgrade, btn_back)
     return markup
+
+def escape_action_keyboard():
+    markup = InlineKeyboardMarkup(row_width=1)
+
+    
+    btn_upgrade = InlineKeyboardButton("× إلغاء", callback_data=f"cancel")
+
+    
+
+    markup.add(btn_status, btn_upgrade, btn_back)
+    return markup
