@@ -68,14 +68,14 @@ def register(bot):
             state = get_state_safe(user_id)
             
             if state == "awaiting_poll_text":
-                if has_previous_poll():
+                if has_previous_poll(user_id):
                     group_selection = get_message("POLL_TO_CHAT")
           
                 
-                    if text.len() < 200:
+                    if len(text) < 200:
                         keybord = get_chat_request_keyboard()    
                         bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
-                        user_state[user_id] = "poll"
+                        user_states[user_id] = "poll"
                         return
                         
                     else:
@@ -85,16 +85,16 @@ def register(bot):
                         #time.sleep(2)
                         # action_keybord = get_chat_request_keyboard()
                         
-                        keybord = get_chat_request_keyboard()    
+                        keyboard = get_chat_request_keyboard()    
                         bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
                     
-                        user_state[user_id] = "poll"
+                        user_states[user_id] = "poll"
                         return
                         
 
                 else:
                     
-                    user_state[user_id] = "generate_poll"
+                    user_states[user_id] = "generate_poll"
           
                     
                     
