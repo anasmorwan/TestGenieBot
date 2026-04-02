@@ -95,7 +95,7 @@ def register(bot):
                     action_keyboard = send_poll_keyboard(user_id, poll_code) 
                 
                     # استخراج البيانات
-                    q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
+                    q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.poll
                     q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
                 
                     bot.delete_message(user_id, waiting_msg.message_id)
