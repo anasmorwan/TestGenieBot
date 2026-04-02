@@ -99,7 +99,7 @@
   "3. Find similar conditions (same presentation)",
   "4. Add one contraindicated option",
   "5. Add one partially correct option",
-  "6. Ensure all options are نفس الفئة (diagnoses or drugs etc.)",
+  "6. Ensure all options are same category (diagnoses or drugs etc.)",
   "7. Remove obvious wrong answers"
   ],
   
@@ -116,7 +116,7 @@
   "Which condition best explains this presentation?",
   "This patient most likely has:"
     ],
-  "Next Step / Management": [
+  "management_patterns": [
   "What is the next best step in management?",
   "What is the most appropriate initial treatment?",
   "What should be done first?",
@@ -135,7 +135,7 @@
   "Which of the following best explains these findings?",
   "What is the significance of this ECG/lab?"
   ],
-  "Contraindication": [
+  "safety_patterns": [
   "Which of the following is contraindicated?",
   "Which drug should be avoided?",
   "What is the most dangerous option?",
