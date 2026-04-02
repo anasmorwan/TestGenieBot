@@ -2,7 +2,7 @@
 import json
 import random
 from ai.llm_client import generate_smart_response
-
+from utils.json_utils import extract_json_objects_safely, parse_llm_json
 
 
 
@@ -12,12 +12,12 @@ def analyze_text_metadata(text_content):
     """
     analysis_prompt = f"""
     Analyze the following content and recognize the main domain, return ONLY a JSON object with this example structure:
-    
+    for estimated_difficulty: return 'early', 'mid', or 'advanced' for easy/moderate/hard respectfully.
     {{
       "domain": "medicine",
       "subject": "one of (anatomy, physiology, biochemistry, pathology, pharmacology, microbiology, clinical_medicine)",
       "concepts": ["list of 3-5 key medical concepts"],
-      "estimated_difficulty": "easy/moderate/hard"
+      "estimated_difficulty": "early/mid/advanced"
     }}
     content:
     {text_content[:1000]}
@@ -25,7 +25,8 @@ def analyze_text_metadata(text_content):
     
     # هنا تضع طلب الـ API الخاص بك (Gemini أو OpenAI)
     # لنفترض أن النتيجة عادت كـ JSON
-    response = generate_smart_response(analysis_prompt) 
+    raw_response = generate_smart_response(analysis_prompt) 
+    response = parse_llm_json(raw_response)
     return json.loads(response)
     
 
@@ -36,11 +37,11 @@ def generate_smart_prompt(user_id, text_content):
     detected_subject = metadata['subject']
     
     # 2. جلب بيانات المستخدم (نفترض أننا نعرف المرحلة الدراسية من قاعدة البيانات)
-    user_stage = get_user_academic_stage(user_id) # 'early', 'mid', or 'advanced'
+    user_stage = metadata['estimated_difficulty'] # 'early', 'mid', or 'advanced'
     
     # 3. تحميل ملف القواعد (domain_profile.json)
     with open('domain_profile.json', 'r') as f:
-        config = json.load(f)["medicine"]
+        config = json.load(f)[detected_subject]
 
     # 4. اختيار أنواع الأسئلة بناءً على الأوزان (Weighted Random)
     # سنختار نوع السؤال لكل سؤال نريد توليده (مثلاً نولد 5 أسئلة)
