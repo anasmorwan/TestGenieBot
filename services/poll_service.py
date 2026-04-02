@@ -15,9 +15,9 @@ def generate_and_store_question(user_id, prompt):
     return poll_code, poll
 
 
-def generate_poll(user_id, content):
+def generate_poll(user_id, content, channel_name=None):
     try:
-        prompt = build_poll_prompt(content)
+        prompt = build_poll_prompt(content, channel_name=None)
         poll_code, poll = generate_and_store_question(user_id, prompt)
         
         if not isinstance(poll, list):
