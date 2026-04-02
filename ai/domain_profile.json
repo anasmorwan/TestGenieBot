@@ -39,6 +39,16 @@
     "contraindication"
   ],
 
+  "subjects": [
+  "anatomy",
+  "physiology",
+  "biochemistry",
+  "pathology",
+  "pharmacology",
+  "microbiology",
+  "clinical_medicine"
+  ],
+
   "difficulty_levels": ["easy", "moderate", "hard"],
 
   "response_style": {
