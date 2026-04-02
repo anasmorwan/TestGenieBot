@@ -5,19 +5,33 @@ from utils.json_utils import extract_json_objects_safely, parse_llm_json
 
 
 
-example_json_format = """
+
+
+explanation_style_guidelines = """
+EXPLANATION STYLE (Hybrid Arabic-English):
+You MUST follow this exact pedagogical structure for the 'explanation' field:
+1. 🎯 خلاصة سريعة: (One sentence in Arabic/English about the core idea).
+2. 🔍 التحليل السريري: (Bullet points in English for key symptoms/findings).
+3. ✅ لماذا هذه الإجابة؟: (Short Arabic explanation of the logic).
+4. 💡 حيلة الامتحان: (A mnemonic or a 'hack' in Arabic to identify the answer quickly).
+5. ❌ استبعاد الخيارات: (Briefly why others are wrong - Hybrid).
+
+Language Rule: Use English for all medical terms, diagnoses, and lab values. Use Arabic for the logical connection and 'hacks'.
+"""
+
+# أضف هذا المتغير داخل دالة generate_smart_batch_prompt
+example_json_format = f"""
 Output JSON format:
 [
-  {
+  {{
     "question": "...",
     "options": ["A", "B", "C", "D"],
     "correct_index": 0,
-    "explanation": "Step-by-step reasoning...",
-    "type": "Recall"
-  }
+    "explanation": "🎯 خلاصة سريعة: تشخيص الـ Pyloric Stenosis...\\n🔍 Clinical Keys: Projectile vomiting, Olive-shaped mass...\\n💡 حيلة: Projectile vomiting + olive = Pyloric stenosis",
+    "type": "Diagnosis"
+  }}
 ]
 """
-
 
 
 
@@ -122,6 +136,7 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     - Structure: Every question MUST use a {config['response_style']['structure']}.
     - Explanation Depth: {config['response_style']['explanation_depth']}. Explain why the correct answer is right AND strictly explain why each distractor is wrong.
     - Adherence: Use ONLY information derived from the SOURCE TEXT below.
+    - explanation Language: Hybrid (English for Medical Terms, Arabic for explanation and logic).
     
     SOURCE TEXT:
     {text_content}
@@ -132,3 +147,4 @@ def generate_smart_batch_prompt(text_content, num_questions=5):
     
     return final_prompt
 
+  
