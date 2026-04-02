@@ -89,24 +89,50 @@ def register(bot):
                 try:
                     print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
                     poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
-                
+                    print(f"DEBUG: poll type is {type(poll)}", flush=True)
+
                     
+                
+                    # 1. نظام استخراج البيانات المرن (Flexible Extraction)
+                    q_text = "Poll"
+                    q_options = []
+
+                    if isinstance(poll, dict):
+                         # إذا كان قاموساً (JSON parsed)
+                         q_text = poll.get('poll') or poll.get('question') or "Poll"
+                         q_options = poll.get('answers') or poll.get('options') or []
+    
+                     elif isinstance(poll, list) and len(poll) > 0:
+                         # إذا عاد كقائمة (بعض المكتبات تعيد الاستطلاع كأول عنصر في قائمة)
+                         first_item = poll[0]
+                         if isinstance(first_item, dict):
+                             q_text = first_item.get('poll') or first_item.get('question')
+                             q_options = first_item.get('answers') or first_item.get('options')
+    
+                     else:
+                         # إذا كان كائناً (Object/Class instance)
+                         # نستخدم getattr لتجنب AttributeError
+                         q_text = getattr(poll, 'poll', getattr(poll, 'question', "Poll"))
+                         q_options = getattr(poll, 'answers', getattr(poll, 'options', []))
+
+                     # 2. التحقق النهائي قبل الإرسال
+                     if not q_options:
+                         raise ValueError("لم يتم العثور على خيارات في الاستطلاع المولد")
+
+                     print(f"DEBUG: Question extracted: {q_text[:20]}...", flush=True)
+
+                     # 3. إرسال الاستطلاع
+                     bot.send_poll(
+                         chat_id=chat_id, # تأكد من أن chat_id هو المعرف الصحيح للمستقبل
+                         question=str(q_text)[:300],
+                         options=[str(opt) for opt in q_options if opt][:10], # التليجرام يقبل 10 خيارات كحد أقصى
+                         type="regular",
+                         is_anonymous=False
+                     )
                 
                     action_keyboard = send_poll_keyboard(user_id, poll_code) 
                 
-                    # استخراج البيانات
-                    q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.poll
-                    q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
-                
-                    bot.delete_message(user_id, waiting_msg.message_id)
-
-                    bot.send_poll(
-                        chat_id=user_id,
-                        question=str(q_text)[:300],
-                        options=[str(opt) for opt in q_options if opt],
-                        type="regular",
-                        is_anonymous=False
-                    )
+                    
                 
                     bot.send_message(user_id, share_msg, reply_markup=action_keyboard, parse_mode="HTML")
                     user_states[user_id] = None 
@@ -156,4 +182,3 @@ def register(bot):
             
         
         
-            
