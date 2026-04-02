@@ -1,5 +1,5 @@
 from services.quiz_service import generate_quizzes_from_text
-from storage.quiz_repository import store_quiz, maybe_cleanup
+from storage.quiz_repository import store_quiz, maybe_cleanup, has_previous_poll
 from services.quiz_session_service import quiz_manager
 from storage.messages import get_message
 from services.referral import reward_referral_if_needed
@@ -68,42 +68,46 @@ def register(bot):
             state = user_states.get("user_id")
             
             if state == "awaiting_poll_text":
-                group_selection = get_message("POLL_TO_CHAT")
+                if has_previous_poll():
+                    group_selection = get_message("POLL_TO_CHAT")
           
                 
-                if text.len() < 200:
+                    if text.len() < 200:
+                        keybord = get_chat_request_keyboard()    
+                        bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
+                        user_state[user_id] = "poll"
+                        return
+                        
+                    else:
+                        #error_text = get_message("REGECTED_POLL_TXT")
+                        # cancel_keyboard = escape_action_keyboard()  
+                        # bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
+                        #time.sleep(2)
+                        # action_keybord = get_chat_request_keyboard()
+                        
+                        keybord = get_chat_request_keyboard()    
+                        bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
                     
-                    
-                    keybord = get_chat_request_keyboard()    
-                    bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
-                    
-                    user_state[user_id] = "poll"
-                    
-                    return
+                        user_state[user_id] = "poll"
+                        return
+                        
 
                 else:
-                    #error_text = get_message("REGECTED_POLL_TXT")
-                
-                    # cancel_keyboard = escape_action_keyboard()  
-                    # bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
-                    #time.sleep(2)
                     
-                    # action_keybord = get_chat_request_keyboard()
+                    user_state[user_id] = "generate_poll"
+          
                     
-                    keybord = get_chat_request_keyboard()    
-                    bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
                     
-                    user_state[user_id] = "poll"
-                    
-                    return
                     
                     
 
             elif state == "generate_poll":
-                text = get_message("POST_POLL_TEXT")
+                share_msg = get_message("POST_POLL_TEXT")
+                text = get_message("GENERATE_POLL")
                 
-                bot.send_message(chat_id, text, reply_markup=keyboard, parse_mode="HTML")
+                bot.send_message(chat_id, text, parse_mode="HTML")
                 
+                action_keyboard = send_poll_keyboard()
                 poll_code, poll = generate_poll(text)
                 
                 bot.send_poll(
