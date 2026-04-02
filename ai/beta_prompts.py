@@ -31,6 +31,20 @@ def analyze_text_metadata(text_content):
     
 
 
+
+def get_question_type_distribution(stage_weights):
+    """
+    بدلاً من اختيار عشوائي فقط،
+    نرجع جميع الأنواع مع وزنها النسبي لتسهيل توليد عدة أسئلة
+    """
+    total = sum(stage_weights.values())
+    normalized = {k: v / total for k, v in stage_weights.items()}
+    return normalized
+
+
+
+
+
 def generate_smart_prompt(user_id, text_content):
     # 1. تحليل النص أولاً
     metadata = analyze_text_metadata(text_content)
@@ -46,7 +60,8 @@ def generate_smart_prompt(user_id, text_content):
     # 4. اختيار أنواع الأسئلة بناءً على الأوزان (Weighted Random)
     # سنختار نوع السؤال لكل سؤال نريد توليده (مثلاً نولد 5 أسئلة)
     stage_weights = config["stages"][user_stage]["weights"]
-    
+    question_type_distribution = get_question_type_distribution(stage_weights)
+        
     # تحويل الأوزان إلى قائمة متوافقة مع random.choices
     types = list(stage_weights.keys())
     weights = list(stage_weights.values())
