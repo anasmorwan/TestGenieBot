@@ -7,6 +7,10 @@ def register(bot):
     def handle_group_messages(message):
         print(f"📥 [New Message] From: {message.from_user.username} in Chat: {message.chat.id}", flush=True)
         
+        chat_id = message.chat.id
+        user_name = message.from_user.first_name
+            
+        
         text = message.text or message.caption
         if not text:
             print("❌ [Skip] Message has no text or caption.", flush=True)
@@ -37,9 +41,7 @@ def register(bot):
 
                 
             if confidence >= 0.70: # خفضناها قليلاً للتجربة
-                chat_id = message.chat.id
-                user_name = message.from_user.first_name
-            
+                
                 response_text = (
                     f"✅ **تم اكتشاف سؤال جديد!**\n"
                     f"📊 درجة الثقة: {confidence:.2f}\n"
