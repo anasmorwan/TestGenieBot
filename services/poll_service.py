@@ -3,7 +3,7 @@ from ai.llm_client import generate_smart_response
 from ai.prompts import build_poll_prompt
 from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
-
+from storage.quiz_repository import generate_quiz_code
 
 
 def generate_poll_question(prompt):
