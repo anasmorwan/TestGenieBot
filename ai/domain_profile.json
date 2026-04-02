@@ -49,7 +49,7 @@
   },
   "pathology": {
     "high": ["diagnosis", "mechanism"],
-    "medium": ["interpretation", "clinical_reasoning"],
+    "medium": ["interpretation", "clinical_reasoning", "complication"],
     "low": ["contraindication"]
   },
   "pharmacology": {
