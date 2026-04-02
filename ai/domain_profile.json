@@ -1,0 +1,79 @@
+"medicine": {
+  "title": "Medicine",
+  "teaching_priorities": ["safety", "clinical_reasoning", "pathophysiology"],
+  "response_style": {
+    "tone": "professional",
+    "structure": "clinical_vignette"
+  },
+  "prompt_instructions": "Create USMLE-style multiple-choice questions. Start with a patient presentation (age, gender, symptoms), followed by vital signs, and ask for the most likely diagnosis or next best step.",
+  "few_shot_examples": [
+    "Q: A 45-year-old man presents with right upper quadrant pain... What is the most likely diagnosis?\nA) ... B) ... C) ...\nExplanation: Option A is correct because..."
+  ]
+}
+
+
+{
+  "domains": {
+    "law": {
+      "title": "Law",
+      "teaching_priorities": ["precision", "argumentation", "case_analysis", "rule_application"],
+      "preferred_methods": [
+        "direct_explanation",
+        "case_based_learning",
+        "socratic_questioning",
+        "comparison",
+        "simulation"
+      ],
+      "excluded_methods": [
+        "overly_casual_tone",
+        "gamification_heavy"
+      ],
+      "response_style": {
+        "tone": "formal",
+        "depth": "high",
+        "structure": "issue_rule_analysis_conclusion",
+        "correction_style": "strict"
+      }
+    },
+    "medicine": {
+      "title": "Medicine",
+      "teaching_priorities": ["safety", "clinical_reasoning", "pathophysiology", "red_flags"],
+      "preferred_methods": [
+        "direct_explanation",
+        "case_based_learning",
+        "simulation",
+        "visual_analogy",
+        "active_recall"
+      ],
+      "excluded_methods": [
+        "unclear_generalizations"
+      ],
+      "response_style": {
+        "tone": "professional",
+        "depth": "high",
+        "structure": "concept_to_case",
+        "correction_style": "strict"
+      }
+    },
+    "english_learning": {
+      "title": "English Learning",
+      "teaching_priorities": ["fluency", "confidence", "real_usage", "interactive_practice"],
+      "preferred_methods": [
+        "conversation",
+        "role_play",
+        "error_delay_correction",
+        "repetition",
+        "active_recall"
+      ],
+      "excluded_methods": [
+        "overly_academic_tone"
+      ],
+      "response_style": {
+        "tone": "friendly",
+        "depth": "medium",
+        "structure": "practice_first",
+        "correction_style": "delayed"
+      }
+    }
+  }
+}
