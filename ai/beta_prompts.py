@@ -7,17 +7,17 @@ from utils.json_utils import extract_json_objects_safely, parse_llm_json
 
 example_json_format = """
 Output JSON format:
-
 [
   {
     "question": "...",
     "options": ["A", "B", "C", "D"],
-    "correct_index": 0
+    "correct_index": 0,
     "explanation": "Step-by-step reasoning...",
-    "type": "Recall/Clinical/etc"
+    "type": "Recall"
   }
 ]
 """
+
 
 
 
