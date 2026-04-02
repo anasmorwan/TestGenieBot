@@ -130,6 +130,12 @@ def register(bot):
                     reply_markup=quiz_keyboard(quiz_code), 
                     parse_mode="HTML"
                 )
+                if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=True):
+                    bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=loading_msg.message_id,
+                    text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
+                    )
                 print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
             
         except Exception as e:
