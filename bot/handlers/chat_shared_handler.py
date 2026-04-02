@@ -2,7 +2,7 @@ from telebot import types
 from services.usage import is_paid_user_active
 from storage.quiz_repository import get_user_current_quiz
 from storage.messages import get_message
-from storage.session_store import user_states, get_state_safe
+from storage.session_store import user_states, get_state_safe, temp_texts
 from services.poll_service import generate_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
 
@@ -79,13 +79,14 @@ def register(bot):
 
 
             if state == "poll":
-                text = f"تم تحديد القناة: {chat_title}\n\nيتم إنشاء استطلاع الان..."
+                waiting_text = f"تم تحديد القناة: {chat_title}\n\nيتم إنشاء استطلاع الان..."
                 receive_text = get_message("POLL_TEXT")
                 share_msg = get_message("SEND_POLL")
+                text = temp_texts.get(user_id)
 
 
                 
-                waiting_msg = bot.send_message(user_id, text)
+                waiting_msg = bot.send_message(user_id, waiting_text)
                 
                 try:
                     print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
