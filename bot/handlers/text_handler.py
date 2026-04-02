@@ -13,146 +13,124 @@ from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_key
 from services.poll_service import generate_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 
-
-
 def register(bot):
 
     def show_referral_message(bot, chat_id, user_id):
         keyboard = referral_keyboard(user_id)
         bot.send_message(
-        chat_id=chat_id, 
-        text=get_message("REFERRAL_1"),
-        reply_markup=keyboard,
-        parse_mode="HTML"
-    )
-
+            chat_id=chat_id, 
+            text=get_message("REFERRAL_1"),
+            reply_markup=keyboard,
+            parse_mode="HTML"
+        )
 
     @bot.message_handler(func=lambda msg: msg.chat.type == "private", content_types=["text"])
     def handle_text_message(msg):
         if msg.chat.type != "private":
-        
             return
+            
         user_id = msg.from_user.id
         chat_id = msg.chat.id
         text = msg.text
 
         try:
             plan = check_subscription_valid(user_id)
-
             allowed, info = can_generate(user_id)
 
             if not allowed:
                 show_referral_message(bot, chat_id, user_id)
                 return
 
-            # 👇 فقط إذا مسموح
             consume_quiz(user_id)
-            # backup_all()
-            # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
             reward_referral_if_needed(user_id)
-            # backup_all()
 
         except Exception as e:
-            print("File handler ERROR:", e, flush=True)
+            print(f"Auth/Usage Error for user {user_id}: {e}", flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}") 
-
+            return
 
         if not text.strip():
             bot.send_message(chat_id, "⚠️ الرجاء إرسال نص لتوليد الاختبار.")
             return
 
-
-
-        
         try:
             state = get_state_safe(user_id)
+            print(f"DEBUG: [User: {user_id}] current_state: {state}", flush=True)
             
             if state == "awaiting_poll_text":
+                print(f"DEBUG: [User: {user_id}] Entered awaiting_poll_text block", flush=True)
                 if has_previous_poll(user_id):
+                    print(f"DEBUG: [User: {user_id}] Found previous polls. Asking for group.", flush=True)
                     group_selection = get_message("POLL_TO_CHAT")
-          
-                
-                    if len(text) < 200:
-                        keyboard = get_chat_request_keyboard()    
-                        bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
-                        user_states[user_id] = "poll"
-                        return
-                        
-                    else:
-                        #error_text = get_message("REGECTED_POLL_TXT")
-                        # cancel_keyboard = escape_action_keyboard()  
-                        # bot.send_message(chat_id, error_text, parse_mode="HTML", reply_markup=cancel_keyboard)
-                        #time.sleep(2)
-                        # action_keybord = get_chat_request_keyboard()
-                        
-                        keyboard = get_chat_request_keyboard()    
-                        bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
-                    
-                        user_states[user_id] = "poll"
-                        return
-                        
-
+                    keyboard = get_chat_request_keyboard()    
+                    bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
+                    user_states[user_id] = "poll"
+                    return
                 else:
-                    
+                    print(f"DEBUG: [User: {user_id}] No previous polls. Moving to generate_poll state.", flush=True)
                     user_states[user_id] = "generate_poll"
-          
-                    
-                    
-                    
-                    
-
+                    # يمكنك إضافة رسالة توضيحية هنا إذا لزم الأمر
+                    return
+                        
             elif state == "generate_poll":
+                print(f"DEBUG: [User: {user_id}] Started generate_poll logic", flush=True)
                 chat_title = get_chat_title(user_id)
                 share_msg = get_message("POST_POLL_TEXT")
-                text = get_message("GENERATE_POLL")
+                wait_text = get_message("GENERATE_POLL") # تم تغيير الاسم لتجنب مسح نص المستخدم 'text'
                 
-                bot.send_message(chat_id, text, parse_mode="HTML")
+                bot.send_message(chat_id, wait_text, parse_mode="HTML")
                 
-                
+                print(f"DEBUG: [User: {user_id}] Generating AI Poll for chat: {chat_title}", flush=True)
                 poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
-                action_keyboard = send_poll_keyboard(text, poll_code)
                 
-                bot.send_poll(
-                        chat_id=chat_id,
-                        question=str(poll.question)[:300],
-                        options=[str(opt) for opt in poll.options if opt],
-                        type="regular",
-                        explanation=str(question.explanation or "")[:200],
-                        is_anonymous=False
-                )
-                bot.send_message(chat_id, share_msg, reply_markup=action_keybord, parse_mode="HTML")
-                return
+                # تصحيح مرجعية المتغيرات هنا
+                action_keyboard = send_poll_keyboard(text, poll_code) 
                 
+                print(f"DEBUG: [User: {user_id}] Poll generated. Sending to chat.", flush=True)
                 
+                # استخراج البيانات بأمان سواء كان poll قاموساً أو كائناً
+                q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
+                q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
 
+                bot.send_poll(
+                    chat_id=chat_id,
+                    question=str(q_text)[:300],
+                    options=[str(opt) for opt in q_options if opt],
+                    type="regular",
+                    is_anonymous=False
+                )
+                
+                bot.send_message(chat_id, share_msg, reply_markup=action_keyboard, parse_mode="HTML")
+                user_states[user_id] = None # تصفير الحالة
+                print(f"DEBUG: [User: {user_id}] generate_poll sequence COMPLETED", flush=True)
+                return
 
             else:
-            
+                # الحالة الافتراضية توليد اختبار عادي
+                print(f"DEBUG: [User: {user_id}] No specific state found. Starting standard Quiz generation.", flush=True)
                 waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
-                # توليد الأسئلة
+                
                 quizzes = generate_quizzes_from_text(text, user_id)
 
                 if not quizzes or len(quizzes) == 0:
+                    print(f"DEBUG: [User: {user_id}] Quiz generation returned EMPTY result.", flush=True)
                     bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
                     return
 
-                # تخزين الاختبار
                 quiz_code = store_quiz(user_id, quizzes)
                 maybe_cleanup()
-                # backup_all()
                 quiz_len = len(quizzes)
 
-
                 bot.edit_message_text(
-                chat_id=chat_id,
-                message_id=waiting_msg.message_id,
-                text=get_message("QUIZ_CREATED", count=quiz_len),
-                reply_markup=quiz_keyboard(quiz_code),
-                parse_mode="HTML"
+                    chat_id=chat_id,
+                    message_id=waiting_msg.message_id,
+                    text=get_message("QUIZ_CREATED", count=quiz_len),
+                    reply_markup=quiz_keyboard(quiz_code), 
+                    parse_mode="HTML"
                 )
+                print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
             
         except Exception as e:
-            print("File handler ERROR:", e, flush=True)
+            print(f"CRITICAL ERROR [User: {user_id}]: {e}", flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}")
-
 
