@@ -113,7 +113,7 @@ def register(bot):
                     return
                     
                 except Exception as e:
-                    bot.send_message(chat_id, f"فشل إنشاء إستطلاع.\n\n {str(e)}")
+                    bot.send_message(user_id, f"فشل إنشاء إستطلاع.\n\n {str(e)}")
                     user_states.pop(user_id, None)
                 finally:
                     user_states.pop(user_id, None)
