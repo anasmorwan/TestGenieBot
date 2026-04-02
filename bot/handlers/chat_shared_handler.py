@@ -84,7 +84,7 @@ def register(bot):
 
 
                 
-                bot.send_message(user_id, text)
+                waiting_msg = bot.send_message(user_id, text)
                 
                 try:
                     print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
