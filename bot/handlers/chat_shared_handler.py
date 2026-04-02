@@ -50,7 +50,7 @@ def register(bot):
             return
         user_id = message.from_user.id
         shared_by = message.from_user.first_name
-        chat_id_to_publish = message.chat_shared.chat_id
+        chat_id_to_publish = message.chat_shared.chat_id if message.chat_shared and message.chat_shared.chat_id else -1003806238292
         request_id = message.chat_shared.request_id  # 🔥 هذا المهم
         
         
@@ -66,9 +66,15 @@ def register(bot):
 
 
         try:
+            
             chat_details = bot.get_chat(chat_id_to_publish)
-            chat_title = chat_details.title
-        
+            try:
+                chat_title = chat_details.title if chat_details.title else "بدون عنوان"
+            except:
+                chat_title = "قناة غير معروفة"
+                
+
+            chat_title = "قناة غير معروفة"
             state = get_state_safe(user_id)
 
 
@@ -82,6 +88,7 @@ def register(bot):
                 "chat_id": chat_id_to_publish
                 }
                 bot.send_message(chat_id, receive_text)
+
                 return
                 
 
