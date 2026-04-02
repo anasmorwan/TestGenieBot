@@ -482,7 +482,7 @@ Guidelines:
    - If the user provided specific options, use them exactly as they are.
    - If no options are provided, generate 2 to 4 contextually relevant and high-quality options.
 3. **Smart Context**: Detect if the user wants a "Quiz" (one correct answer) or a "Regular Poll" (opinion-based).
-
+4. **Engagement Style**: Rewrite the question to sound human, engaging, and attention-grabbing. Use a natural conversational tone and incorporate curiosity or emotional pull when appropriate. Avoid generic, repetitive, or robotic phrasing.
 Output MUST be a valid JSON object with these keys:
 - "poll": (String) The final question text.
 - "answers": (Array of Strings) The options for the poll.
