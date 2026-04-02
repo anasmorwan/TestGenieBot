@@ -64,7 +64,9 @@ def register(bot):
         try:
             state = user_states.get("user_id")
             
-            if state == "poll":
+            if state == "awaiting_poll_text":
+                group_selection = get_message("POLL_TO_CHAT")
+            
                 poll_text = get_message("POLL_INST")
                 error_text = get_message("REGECTED_POLL_TXT")
                 text = get_message("POST_POLL_TEXT")
@@ -72,7 +74,8 @@ def register(bot):
                 
                 if text.len() < 200:
                     
-                    bot.send_message(chat_id, poll_text, parse_mode="HTML")
+                    bot.send_message(chat_id, group_selection, parse_mode="HTML")
+                    user_state[user_id] = "poll"
 
                     poll_code, poll = generate_poll(text)
 
