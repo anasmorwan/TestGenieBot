@@ -9,6 +9,8 @@ from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.session_store import user_states
+from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
+
 
 def register(bot):
 
