@@ -8,7 +8,7 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
 from bot.keyboards.quiz_buttons import quiz_keyboard
-from storage.session_store import user_states, get_state_safe
+from storage.session_store import user_states, get_state_safe, get_chat_title
 from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
 from services.poll_service import generate_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
@@ -102,13 +102,14 @@ def register(bot):
                     
 
             elif state == "generate_poll":
+                chat_title = get_chat_title(user_id)
                 share_msg = get_message("POST_POLL_TEXT")
                 text = get_message("GENERATE_POLL")
                 
                 bot.send_message(chat_id, text, parse_mode="HTML")
                 
                 
-                poll_code, poll = generate_poll(text)
+                poll_code, poll = generate_poll(text, )
                 action_keyboard = send_poll_keyboard(text, poll_code)
                 
                 bot.send_poll(
