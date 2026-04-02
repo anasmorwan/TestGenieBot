@@ -74,38 +74,47 @@ def register(bot):
                     
                         
             if state == "generate_poll":
-                print(f"DEBUG: [User: {user_id}] Logic: Executing generation sequence", flush=True)
-                chat_title = get_chat_title(user_id)
-                share_msg = get_message("POST_POLL_TEXT")
-                wait_text = get_message("GENERATE_POLL")
+                try:
+                    print(f"DEBUG: [User: {user_id}] Logic: Executing generation sequence", flush=True)
+                    chat_title = get_chat_title(user_id)
+                    share_msg = get_message("POST_POLL_TEXT")
+                    wait_text = get_message("GENERATE_POLL")
                 
-                waiting_msg = bot.send_message(chat_id, wait_text, parse_mode="HTML")
+                    waiting_msg = bot.send_message(chat_id, wait_text, parse_mode="HTML")
                 
-                print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
-                poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
+                    print(f"DEBUG: [User: {user_id}] Calling AI for Poll...", flush=True)
+                    poll_code, poll = generate_poll(user_id, text, channel_name=chat_title)
                 
-                temp_texts[user_id] = text
+                    temp_texts[user_id] = text
                 
-                action_keyboard = send_poll_keyboard(user_id, poll_code) 
+                    action_keyboard = send_poll_keyboard(user_id, poll_code) 
                 
-                # استخراج البيانات
-                q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
-                q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
+                    # استخراج البيانات
+                    q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
+                    q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
                 
-                bot.delete_message(chat_id, waiting_msg.message_id)
+                    bot.delete_message(chat_id, waiting_msg.message_id)
 
-                bot.send_poll(
-                    chat_id=chat_id,
-                    question=str(q_text)[:300],
-                    options=[str(opt) for opt in q_options if opt],
-                    type="regular",
-                    is_anonymous=False
-                )
+                    bot.send_poll(
+                        chat_id=chat_id,
+                        question=str(q_text)[:300],
+                        options=[str(opt) for opt in q_options if opt],
+                        type="regular",
+                        is_anonymous=False
+                    )
                 
-                bot.send_message(chat_id, share_msg, reply_markup=action_keyboard, parse_mode="HTML")
-                user_states[user_id] = None 
-                print(f"DEBUG: [User: {user_id}] generate_poll COMPLETED", flush=True)
-                return
+                    bot.send_message(chat_id, share_msg, reply_markup=action_keyboard, parse_mode="HTML")
+                    user_states[user_id] = None 
+                    print(f"DEBUG: [User: {user_id}] generate_poll COMPLETED", flush=True)
+                    return
+                except Exception as e:
+                    bot.send_message(chat_id, f"فشل إنشاء إستطلاع.\n\n {str(e)}")
+                    user_states.pop(user_id, None)
+                finally:
+                    user_states.pop(user_id, None)
+
+
+            
 
             elif state is None or state == "" or state == "idle":
                 # الحالة الافتراضية توليد اختبار عادي
