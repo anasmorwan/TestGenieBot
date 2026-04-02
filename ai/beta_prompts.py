@@ -26,17 +26,18 @@ def analyze_text_metadata(text_content):
     """
     تحليل النص لمعرفة التخصص والمرحلة
     """
-    analysis_prompt = f"""
+        analysis_prompt = f"""
     Analyze the following content and recognize the main domain, return ONLY a JSON object with this exact structure:
     {{
       "domain": "medicine",
-      "subject": "one of (anatomy, physiology, biochemistry, pathology, pharmacology, microbiology, clinical_medicine)",
-      "concepts": ["list of 3-5 key medical concepts"],
-      "estimated_difficulty": "early", "mid", or "advanced"
+      "subject": "anatomy",
+      "concepts": ["concept1", "concept2"],
+      "estimated_difficulty": "early" 
     }}
     content:
     {text_content[:1000]}
     """
+
     
     raw_response = generate_smart_response(analysis_prompt) 
     # تأكد من أن parse_llm_json ترجع string يمكن تمريره لـ json.loads
