@@ -1,3 +1,4 @@
+{
 "medicine": {
   "title": "Medicine",
 
@@ -152,4 +153,5 @@
   "few_shot_examples": [
     "Q: A 45-year-old man presents with right upper quadrant pain...\nWhat is the most likely diagnosis?\nA) ... B) ... C) ...\nExplanation: Step 1: Identify key symptom...\nStep 2: Eliminate distractors...\nFinal: Option A."
   ]
+}
 }
