@@ -1,11 +1,7 @@
-import sqlite3
+
 
 def has_previous_poll(user_id):
-    """
-    Check if the user has previously generated any poll in the system.
-    Returns True if at least one poll is found, otherwise False.
-    """
-    conn = None
+
     try:
         # الاتصال بقاعدة البيانات باستخدام الدالة المتوفرة لديك
         conn = get_connection()
@@ -32,9 +28,3 @@ def has_previous_poll(user_id):
     finally:
         if conn:
             conn.close()
-
-# مثال على كيفية استخدام الدالة في منطق البوت الخاص بك:
-# if not has_previous_poll(user_id):
-#     # أظهر نصيحة تعليمية عبر answerCallbackQuery
-#     bot.answer_callback_query(callback_query_id, text="💡 نصيحة: يمكنك إرسال سؤالك مباشرة وسأقوم بتوليد الخيارات لك!", show_alert=True)
-
