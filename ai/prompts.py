@@ -465,14 +465,31 @@ Ar_polls_prompt = f"""
 المخرجات يجب أن تكون JSON فقط بالمفاتيح التالية:
 - "poll": نص السؤال.
 - "answers": قائمة (List) بالخيارات.
-- "explanation": (اختياري) شرح بسيط جداً يظهر عند اختيار الإجابة الخاطئة (إذا كان السؤال تعليمي).
-- "is_quiz": (Boolean) هل السؤال له إجابة واحدة صحيحة (True) أم هو استطلاع رأي عام (False)؟
 
 {context_clause}
 
 نص المستخدم:
-"{user_input}"
+{user_input}
 """
+
+en_polls_prompt = f"""
+Act as an expert Telegram Poll Architect. Your task is to analyze the user's input and structure it into a professional poll format.
+
+Guidelines:
+1. **Extraction**: Identify the core question. If the user input is vague, rephrase it into a clear, engaging poll question.
+2. **Options**: 
+   - If the user provided specific options, use them exactly as they are.
+   - If no options are provided, generate 2 to 4 contextually relevant and high-quality options.
+3. **Smart Context**: Detect if the user wants a "Quiz" (one correct answer) or a "Regular Poll" (opinion-based).
+
+Output MUST be a valid JSON object with these keys:
+- "poll": (String) The final question text.
+- "answers": (Array of Strings) The options for the poll.
+
+User Input:
+{user_input}
+"""
+
 
 def build_poll_prompt(content, channel_name=None):
      # --- إضافة الحماية ---
@@ -487,8 +504,11 @@ def build_poll_prompt(content, channel_name=None):
     if channel_name:
         if target_lang == "Arabic":
             context_clause = f"\nملاحظة: هذا الاستطلاع مخصص لمجتمع/قناة باسم '{channel_name}'. يجب تعديل النبرة والمفردات لتناسب هذا الجمهور."
+            prompt = Ar_polls_prompt
         
         else:
             context_clause = f"\nNote: This poll is intended for a community/channel named '{channel_name}'. Adjust the tone and vocabulary to suit this audience."
+            prompt = en_polls_prompt
+
     
-    return 
+    return prompt
