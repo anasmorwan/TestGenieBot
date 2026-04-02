@@ -74,7 +74,7 @@ def register(bot):
                 bot.send_message(user_id, f"حدث خطا أثناء جلب إسم القناة\n\n{str(e)}")
                 
 
-            chat_title = "قناة غير معروفة"
+            
             state = get_state_safe(user_id)
 
 
