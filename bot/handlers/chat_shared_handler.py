@@ -68,9 +68,10 @@ def register(bot):
             
             chat_details = bot.get_chat(chat_id_to_publish)
             try:
-                chat_title = chat_details.title if chat_details.title else "بدون عنوان"
-            except:
+                chat_title = chat_details.title
+            except Exception as e:
                 chat_title = "قناة غير معروفة"
+                bot.send_message(user_id, f"حدث خطا أثناء جلب إسم القناة\n\n{str(e)}")
                 
 
             chat_title = "قناة غير معروفة"
