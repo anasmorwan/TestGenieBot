@@ -25,7 +25,7 @@ def analyze_text_metadata(text_content):
     
     # هنا تضع طلب الـ API الخاص بك (Gemini أو OpenAI)
     # لنفترض أن النتيجة عادت كـ JSON
-    response = call_fast_llm_api(analysis_prompt) 
+    response = generate_smart_response(analysis_prompt) 
     return json.loads(response)
     
 
