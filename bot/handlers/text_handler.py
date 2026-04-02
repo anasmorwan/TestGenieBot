@@ -70,7 +70,7 @@ def register(bot):
                     print(f"DEBUG: [User: {user_id}] No previous polls. Moving to generate_poll state.", flush=True)
                     user_states[user_id] = "generate_poll"
                     # يمكنك إضافة رسالة توضيحية هنا إذا لزم الأمر
-                    return
+                    
                         
             elif state == "generate_poll":
                 print(f"DEBUG: [User: {user_id}] Started generate_poll logic", flush=True)
