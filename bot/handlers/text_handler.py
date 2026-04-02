@@ -65,6 +65,7 @@ def register(bot):
                     keyboard = get_chat_request_keyboard()    
                     bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
                     user_states[user_id] = "poll"
+                    temp_texts[user_id] = text
                     return
                 else:
                     print(f"DEBUG: [User: {user_id}] No previous polls. Moving to generate_poll state.", flush=True)
