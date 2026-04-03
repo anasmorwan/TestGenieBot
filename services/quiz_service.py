@@ -13,10 +13,11 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
     if is_paid_user_active(user_id):
         # دالة Pro ترجع قاموساً فيه metadata و questions
         prompt = generate_smart_batch_prompt(content, num_questions=question_count)
-        raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
         if msg_id:
             bot.edit_message_text(chat_id=user_id, message_id=msg_id, text=text)
-
+            
+        raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+        
         
         quizzes = parse_llm_json(raw_response)
 
@@ -36,11 +37,13 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
        # return quizzes[:num_quizzes]
 
     else:
-        prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
-        raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
         if msg_id:
             bot.edit_message_text(chat_id=user_id, message_id=msg_id, text=text)
             
+        prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
+        
+        raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+        
 
         
         quizzes = parse_llm_json(raw_response)
