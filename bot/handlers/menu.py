@@ -17,7 +17,7 @@ def send_main_menu(chat_id, message_id=None):
     ux_text = get_message("UX_TEXT")
     
     # النص المتغير (التحية أو مقدمة مخصصة)
-    welcome_new_user = "<b>👋 مرحباً بك في TestGenie</b>\n\n"
+    welcome_new_user = "<b>👋 مرحباً بك في Qube</b>\n\n"
     welcome_returning_user = "<b>أهلاً بك، أنا Qube.. كيف يمكنني أن أختبر ذكاءك اليوم؟\n\n"
 
     
