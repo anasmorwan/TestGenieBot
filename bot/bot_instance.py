@@ -1,5 +1,6 @@
 import os
 import telebot
+from telebot import util
 import logging
 from dotenv import load_dotenv
 
@@ -8,7 +9,8 @@ load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 WEBHOOK_URL = os.getenv("WEBHOOK_URL")
 
-mybot = telebot.TeleBot(BOT_TOKEN)
+mybot = telebot.TeleBot(BOT_TOKEN, threaded=True, num_threads=20)
+
 
 def set_webhook():
     mybot.remove_webhook()
