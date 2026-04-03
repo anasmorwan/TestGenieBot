@@ -125,7 +125,7 @@ def register(bot):
                 waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
                 msg_id = waiting_msg.message_id
 
-                quizzes = generate_quizzes_from_text(text, user_id, msg_id)
+                quizzes = generate_quizzes_from_text(text, user_id, msg_id=msg_id)
 
                 if not quizzes or len(quizzes) == 0:
                     print(f"DEBUG: [User: {user_id}] Quiz generation returned EMPTY result.", flush=True)
