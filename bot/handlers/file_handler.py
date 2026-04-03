@@ -113,7 +113,8 @@ def register(bot):
             quizzes = generate_quizzes_from_text(
             content=content,
             user_id=user_id,
-            user_instruction=user_instruction
+            bot=bot,
+            user_instruction=user_instruction,
             msg_id=msg_id
             )
             bot.edit_message_text(chat_id=chat_id,
