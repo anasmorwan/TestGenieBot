@@ -145,9 +145,13 @@ def generate_smart_batch_prompt(text_content, num_questions=4):
     metadata = analyze_text_metadata(text_content)
 
     domain_name = metadata.get("domain", "medicine")
+    print(f"📚 Domain : {domain_name}", flush=True)
     detected_subject = metadata.get("subject", "clinical_medicine")
+    print(f"📖 subject : {detected_subject}", flush=True)
     user_stage = normalize_stage_with_heuristics(text_content, metadata)
+    print(f"📊 current user_stage : {user_stage}", flush=True)
     source_language = detect_source_language(text_content)
+    print(f"🌐 source_language is : {source_language}", flush=True)
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
     json_path = os.path.join(current_dir, "domain_profile.json")
@@ -161,7 +165,9 @@ def generate_smart_batch_prompt(text_content, num_questions=4):
 
     subject_matrix = config["subject_type_matrix"].get(detected_subject, {})
     high_priority = ", ".join(subject_matrix.get("high", ["general concepts"]))
+    print(f"🔸 high_priority : {high_priority}", flush=True)
     medium_priority = ", ".join(subject_matrix.get("medium", [])) or "general concepts"
+    print(f"🔹 medium_priority : {medium_priority}", flush=True)
     distractors_text = "\n".join([f"- {rule}" for rule in config["generate_distractors"]])
 
     if user_stage == "early":
