@@ -14,7 +14,7 @@ from services.poll_service import generate_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 
 
-def heavy_process(text, user_id, bot):
+def heavy_process(text, user_id, bot, chat_id, waiting_msg.message_id):
     quizzes = generate_quizzes_from_text(text, user_id)
 
     if not quizzes or len(quizzes) == 0:
@@ -36,7 +36,7 @@ def heavy_process(text, user_id, bot):
     if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=True):
         bot.edit_message_text(
         chat_id=chat_id,
-        message_id=loading_msg.message_id,
+        message_id=waiting_msg.message_id,
         text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
         )
     print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
