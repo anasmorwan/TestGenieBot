@@ -1,4 +1,5 @@
 import os
+import re
 import json
 from ai.llm_client import generate_smart_response
 from utils.json_utils import parse_llm_json
