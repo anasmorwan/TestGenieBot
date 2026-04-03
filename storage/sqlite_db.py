@@ -5,7 +5,7 @@ import sqlite3
 DB_PATH = "quiz_users.db"
 
 def get_connection():
-    return sqlite3.connect(DB_PATH, check_same_thread=False)
+    return sqlite3.connect(DB_PATH, check_same_thread=False, timeout=20)
 
 
 def init_db():
