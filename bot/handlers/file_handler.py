@@ -1,4 +1,5 @@
 import os # لا تنسى استيراد مكتبة نظام التشغيل
+import time
 from services.content_parser import extract_text_from_file
 from services.quiz_service import generate_quizzes_from_text
 from storage.quiz_repository import store_quiz, maybe_cleanup
@@ -137,6 +138,7 @@ def register(bot):
                 reply_markup=quiz_keyboard(quiz_code),
                 parse_mode="HTML"
             )
+            time.sleep(1)
     
             quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False)
         
