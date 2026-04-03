@@ -6,7 +6,21 @@ from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
 from storage.messages import get_message
 
-text = get_message("FINAL_FILE_MSG")
+
+import random
+
+messages = [
+    get_message("FINAL_FILE_MSG"),
+    get_message("FINAL_FILE_MSG2"),
+    get_message("FINAL_FILE_MSG3")
+]
+
+# weights → كلما زاد الرقم زادت فرصة الاختيار
+weights = [0.6, 0.25, 0.15]  # الأول له النسبة الأكبر
+
+selected_text = random.choices(messages, weights=weights, k=1)[0]
+
+
 question_count = 10
 
 def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
@@ -14,8 +28,11 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         # دالة Pro ترجع قاموساً فيه metadata و questions
         prompt = generate_smart_batch_prompt(content, num_questions=question_count)
         if msg_id:
-            bot.edit_message_text(chat_id=user_id, message_id=msg_id, text=text)
-            
+            bot.edit_message_text(
+            chat_id=user_id,
+            message_id=msg_id,
+            text=selected_text
+            )            
         raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
         
         
@@ -38,8 +55,11 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 
     else:
         if msg_id:
-            bot.edit_message_text(chat_id=user_id, message_id=msg_id, text=text)
-            
+            bot.edit_message_text(
+            chat_id=user_id,
+            message_id=msg_id,
+            text=selected_text
+            )            
         prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
         
         raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
