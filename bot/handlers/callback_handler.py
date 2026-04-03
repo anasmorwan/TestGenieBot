@@ -24,12 +24,13 @@ from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
+from storage.session_store import user_selections
 import random
 import json
 import time
 
 
-user_selections = {}
+
 
 def register(bot):
     
