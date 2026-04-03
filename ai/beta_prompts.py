@@ -1,50 +1,43 @@
 import os
 import json
 from ai.llm_client import generate_smart_response
-from utils.json_utils import extract_json_objects_safely, parse_llm_json
+from utils.json_utils import parse_llm_json
 
 
+def normalize_text_content(text_content):
+    if isinstance(text_content, tuple):
+        return " ".join(map(str, text_content))
+    if text_content is None:
+        return ""
+    return str(text_content)
 
+
+def detect_source_language(text_content):
+    text_content = normalize_text_content(text_content)
+    arabic_chars = sum(1 for ch in text_content if '\u0600' <= ch <= '\u06FF')
+    latin_chars = sum(1 for ch in text_content if ch.isalpha() and not ('\u0600' <= ch <= '\u06FF'))
+    return "Arabic" if arabic_chars >= latin_chars else "English"
 
 
 explanation_style_guidelines = """
 EXPLANATION STYLE:
-- Write mainly in Arabic.
-- Keep medical terms, diagnoses, tests, labs, drugs, and anatomy in English exactly as they appear in medicine.
-- Include 2–4 English medical terms naturally in every explanation when relevant.
-- Do NOT translate all medical terms into Arabic.
-- Do NOT copy the question stem.
-- Do NOT write long explanations.
+- Use the SAME language as the SOURCE TEXT.
+- If source is English, write question, options, and explanation in English.
+- If source is Arabic, write them in Arabic, while keeping standard medical terms in English when useful.
+- Keep explanation very short: max 3 short lines, max 45 words.
+- Do NOT repeat the stem.
+- Do NOT make the explanation long or split it into many bullets.
 
-Use this compact structure:
-1. 🎯 الخلاصة: one short line.
-2. 🔍 التحليل: short reasoning with English medical terms.
-3. ✅ لماذا هذه الإجابة؟: direct logic.
-4. 💡 حيلة الامتحان: quick memory hook.
-5. ❌ استبعاد الخيارات: brief elimination.
+Format:
+🎯 Answer:
+🔍 Why:
+❌ Why not others:
 """
-
-# أضف هذا المتغير داخل دالة generate_smart_batch_prompt
-example_json_format = f"""
-Output JSON format:
-[
-  {{
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "correct_index": 0,
-    "explanation": "🎯 خلاصة سريعة: تشخيص الـ Pyloric Stenosis...\\n🔍 Clinical Keys: Projectile vomiting, Olive-shaped mass...\\n💡 حيلة: Projectile vomiting + olive = Pyloric stenosis",
-    "type": "Diagnosis"
-  }}
-]
-"""
-
-
 
 
 def analyze_text_metadata(text_content):
-    """
-    Analyze text domain, subject, difficulty, and confidence.
-    """
+    text_content = normalize_text_content(text_content)
+
     analysis_prompt = f"""
 Return ONLY a JSON object with this exact structure:
 {{
@@ -76,12 +69,6 @@ content:
 
 
 def build_exact_question_plan(stage_weights, num_questions):
-    """
-    Convert stage weights into an exact per-question plan.
-    Returns:
-        counts: dict[type] = count
-        plan: list[dict] in final generation order
-    """
     weighted = {k: v * num_questions for k, v in stage_weights.items()}
     counts = {k: int(v) for k, v in weighted.items()}
 
@@ -94,7 +81,6 @@ def build_exact_question_plan(stage_weights, num_questions):
     for _, key in fractional_parts[:remainder]:
         counts[key] += 1
 
-    # Build ordered plan
     plan = []
     slot = 1
     for q_type, count in counts.items():
@@ -105,16 +91,8 @@ def build_exact_question_plan(stage_weights, num_questions):
     return counts, plan
 
 
-
 def normalize_stage_with_heuristics(text_content, metadata):
-    """
-    Fallback heuristic to prevent wrong stage classification.
-    """
-    if isinstance(text_content, tuple):
-        text_content = " ".join(map(str, text_content))
-    elif not isinstance(text_content, str):
-        text_content = str(text_content)
-
+    text_content = normalize_text_content(text_content)
     text_lower = text_content.lower()
 
     clinical_cues = [
@@ -142,61 +120,66 @@ def normalize_stage_with_heuristics(text_content, metadata):
     return stage
 
 
+def sanitize_generated_questions(items, num_questions):
+    if not isinstance(items, list):
+        return items
 
-def generate_smart_batch_prompt(text_content, num_questions=5):
-    """
-    Build a production-ready generation prompt with exact question planning.
-    """
+    cleaned = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+
+        q = dict(item)
+        q["question"] = str(q.get("question", "")).strip()
+        q["options"] = [str(x).strip() for x in q.get("options", [])[:4]]
+        q["explanation"] = " ".join(str(q.get("explanation", "")).split())
+        q["type"] = str(q.get("type", "")).strip()
+        q["difficulty"] = str(q.get("difficulty", "")).strip()
+        cleaned.append(q)
+
+    return cleaned[:num_questions]
+
+
+def generate_smart_batch_prompt(text_content, num_questions=4):
+    text_content = normalize_text_content(text_content)
     metadata = analyze_text_metadata(text_content)
-    domain_name = metadata.get('domain', 'medicine')
-    detected_subject = metadata.get('subject', 'clinical_medicine')
+
+    domain_name = metadata.get("domain", "medicine")
+    detected_subject = metadata.get("subject", "clinical_medicine")
     user_stage = normalize_stage_with_heuristics(text_content, metadata)
+    source_language = detect_source_language(text_content)
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    json_path = os.path.join(current_dir, 'domain_profile.json')
+    json_path = os.path.join(current_dir, "domain_profile.json")
 
-    try:
-        with open(json_path, 'r', encoding='utf-8') as f:
-            full_json = json.load(f)
-            config = full_json[domain_name]
-    except FileNotFoundError:
-        raise FileNotFoundError(f"Domain profile not found at: {json_path}")
+    with open(json_path, "r", encoding="utf-8") as f:
+        full_json = json.load(f)
+        config = full_json[domain_name]
 
     stage_weights = config["stages"][user_stage]["weights"]
     counts, question_plan = build_exact_question_plan(stage_weights, num_questions)
 
-    weights_text = "\n".join([f"- {k}: {v}" for k, v in counts.items()])
-
     subject_matrix = config["subject_type_matrix"].get(detected_subject, {})
     high_priority = ", ".join(subject_matrix.get("high", ["general concepts"]))
     medium_priority = ", ".join(subject_matrix.get("medium", [])) or "general concepts"
+    distractors_text = "\n".join([f"- {rule}" for rule in config["generate_distractors"]])
 
-    distractors_text = "\n".join([f"- {rule}" for rule in config['generate_distractors']])
-
-    # Stage-specific style control
     if user_stage == "early":
-        question_style_rule = """
-QUESTION STYLE RULES:
-- Use direct academic questions.
-- Avoid patient vignettes unless the source text already contains one.
-- Prefer recall, definition, identification, and basic concept questions.
-- Do NOT force clinical scenarios.
-- Use short stems.
-"""
+        question_style_rule = (
+            "Use direct academic questions. "
+            "Avoid patient vignettes unless the source text is case-based. "
+            "Prefer recall, definition, identification, and basic concept questions."
+        )
     elif user_stage == "mid":
-        question_style_rule = """
-QUESTION STYLE RULES:
-- Mix direct questions and light clinical reasoning.
-- Use a limited vignette only when it helps testing understanding.
-- Keep stems concise.
-"""
+        question_style_rule = (
+            "Mix direct questions and light reasoning. "
+            "Use a short vignette only when it helps understanding."
+        )
     else:
-        question_style_rule = """
-QUESTION STYLE RULES:
-- Use clinical vignettes when appropriate.
-- Prioritize reasoning, interpretation, and diagnosis/management logic.
-- Keep one best answer only.
-"""
+        question_style_rule = (
+            "Use clinical reasoning when appropriate. "
+            "Keep one best answer only."
+        )
 
     plan_text = "\n".join([f"{item['slot']}. {item['type']}" for item in question_plan])
 
@@ -207,19 +190,20 @@ CONTEXT:
 - Subject: {detected_subject}
 - Student stage: {user_stage}
 - Source mode: {metadata.get('source_mode', 'textbook')}
+- Source language: {source_language}
 - Key concepts: {", ".join(metadata.get('concepts', []))}
 
 TASK:
 Generate exactly {num_questions} MCQs based ONLY on the SOURCE TEXT.
 
-RULES:
-- Follow the exact question plan below.
-- Match the student stage strictly.
-- For early stage: ask direct recall/basic concept questions, not clinical vignettes unless the source text is case-based.
-- For mid stage: mix recall and light reasoning.
-- For advanced stage: use clinical reasoning when justified.
+HARD RULES:
+- Return exactly {num_questions} items, no more and no less.
+- Output language must match the SOURCE LANGUAGE.
+- If the source text is English, write question, options, and explanation in English.
+- If the source text is Arabic, write them in Arabic.
 - Do not invent facts outside the source.
 - Each question must have one best answer and plausible distractors.
+- Keep explanations short.
 
 EXACT QUESTION PLAN:
 {plan_text}
@@ -234,12 +218,7 @@ DISTRACTOR RULES:
 QUESTION STYLE:
 {question_style_rule}
 
-GLOBAL STYLE:
-- Tone: {config['response_style']['tone']}
-- Explanation depth: {config['response_style']['explanation_depth']}
-- Do not repeat the same pattern across all questions.
-
-EXPLANATION:
+EXPLANATION RULE:
 {explanation_style_guidelines}
 
 SOURCE TEXT:
@@ -255,5 +234,5 @@ Each object must have:
 - type
 - difficulty
 """
+    return final_prompt
 
-    return final_prompt  
