@@ -1,5 +1,6 @@
 # bot/flask.py
 import json
+import threading
 import telebot
 from flask import Flask, request
 from bot.bot_instance import BOT_TOKEN, mybot
@@ -33,3 +34,8 @@ def register():
             # طباعة الخطأ للإطلاع
             print("Webhook error:", e, flush=True)
             return "ERROR", 500
+
+
+
+
+
