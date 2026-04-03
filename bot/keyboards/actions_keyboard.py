@@ -28,7 +28,8 @@ def quiz_refill_keyboard():
 
     
     btn_refill = InlineKeyboardButton("✅ نعم أريد", callback_data=f"refill_quiz")
-
+    btn_new_quiz = InlineKeyboardButton("أريد إختبار جديد", callback_data=f"questions_quiz")
+    
     
 
     markup.add(btn_cancel)
