@@ -149,24 +149,25 @@ def analyze_text_metadata(text_content):
     text_content = normalize_text_content(text_content)
 
     analysis_prompt = f"""
+
 Return ONLY a JSON object with this exact structure:
 {{
-  "domain": "medicine",
-  "subject": "one or more subjects separated by | when needed",
-  "concepts": ["concept1", "concept2"],
-  "estimated_difficulty": "early | mid | advanced",
-  "source_mode": "textbook | mixed | case_based",
-  "confidence": 0.0
+"domain": "medicine",
+"subject": "anatomy | physiology | biochemistry | pathology | pharmacology | microbiology | clinical_medicine",
+"concepts": ["concept1", "concept2"],
+"estimated_difficulty": "early | mid | advanced",
+"source_mode": "textbook | mixed | case_based",
+"confidence": 0.0
 }}
 
 Rules:
-- If the text spans more than one subject, return them separated by |, for example: "anatomy | pathology".
-- estimated_difficulty = early for definitions, lists, basic facts, and foundation-level content.
-- estimated_difficulty = mid for conceptual or moderate reasoning content.
-- estimated_difficulty = advanced for clinical cases, management, differential diagnosis, or multi-step reasoning.
-- source_mode = textbook if the text is factual and non-case-based.
-- source_mode = case_based if the text is a patient scenario.
-- confidence must be between 0 and 1.
+estimated_difficulty = early for definitions, lists, basic facts, and foundation-level content.
+estimated_difficulty = mid for conceptual or moderate reasoning content.
+estimated_difficulty = advanced for clinical cases, management, differential diagnosis, or multi-step reasoning.
+source_mode = textbook if the text is factual and non-case-based.
+source_mode = case_based if the text is a patient scenario.
+confidence must be between 0 and 1.
+
 
 content:
 {text_content[:1200]}
@@ -174,8 +175,8 @@ content:
     raw_response = generate_smart_response(analysis_prompt)
     parsed_response = parse_llm_json(raw_response)
 
-    if isinstance(parsed_response, str):
-        return json.loads(parsed_response)
+    if isinstance(parsed_response, str):  
+        return json.loads(parsed_response)  
     return parsed_response
 
 
