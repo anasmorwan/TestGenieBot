@@ -78,14 +78,14 @@ def register(bot):
             
             quiz_message = get_message("POLL_INST")
 
-            keyboard = 
+            keyboard = get_testgenie_keyboard(selected_level='متوسط', selected_count=10)
             
             bot.send_message(chat_id,
-            text=poll_message,
+            text=quiz_message,
+            reply_markup=keyboard,
             parse_mode="HTML")
 
-            user_states[user_id] = "awaiting_poll_text"
-
+            
         except Exception as e:
             bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
 
