@@ -67,6 +67,15 @@
         "low": ["recall"]
       }
     },
+    "subjects": [
+      "anatomy",
+      "physiology",
+      "biochemistry",
+      "pathology",
+      "pharmacology",
+      "microbiology",
+      "clinical_medicine"
+    ],
     "generate_distractors": [
       "1. Identify correct answer",
       "2. Extract key features (symptoms, age, risk factors)",
