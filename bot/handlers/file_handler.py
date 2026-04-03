@@ -45,7 +45,7 @@ def heavy_process(bot, chat_id, waiting_msg_id, user_id, content, user_instructi
         parse_mode="HTML"
     )
     
-    quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False):
+    quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False)
         
     
     
