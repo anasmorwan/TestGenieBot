@@ -55,8 +55,6 @@ if COHERE_API_KEY:
         logging.warning(f"⚠️ Could not configure Cohere: {e}")
 
 
-# --- الدالة الموحدة لتوليد الردود ---
-
 def generate_smart_response(prompt: str) -> str:
     """
     Tries to generate a response by attempting a chain of services silently.
@@ -71,8 +69,12 @@ def generate_smart_response(prompt: str) -> str:
             logging.info("Attempting request with: 1. Google Gemini...")
 
             response = gemini_model.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
+            model="gemini-2.5-flash", 
+            contents=prompt,
+            config={
+                'temperature': 0.8,
+                'top_p': 0.95,
+            }
             )
 
             if response and response.text:
