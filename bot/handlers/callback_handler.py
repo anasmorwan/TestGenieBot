@@ -29,7 +29,7 @@ import json
 import time
 
 
-
+user_selections = {}
 
 def register(bot):
     
