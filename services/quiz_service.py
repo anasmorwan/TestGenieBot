@@ -4,9 +4,9 @@ from ai.prompts import build_quiz_prompt, pro_quiz_generator, safe_generate
 from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
+from storage.messages import get_message
 
-
-text = get_message("x")
+text = get_message("FINAL_FILE_MSG")
 question_count = 10
 
 def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
