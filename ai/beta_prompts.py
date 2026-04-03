@@ -160,11 +160,10 @@ Return ONLY a JSON object with this exact structure:
 "confidence": 0.0
 }}
 
-Rules for Subject Selection:
-- You MUST select one or more values ONLY from subject list.
-- Do NOT use any terms outside this list.
-- If the text covers multiple subjects, join them using a pipe separator with spaces (e.g., "subject1 | subject2").
-- If only one subject applies, return it as a single string (e.g., "pathology").
+Select subject(s) ONLY from the provided list.
+- Use exact terms only (no new labels).
+- If multiple: join with " | ".
+- If one: return it as a single string.
 
 General Rules:
 - estimated_difficulty = early for definitions, lists, basic facts, and foundation-level content.
