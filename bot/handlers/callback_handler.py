@@ -30,11 +30,84 @@ import time
 
 
 
-# 2. تسجيل الهاندلرز (هنا يكمن الحل)
+
 def register(bot):
+    
 
-    # الهاندلر الأول: استقبال القناة وعرض أزرار الخيارات
+    @bot.callback_query_handler(
+        func=lambda call: any([
+            call.data.startswith("level_"),
+            call.data.startswith("count_"),
+            call.data == "start_test"
+        ])
+    )
+    def handle_testgenie_callbacks(call: CallbackQuery):
 
+
+        chat_id = call.message.chat.id
+        data = call.data
+    
+        # تهيئة بيانات المستخدم إذا لم تكن موجودة
+        if chat_id not in user_selections:
+            user_selections[chat_id] = {'level': 'متوسط', 'count': 10}
+    
+        # معالجة اختيار المستوى
+        if data.startswith("level_"):
+            selected_level = data.split("_")[1]
+            # شرط: المستوى يجب أن يكون واحداً من ['متقدم', 'متوسط', 'مبتدئ']
+            if selected_level in ['متقدم', 'متوسط', 'مبتدئ']:
+                user_selections[chat_id]['level'] = selected_level
+                # تحديث لوحة المفاتيح
+                new_markup = get_testgenie_keyboard(
+                    selected_level=selected_level,
+                    selected_count=user_selections[chat_id]['count']
+                )
+                bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+                bot.answer_callback_query(call.id, f"تم اختيار المستوى: {selected_level}")
+    
+        # معالجة اختيار عدد الأسئلة
+        elif data.startswith("count_"):
+            count_value = data.split("_")[1]
+        
+            # شرط: العدد يجب أن يكون 5 أو 10 أو 15 للأزرار العادية
+            if count_value.isdigit() and int(count_value) in [5, 10, 15]:
+                selected_count = int(count_value)
+                user_selections[chat_id]['count'] = selected_count
+                new_markup = get_testgenie_keyboard(
+                    selected_level=user_selections[chat_id]['level'],
+                    selected_count=selected_count
+                )
+                bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+                bot.answer_callback_query(call.id, f"تم اختيار {selected_count} سؤال")
+        
+            # شرط: زر مخصص (Custom)
+            elif count_value == "custom":
+                bot.answer_callback_query(call.id, "✨ سيتم فتح نافذة لإدخال عدد مخصص (قريباً)", show_alert=True)
+                # يمكنك هنا إرسال رسالة تطلب من المستخدم إدخال رقم
+        
+            # شرط: زر Pro (20 سؤال)
+            elif count_value == "pro":
+                bot.answer_callback_query(call.id, "🔓 هذه الميزة للمشتركين المميزين فقط - قم بالترقية الآن!", show_alert=True)
+    
+        # معالجة زر بدء الاختبار
+        elif data == "start_test":
+            level = user_selections[chat_id]['level']
+            count = user_selections[chat_id]['count']
+        
+            # شرط: التأكد من وجود مستوى وعدد صالحين قبل البدء
+            if level and count:
+                bot.answer_callback_query(call.id, f"🚀 جاري توليد اختبار بـ {count} سؤال (مستوى {level})...")
+                # هنا قم باستدعاء دالة توليد الاختبار الفعلية
+                # generate_test(chat_id, level, count)
+            else:
+                bot.answer_callback_query(call.id, "❌ الرجاء اختيار المستوى وعدد الأسئلة أولاً", show_alert=True)
+
+        # معالجة أي بيانات غير متوقعة
+        else:
+            bot.answer_callback_query(call.id, "⚠️ خيار غير معروف")
+
+
+    
     # الهاندلر الثاني (الذي كان مفقوداً): معالجة الضغط على أزرار Pro
     @bot.callback_query_handler(func=lambda call: call.data.startswith("pub:"))
     def handle_publishing_options(call):
