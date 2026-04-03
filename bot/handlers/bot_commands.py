@@ -67,3 +67,27 @@ def register(bot):
             bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
 
       
+    @bot.message_handler(commands=["quiz_level"])
+    def user_info(msg):
+        try:
+            user_id = msg.from_user.id
+            chat_id = msg.chat.id
+            
+                
+            
+            
+            quiz_message = get_message("POLL_INST")
+
+            keyboard = 
+            
+            bot.send_message(chat_id,
+            text=poll_message,
+            parse_mode="HTML")
+
+            user_states[user_id] = "awaiting_poll_text"
+
+        except Exception as e:
+            bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
+
+
+  
