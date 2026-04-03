@@ -13,7 +13,10 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
-
+import threading
+    
+def heavy_process(message):
+    generate_quizzes_from_text(content)
 
 def register(bot):
     
@@ -119,6 +122,8 @@ def register(bot):
             user_instruction = getattr(msg, "caption", None)
             if user_instruction:
                 user_instruction = user_instruction.strip()
+
+            threading.Thread(target=heavy_process, args=(message,)).start()
 
             
             quizzes = generate_quizzes_from_text(
