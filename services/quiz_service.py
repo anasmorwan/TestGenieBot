@@ -5,12 +5,12 @@ from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
 
-
+question_count = 10
 
 def generate_quizzes_from_text(content, user_id, user_instruction=None, num_quizzes=5):
     if is_paid_user_active(user_id):
         # دالة Pro ترجع قاموساً فيه metadata و questions
-        prompt = generate_smart_batch_prompt(content, num_questions=10)
+        prompt = generate_smart_batch_prompt(content, num_questions=question_count)
         raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
 
         
