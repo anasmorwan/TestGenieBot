@@ -1,6 +1,15 @@
 {
   "medicine": {
     "title": "Medicine",
+    "subject_bias": {
+      "pathology": "mid",
+      "clinical_medicine": "advanced",
+      "anatomy": "early",
+      "physiology": "early",
+      "microbiology": "mid",
+      "pharmacology": "mid",
+      "biochemistry": "early"  
+    },
     "stages": {
       "early": {
         "weights": {
