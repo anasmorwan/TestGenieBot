@@ -108,10 +108,13 @@ def register(bot):
             if user_instruction:
                 user_instruction = user_instruction.strip()
 
+            msg_id = waiting_msg.message_id
+
             quizzes = generate_quizzes_from_text(
             content=content,
             user_id=user_id,
             user_instruction=user_instruction
+            msg_id=msg_id
             )
             bot.edit_message_text(chat_id=chat_id,
             message_id=waiting_msg.message_id,
