@@ -22,20 +22,20 @@ def heavy_process(bot, chat_id, waiting_msg_id, user_id, content, user_instructi
         user_instruction=user_instruction
     )
     bot.edit_message_text(chat_id=chat_id,
-        message_id=waiting_msg.message_id,
+        message_id=waiting_msg_id,
         text=get_message("FINAL_FILE_MSG"), parse_mode="HTML")
                 
     maybe_cleanup()
 
     if not quizzes:
-        bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
+        bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
         return
 
     quiz_code = store_quiz(user_id, quizzes)
     # backup_all()
     quiz_len = len(quizzes)
 
-    bot.delete_message(chat_id, message_id=waiting_msg.message_id)
+    bot.delete_message(chat_id, message_id=waiting_msg_id)
             
 
     bot.send_message(
@@ -45,14 +45,9 @@ def heavy_process(bot, chat_id, waiting_msg_id, user_id, content, user_instructi
         parse_mode="HTML"
     )
     
-    if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=True):
-        bot.edit_message_text(
-          chat_id=chat_id,
-            message_id=loading_msg.message_id,
-            text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
-        )
-        print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
-            
+    quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False):
+        
+    
     
 
 def register(bot):
