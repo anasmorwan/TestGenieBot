@@ -142,7 +142,7 @@ def register(bot):
                     reply_markup=quiz_keyboard(quiz_code), 
                     parse_mode="HTML"
                 )
-                if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=True):
+                if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False):
                     bot.edit_message_text(
                     chat_id=chat_id,
                     message_id=waiting_msg.message_id,
