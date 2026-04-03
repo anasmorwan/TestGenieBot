@@ -95,7 +95,7 @@ def generate_smart_response(prompt: str) -> str:
             response = cohere_client.chat(
                 model="command-a-03-2025",
                 message=prompt,
-                temperature=0.7
+                temperature=0.8
             )
 
             if response and response.text:
@@ -119,7 +119,7 @@ def generate_smart_response(prompt: str) -> str:
             chat_completion = groq_client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
                 model="llama-3.3-70b-versatile",
-                temperature=0.7,
+                temperature=0.8,
             )
 
             result = chat_completion.choices[0].message.content
