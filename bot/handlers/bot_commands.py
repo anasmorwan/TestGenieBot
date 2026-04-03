@@ -2,7 +2,7 @@ from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.main_menu import main_menu_keyboard
 from storage.messages import get_message
 from storage.session_store import user_states
-
+from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
 
 def register(bot):
   
