@@ -15,40 +15,7 @@ from services.backup_service import smart_restore, is_db_valid
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 import threading
     
-def heavy_process(bot, chat_id, waiting_msg_id, user_id, content, user_instruction):
-    quizzes = generate_quizzes_from_text(
-        content=content,
-        user_id=user_id,
-        user_instruction=user_instruction
-    )
-    bot.edit_message_text(chat_id=chat_id,
-        message_id=waiting_msg_id,
-        text=get_message("FINAL_FILE_MSG"), parse_mode="HTML")
-                
-    maybe_cleanup()
 
-    if not quizzes:
-        bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
-        return
-
-    quiz_code = store_quiz(user_id, quizzes)
-    # backup_all()
-    quiz_len = len(quizzes)
-
-    bot.delete_message(chat_id, message_id=waiting_msg_id)
-            
-
-    bot.send_message(
-        chat_id=chat_id,
-        text=get_message("QUIZ_CREATED", count=quiz_len),
-        reply_markup=quiz_keyboard(quiz_code),
-        parse_mode="HTML"
-    )
-    
-    quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False)
-        
-    
-    
 
 def register(bot):
     
@@ -141,20 +108,38 @@ def register(bot):
             if user_instruction:
                 user_instruction = user_instruction.strip()
 
-            threading.Thread(target=heavy_process, args=(
-            bot, 
-            chat_id, 
-            waiting_msg.message_id, 
-            user_id, 
-            content, 
-            user_instruction
-            )).start()
-            
-            
-         
+            quizzes = generate_quizzes_from_text(
+            content=content,
+            user_id=user_id,
+            user_instruction=user_instruction
+            )
+            bot.edit_message_text(chat_id=chat_id,
+            message_id=waiting_msg_id,
+            text=get_message("FINAL_FILE_MSG"), parse_mode="HTML")
+                
+            maybe_cleanup()
 
+            if not quizzes:
+                bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
+                return
+
+            quiz_code = store_quiz(user_id, quizzes)
+            # backup_all()
+            quiz_len = len(quizzes)
+
+            bot.delete_message(chat_id, message_id=waiting_msg_id)
             
-            
+
+            bot.send_message(
+                chat_id=chat_id,
+                text=get_message("QUIZ_CREATED", count=quiz_len),
+                reply_markup=quiz_keyboard(quiz_code),
+                parse_mode="HTML"
+            )
+    
+            quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False)
+        
+        
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}")
