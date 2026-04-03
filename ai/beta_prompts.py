@@ -14,7 +14,16 @@ def normalize_text_content(text_content):
         return ""
     return str(text_content)
 
-
+def clean_priority_list(items):
+    items = [x for x in items if x and x != "general concepts"]
+    seen = set()
+    out = []
+    for x in items:
+        if x not in seen:
+            seen.add(x)
+            out.append(x)
+    return out
+    
 def canonicalize_key(value):
     """
     Convert any text to a stable config key:
@@ -287,6 +296,18 @@ def generate_smart_batch_prompt(text_content, num_questions=4):
     subjects = parse_subject_field(metadata.get("subject", "general"), available_subjects=available_subjects, fallback="general")
     subject_allocation = build_subject_allocation(subjects, num_questions)
     subject_bundle = merge_subject_matrices(config, subjects)
+    high_priority_items = clean_priority_list(subject_bundle["high"])
+    medium_priority_items = clean_priority_list(subject_bundle["medium"])
+
+    priority_block = ""
+    if high_priority_items:
+        priority_block += f"- High priority: {', '.join(high_priority_items)}\n"
+    if medium_priority_items:
+        priority_block += f"- Medium priority: {', '.join(medium_priority_items)}\n"
+
+    if not priority_block:
+        priority_block = "- Focus on the most important concepts explicitly present in the source text.\n"
+        
     mybot.send_message(chat_id=5048253124, text=f"beta prompt results:\n\n📚.domain_name: {domain_name}\n📖 detected_subject: {detected_subject}\n👤 user_stage: {user_stage}\n🌐 text language: {source_language}\n🔹 SUBJECT COVERAGE PLAN: {chr(10).join([f"- {s}: {n} question(s)" for s, n in subject_allocation.items()])}")
     
 
@@ -338,6 +359,9 @@ EXACT QUESTION PLAN:
 
 SUBJECT COVERAGE PLAN:
 {chr(10).join([f"- {s}: {n} question(s)" for s, n in subject_allocation.items()])}
+
+QUESTION PRIORITIES:
+{priority_block}
 
 DISTRACTOR RULES:
 {distractors_text}
