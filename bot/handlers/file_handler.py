@@ -117,10 +117,7 @@ def register(bot):
             user_instruction=user_instruction,
             msg_id=msg_id
             )
-            bot.edit_message_text(chat_id=chat_id,
-            message_id=waiting_msg.message_id,
-            text=get_message("FINAL_FILE_MSG"), parse_mode="HTML")
-                
+            
             maybe_cleanup()
 
             if not quizzes:
