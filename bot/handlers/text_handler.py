@@ -13,6 +13,42 @@ from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_key
 from services.poll_service import generate_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 
+
+def heavy_process(text, user_id, bot):
+    quizzes = generate_quizzes_from_text(text, user_id)
+
+    if not quizzes or len(quizzes) == 0:
+        print(f"DEBUG: [User: {user_id}] Quiz generation returned EMPTY result.", flush=True)
+        bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
+        return
+
+    quiz_code = store_quiz(user_id, quizzes)
+    maybe_cleanup()
+    quiz_len = len(quizzes)
+
+    bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=waiting_msg.message_id,
+        text=get_message("QUIZ_CREATED", count=quiz_len),
+        reply_markup=quiz_keyboard(quiz_code), 
+        parse_mode="HTML"
+    )
+    if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=True):
+        bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=loading_msg.message_id,
+        text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
+        )
+    print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
+            
+
+
+
+
+
+
+
+
 def register(bot):
 
     def show_referral_message(bot, chat_id, user_id):
@@ -121,33 +157,17 @@ def register(bot):
                 # الحالة الافتراضية توليد اختبار عادي
                 print(f"DEBUG: [User: {user_id}] No specific state found. Starting standard Quiz generation.", flush=True)
                 waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
-                
-                quizzes = generate_quizzes_from_text(text, user_id)
 
-                if not quizzes or len(quizzes) == 0:
-                    print(f"DEBUG: [User: {user_id}] Quiz generation returned EMPTY result.", flush=True)
-                    bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
-                    return
-
-                quiz_code = store_quiz(user_id, quizzes)
-                maybe_cleanup()
-                quiz_len = len(quizzes)
-
-                bot.edit_message_text(
-                    chat_id=chat_id,
-                    message_id=waiting_msg.message_id,
-                    text=get_message("QUIZ_CREATED", count=quiz_len),
-                    reply_markup=quiz_keyboard(quiz_code), 
-                    parse_mode="HTML"
-                )
-                if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=True):
-                    bot.edit_message_text(
-                    chat_id=chat_id,
-                    message_id=loading_msg.message_id,
-                    text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
-                    )
-                print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
+                threading.Thread(target=heavy_process, args=(
+                    text,
+                    user_id,
+                    bot,
+                    chat_id,
+                    waiting_msg.message_id
+                    )).start()
             
+                
+                
         except Exception as e:
             print(f"CRITICAL ERROR [User: {user_id}]: {e}", flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}")
