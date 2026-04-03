@@ -15,8 +15,36 @@ from services.backup_service import smart_restore, is_db_valid
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 import threading
     
-def heavy_process(message):
-    generate_quizzes_from_text(content)
+def heavy_process(bot, chat_id, waiting_msg_id, user_id, content, user_instruction):
+    quizzes = generate_quizzes_from_text(
+        content=content,
+        user_id=user_id,
+        user_instruction=user_instruction
+    )
+    bot.edit_message_text(chat_id=chat_id,
+        message_id=waiting_msg.message_id,
+        text=get_message("FINAL_FILE_MSG"), parse_mode="HTML")
+                
+    maybe_cleanup()
+
+    if not quizzes:
+        bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
+        return
+
+    quiz_code = store_quiz(user_id, quizzes)
+    # backup_all()
+    quiz_len = len(quizzes)
+
+    bot.delete_message(chat_id, message_id=waiting_msg.message_id)
+            
+
+    bot.send_message(
+        chat_id=chat_id,
+        text=get_message("QUIZ_CREATED", count=quiz_len),
+        reply_markup=quiz_keyboard(quiz_code),
+        parse_mode="HTML"
+    )
+    
 
 def register(bot):
     
@@ -41,7 +69,6 @@ def register(bot):
 
         try:
             plan = check_subscription_valid(user_id)
-
             allowed, info = can_generate(user_id)
 
             if not allowed:
@@ -71,9 +98,7 @@ def register(bot):
         content = None
 
         try:
-
-            if path:
-                
+            if path:         
                 content = extract_text_from_file(
                     user_id,
                     bot,
@@ -91,23 +116,12 @@ def register(bot):
                         pass
                       #  keyboard = 
                       #  bot.edit_message_text(chat_id, message_id=waiting_msg.message_id, text="💡 هذا النص الملف يحتوي على أسئلة بالفعل، إذا أحببت يمكنني صياغتها لك بتنسيق أسئلة سريعة ؟", reply_markup=keyboard)
-                        
-                        
-            
                     elif decision == "review":
                         pass
-                        # final_detection = smart_quiz_detection(content)
-                        # if final_detection:
-                            
-                       #     bot.send_message()
-                       # else:
-                            
-            
                 except:
                     pass
-                
 
-                
+
                 
                 if not content:
                     bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
@@ -123,39 +137,17 @@ def register(bot):
             if user_instruction:
                 user_instruction = user_instruction.strip()
 
-            threading.Thread(target=heavy_process, args=(message,)).start()
+            threading.Thread(target=heavy_process, args=(
+            bot, 
+            chat_id, 
+            waiting_msg.message_id, 
+            user_id, 
+            content, 
+            user_instruction.strip()
+            )).start()
+         
 
             
-            quizzes = generate_quizzes_from_text(
-                content=content,
-                user_id=user_id,
-                user_instruction=user_instruction
-            )
-            
-
-            bot.edit_message_text(chat_id=chat_id,
-                message_id=waiting_msg.message_id,
-                text=get_message("FINAL_FILE_MSG"), parse_mode="HTML")
-                
-            maybe_cleanup()
-
-            if not quizzes:
-                bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
-                return
-
-            quiz_code = store_quiz(user_id, quizzes)
-            # backup_all()
-            quiz_len = len(quizzes)
-
-            bot.delete_message(chat_id, message_id=waiting_msg.message_id)
-            
-
-            bot.send_message(
-                chat_id=chat_id,
-                text=get_message("QUIZ_CREATED", count=quiz_len),
-                reply_markup=quiz_keyboard(quiz_code),
-                parse_mode="HTML"
-            )
             
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
