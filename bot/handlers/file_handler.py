@@ -152,7 +152,7 @@ def register(bot):
             waiting_msg.message_id, 
             user_id, 
             content, 
-            user_instruction.strip()
+            user_instruction
             )).start()
             
             
