@@ -275,7 +275,7 @@ def generate_smart_batch_prompt(text_content, num_questions=4):
     stage_weights = config["stages"][user_stage]["weights"]
     counts, question_plan = build_exact_question_plan(stage_weights, num_questions)
 
-    print(f"🔹 medium_priority : {medium_priority}", flush=True)
+
     distractors_text = "\n".join([f"- {rule}" for rule in config["generate_distractors"]])
     
     available_subjects = list(config.get("subject_type_matrix", {}).keys())
