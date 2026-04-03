@@ -64,6 +64,28 @@ def generate_smart_response(prompt: str) -> str:
     """
     timeout_seconds = 45
 
+    
+    # 2️⃣ Google Gemini
+    if gemini_model:
+        try:
+            logging.info("Attempting request with: 1. Google Gemini...")
+
+            response = gemini_model.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+
+            if response and response.text:
+                logging.info("✅ Success with Gemini.")
+                print("✅ Success with Gemini", flush=True)
+                return response.text.strip()
+
+            logging.warning("❌ Gemini returned empty response. Trying fallback...")
+
+        except Exception as e:
+            logging.warning(f"❌ Gemini failed: {e}")
+            
+
 
     # 1️⃣ Cohere
     if cohere_client:
@@ -87,26 +109,7 @@ def generate_smart_response(prompt: str) -> str:
             logging.warning(f"❌ Cohere failed: {e}")
 
 
-    # 2️⃣ Google Gemini
-    if gemini_model:
-        try:
-            logging.info("Attempting request with: 1. Google Gemini...")
-
-            response = gemini_model.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
-
-            if response and response.text:
-                logging.info("✅ Success with Gemini.")
-                print("✅ Success with Gemini", flush=True)
-                return response.text.strip()
-
-            logging.warning("❌ Gemini returned empty response. Trying fallback...")
-
-        except Exception as e:
-            logging.warning(f"❌ Gemini failed: {e}")
-
+    
 
     # 3️⃣ Groq (LLaMA 3.3)
     if groq_client:
