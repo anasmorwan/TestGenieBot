@@ -5,13 +5,17 @@ from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
 
+
+text = get_message("x")
 question_count = 10
 
-def generate_quizzes_from_text(content, user_id, user_instruction=None, num_quizzes=10):
+def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
     if is_paid_user_active(user_id):
         # دالة Pro ترجع قاموساً فيه metadata و questions
         prompt = generate_smart_batch_prompt(content, num_questions=question_count)
         raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+        if msg_id:
+            bot.edit_message_text(chat_id=user_id, message_id=msg_id, text=text)
 
         
         quizzes = parse_llm_json(raw_response)
@@ -34,6 +38,9 @@ def generate_quizzes_from_text(content, user_id, user_instruction=None, num_quiz
     else:
         prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
         raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+        if msg_id:
+            bot.edit_message_text(chat_id=user_id, message_id=msg_id, text=text)
+            
 
         
         quizzes = parse_llm_json(raw_response)
