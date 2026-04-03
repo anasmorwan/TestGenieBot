@@ -332,6 +332,7 @@ def sanitize_generated_questions(items, num_questions):
     return cleaned[:num_questions]
 
 
+def generate_smart_batch_prompt(text_content, num_questions):
 
 def generate_smart_batch_prompt(text_content, num_questions):
     text_content = normalize_text_content(text_content)
@@ -347,9 +348,15 @@ def generate_smart_batch_prompt(text_content, num_questions):
     
     # 2. التطبيع الاحترافي للمستوى
     user_stage = normalize_stage_smart(metadata, config)
+
+    available_subjects = config.get("subjects", [])
     
     # 3. جلب التخصصات وتوزيع الأسئلة
-    subjects = parse_subject_field(metadata.get("subject", "clinical_medicine"), available_subjects=config["subjects"])
+    subjects = parse_subject_field(
+        metadata.get("subject", "general"), 
+        available_subjects=available_subjects, 
+        fallback=available_subjects[0] # بدلاً من general، خذ أول مادة في القائمة كافتراضي
+    )
     subject_allocation = build_subject_allocation(subjects, num_questions)
     
     # 4. بناء خطة الأسئلة بناءً على أوزان الـ Stage المختار
