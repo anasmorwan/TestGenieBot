@@ -20,22 +20,17 @@ def register():
             json_string = request.get_data().decode("utf-8")
             print("=== webhook received ===", flush=True)
             print(json_string, flush=True)
-
-            # parse JSON string إلى dict
             update_dict = json.loads(json_string)
 
             # حوّل القاموس إلى كائن Update ثم أرسله لمكتبة telebot
             update = telebot.types.Update.de_json(update_dict)
-            mybot.process_new_updates([update])
+            threading.Thread(target=mybot.process_new_updates, args=([update],)).start()
 
             return "OK", 200
+
+            
 
         except Exception as e:
             # طباعة الخطأ للإطلاع
             print("Webhook error:", e, flush=True)
             return "ERROR", 500
-
-
-
-
-
