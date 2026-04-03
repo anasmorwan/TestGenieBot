@@ -58,7 +58,7 @@ def register(bot):
 
         
         try:
-            waiting_msg = bot.send_message(chat_id=chat_id, text=get_message("FILE_QUIZ"))
+            waiting_msg = bot.send_message(chat_id=chat_id, text=get_message("FILE_QUIZ"), parse_mode="HTML")
             path, filename = handle_file_upload(msg)
 
         except Exception as e:
@@ -106,11 +106,6 @@ def register(bot):
 
                 
                 
-                
-                bot.edit_message_text(chat_id=chat_id,
-                    message_id=waiting_msg.message_id,
-                    text="⏳ لحظة واحدة بعد...")
-                
                 if not content:
                     bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
                     return
@@ -131,6 +126,12 @@ def register(bot):
                 user_id=user_id,
                 user_instruction=user_instruction
             )
+            
+
+            bot.edit_message_text(chat_id=chat_id,
+                message_id=waiting_msg.message_id,
+                text=get_message("FINAL_FILE_MSG"), parse_mode="HTML")
+                
             maybe_cleanup()
 
             if not quizzes:
