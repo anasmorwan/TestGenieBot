@@ -148,89 +148,116 @@ def normalize_stage_with_heuristics(text_content, metadata):
 
 def generate_smart_batch_prompt(text_content, num_questions=5):
     """
-    دالة توليد البرومبت الشامل بناءً على الأوزان
+    Build a production-ready generation prompt with exact question planning.
     """
-    # 1. تحليل النص لمعرفة السياق
     metadata = analyze_text_metadata(text_content)
     domain_name = metadata.get('domain', 'medicine')
-    detected_subject = metadata['subject']
-    user_stage = metadata['estimated_difficulty']
+    detected_subject = metadata.get('subject', 'clinical_medicine')
+    user_stage = normalize_stage_with_heuristics(text_content, metadata)
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
-
     json_path = os.path.join(current_dir, 'domain_profile.json')
+
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
             full_json = json.load(f)
             config = full_json[domain_name]
     except FileNotFoundError:
-        print(f"❌ لم يتم العثور على الملف في المسار: {json_path}")
-        # يمكنك هنا وضع قيمة افتراضية أو رفع الخطأ بشكل أوضح
-        raise
-    
-    
-        
-    # 3. تحضير نسب الأسئلة (Weights) كـ نص مقروء للبرومبت
+        raise FileNotFoundError(f"Domain profile not found at: {json_path}")
+
     stage_weights = config["stages"][user_stage]["weights"]
-    # تحويل { "recall": 0.4 } إلى "recall: 40%"
-    weights_text = "\n".join([f"- {k.replace('_', ' ').title()}: {int(v * 100)}%" for k, v in stage_weights.items()])
-    
-    # 4. تحضير أولويات التخصص (Subject Priorities) كـ نص
+    counts, question_plan = build_exact_question_plan(stage_weights, num_questions)
+
+    weights_text = "\n".join([f"- {k}: {v}" for k, v in counts.items()])
+
     subject_matrix = config["subject_type_matrix"].get(detected_subject, {})
     high_priority = ", ".join(subject_matrix.get("high", ["general concepts"]))
-    medium_priority = ", ".join(subject_matrix.get("medium", []))
-    
-    # 5. تحضير المشتتات (Distractors)
+    medium_priority = ", ".join(subject_matrix.get("medium", [])) or "general concepts"
+
     distractors_text = "\n".join([f"- {rule}" for rule in config['generate_distractors']])
 
-    # أضف هذا المنطق قبل بناء الـ final_prompt
+    # Stage-specific style control
     if user_stage == "early":
-        target_structure = "Direct Academic Question (Clear and concise, focusing on facts)"
+        question_style_rule = """
+QUESTION STYLE RULES:
+- Use direct academic questions.
+- Avoid patient vignettes unless the source text already contains one.
+- Prefer recall, definition, identification, and basic concept questions.
+- Do NOT force clinical scenarios.
+- Use short stems.
+"""
+    elif user_stage == "mid":
+        question_style_rule = """
+QUESTION STYLE RULES:
+- Mix direct questions and light clinical reasoning.
+- Use a limited vignette only when it helps testing understanding.
+- Keep stems concise.
+"""
     else:
-        target_structure = config['response_style']['structure'] # سيأخذ clinical_vignette من الـ JSON
-  
+        question_style_rule = """
+QUESTION STYLE RULES:
+- Use clinical vignettes when appropriate.
+- Prioritize reasoning, interpretation, and diagnosis/management logic.
+- Keep one best answer only.
+"""
 
-    # 6. بناء البرومبت النهائي الموجه للذكاء الاصطناعي
+    plan_text = "\n".join([f"{item['slot']}. {item['type']}" for item in question_plan])
+
     final_prompt = f"""
-    SYSTEM ROLE: You are an expert {config['title']} Education Specialist.
-    
-    CONTEXT:
-    This is an educational text for the {config['title']} domain, specifically the {detected_subject} subject.
-    Target Student Level: {user_stage} stage.
-    Key Concepts inside text: {", ".join(metadata['concepts'])}.
+SYSTEM ROLE: You are an expert {config['title']} Education Specialist.
 
-    TASK:
-    Generate exactly {num_questions} USMLE-style MCQs based on the provided SOURCE TEXT. 
-    Do NOT generate all questions in the same style. You MUST diversify them according to the following strict distribution:
+CONTEXT:
+- Domain: {config['title']}
+- Subject: {detected_subject}
+- Student stage: {user_stage}
+- Source mode: {metadata.get('source_mode', 'textbook')}
+- Key concepts: {", ".join(metadata.get('concepts', []))}
 
-    QUESTION TYPE DISTRIBUTION (Based on student stage):
-    {weights_text}
+TASK:
+Generate exactly {num_questions} MCQs based ONLY on the SOURCE TEXT.
 
-    SUBJECT FOCUS PRIORITIES:
-    Because this is {detected_subject}, follow these priorities for the question concepts:
-    - High Focus: Give highest priority to questions testing [{high_priority}].
-    - Medium Focus: Moderate priority for [{medium_priority}].
+IMPORTANT:
+- Follow the exact question plan below.
+- Do not ignore the distribution.
+- Do not make all questions clinical.
+- Do not invent facts outside the text.
+- Each question must have one best answer and plausible distractors.
 
-    DISTRACTOR RULES (CRITICAL):
-    {distractors_text}
+EXACT QUESTION PLAN:
+{plan_text}
 
-    FORMAT & STYLE:
-    - Structure: {target_structure}
-    - Tone: {config['response_style']['tone']}
-    - Structure: Every question MUST use a {config['response_style']['structure']}.
-    - Explanation Depth: {config['response_style']['explanation_depth']}. Explain why the correct answer is right AND strictly explain why each distractor is wrong.
-    - Adherence: Use ONLY information derived from the SOURCE TEXT below.
-    - explanation Language: Hybrid (English for Medical Terms, Arabic for explanation and logic).
-    
-    {explanation_style_guidelines}
-    
-    SOURCE TEXT:
-    {text_content}
-    
-    OUTPUT FORMAT: Return ONLY a valid JSON array of question objects.
-    {example_json_format}
-    """
-    
-    return final_prompt
+QUESTION TYPE PRIORITIES:
+- High priority: {high_priority}
+- Medium priority: {medium_priority}
 
-  
+QUESTION DISTRACTOR RULES:
+{distractors_text}
+
+{question_style_rule}
+
+GLOBAL STYLE:
+- Tone: {config['response_style']['tone']}
+- Explanation depth: {config['response_style']['explanation_depth']}
+- For early stage, keep questions direct and factual.
+- For mid and advanced, increase reasoning gradually.
+- Do not repeat the same pattern across all questions.
+
+EXPLANATION RULE:
+- Use the hybrid Arabic-English explanation style below.
+{explanation_style_guidelines}
+
+SOURCE TEXT:
+{text_content}
+
+OUTPUT FORMAT:
+Return ONLY a valid JSON array.
+Each object must have:
+- question
+- options
+- correct_index
+- explanation
+- type
+- difficulty
+"""
+
+    return final_prompt  
