@@ -287,7 +287,7 @@ def generate_smart_batch_prompt(text_content, num_questions=4):
     subjects = parse_subject_field(metadata.get("subject", "general"), available_subjects=available_subjects, fallback="general")
     subject_allocation = build_subject_allocation(subjects, num_questions)
     subject_bundle = merge_subject_matrices(config, subjects)
-    mybot.send_message(chat_id=5048253124, text=f"beta prompt results:\n\n1.domain_name: {domain_name}\n2.detected_subject: {detected_subject}\n3. user_stage: {user_stage}\n4. text language: {source_language}\n5. available_subjects: {available_subjects}\n 6.subject_allocation: {subject_allocation}\n\7.subject_bundle: {subject_bundle}")
+    mybot.send_message(chat_id=5048253124, text=f"beta prompt results:\n\n📚.domain_name: {domain_name}\n📖 detected_subject: {detected_subject}\n👤 user_stage: {user_stage}\n🌐 text language: {source_language}\n🔹 SUBJECT COVERAGE PLAN: {chr(10).join([f"- {s}: {n} question(s)" for s, n in subject_allocation.items()])}")
     
 
 
