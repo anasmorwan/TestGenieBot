@@ -155,17 +155,20 @@ Format:
 ❌ Why not others:
 """
 
-def analyze_text_metadata(text_content, allowed_subjects):
+def analyze_text_metadata(text_content, config):
     
-    subjects_list = " | ".join(allowed_subjects)
+    valid_subjects = config.get("subjects", [])
+    subjects_str = " | ".join(valid_subjects)
+    
     analysis_prompt = f"""
 Return ONLY a JSON object.
-Subjects allowed: {subjects_list}
+STRICT SUBJECT LIST:
+{subjects_str}
 
 Structure:
 {{
 "domain": "medicine",
-"subject": "exact subject from list",
+"subject": "Select one or more from the STRICT LIST above",
 "concepts": ["concept1", "concept2"],
 "estimated_difficulty": "early | mid | advanced",
 "cognitive_level": "recall | application | evaluation",
