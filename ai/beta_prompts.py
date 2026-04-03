@@ -8,26 +8,20 @@ from utils.json_utils import extract_json_objects_safely, parse_llm_json
 
 
 explanation_style_guidelines = """
-EXPLANATION STYLE (Hybrid Arabic-English, tutor-like):
-You MUST write the explanation mainly in Arabic, with English medical terms kept exactly as they are.
-Do NOT translate medical terms, diagnoses, drug names, lab tests, or anatomical structures into Arabic.
-Do NOT write the explanation in full English.
-Do NOT repeat the question stem or paraphrase it too closely.
-Do NOT mirror the same wording or structure of the source text.
+EXPLANATION STYLE:
+- Write mainly in Arabic.
+- Keep medical terms, diagnoses, tests, labs, drugs, and anatomy in English exactly as they appear in medicine.
+- Include 2–4 English medical terms naturally in every explanation when relevant.
+- Do NOT translate all medical terms into Arabic.
+- Do NOT copy the question stem.
+- Do NOT write long explanations.
 
-Use this exact 5-part structure, but keep it natural and concise:
-1. 🎯 الخلاصة: one short Arabic sentence that states the core answer.
-2. 🔍 التحليل: short Arabic reasoning with English medical terms embedded naturally.
-3. ✅ لماذا هذه الإجابة؟: a direct logic explanation in Arabic.
-4. 💡 حيلة الامتحان: a short exam trick or memory hook in Arabic.
-5. ❌ استبعاد الخيارات: brief reasons why the main distractors are wrong.
-
-Style rules:
-- Keep the explanation compact and high-yield.
-- Prefer simple Arabic with medical terms in English.
-- Mention only the key clues from the source text.
-- Never invent facts outside the source.
-- Never make the explanation long-winded or repetitive.
+Use this compact structure:
+1. 🎯 الخلاصة: one short line.
+2. 🔍 التحليل: short reasoning with English medical terms.
+3. ✅ لماذا هذه الإجابة؟: direct logic.
+4. 💡 حيلة الامتحان: quick memory hook.
+5. ❌ استبعاد الخيارات: brief elimination.
 """
 
 # أضف هذا المتغير داخل دالة generate_smart_batch_prompt
@@ -116,6 +110,11 @@ def normalize_stage_with_heuristics(text_content, metadata):
     """
     Fallback heuristic to prevent wrong stage classification.
     """
+    if isinstance(text_content, tuple):
+        text_content = " ".join(map(str, text_content))
+    elif not isinstance(text_content, str):
+        text_content = str(text_content)
+
     text_lower = text_content.lower()
 
     clinical_cues = [
@@ -135,14 +134,12 @@ def normalize_stage_with_heuristics(text_content, metadata):
     stage = metadata.get("estimated_difficulty", "early")
     confidence = float(metadata.get("confidence", 0.5))
 
-    # If LLM is uncertain, bias toward safer direct questions for educational text
     if confidence < 0.65 and textbook_hits >= clinical_hits:
         stage = "early"
     elif clinical_hits >= 3 and stage == "early":
         stage = "mid"
 
     return stage
-
 
 
 
@@ -207,7 +204,6 @@ QUESTION STYLE RULES:
 SYSTEM ROLE: You are an expert {config['title']} Education Specialist.
 
 CONTEXT:
-- Domain: {config['title']}
 - Subject: {detected_subject}
 - Student stage: {user_stage}
 - Source mode: {metadata.get('source_mode', 'textbook')}
@@ -216,34 +212,34 @@ CONTEXT:
 TASK:
 Generate exactly {num_questions} MCQs based ONLY on the SOURCE TEXT.
 
-IMPORTANT:
+RULES:
 - Follow the exact question plan below.
-- Do not ignore the distribution.
-- Do not make all questions clinical.
-- Do not invent facts outside the text.
+- Match the student stage strictly.
+- For early stage: ask direct recall/basic concept questions, not clinical vignettes unless the source text is case-based.
+- For mid stage: mix recall and light reasoning.
+- For advanced stage: use clinical reasoning when justified.
+- Do not invent facts outside the source.
 - Each question must have one best answer and plausible distractors.
 
 EXACT QUESTION PLAN:
 {plan_text}
 
-QUESTION TYPE PRIORITIES:
+QUESTION PRIORITIES:
 - High priority: {high_priority}
 - Medium priority: {medium_priority}
 
-QUESTION DISTRACTOR RULES:
+DISTRACTOR RULES:
 {distractors_text}
 
+QUESTION STYLE:
 {question_style_rule}
 
 GLOBAL STYLE:
 - Tone: {config['response_style']['tone']}
 - Explanation depth: {config['response_style']['explanation_depth']}
-- For early stage, keep questions direct and factual.
-- For mid and advanced, increase reasoning gradually.
 - Do not repeat the same pattern across all questions.
 
-EXPLANATION RULE:
-- Use the hybrid Arabic-English explanation style below.
+EXPLANATION:
 {explanation_style_guidelines}
 
 SOURCE TEXT:
