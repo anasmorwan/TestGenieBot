@@ -156,7 +156,6 @@ Format:
 """
 
 
-
 def analyze_text_metadata(text_content):
     text_content = normalize_text_content(text_content)
 
@@ -175,6 +174,17 @@ Select subject(s) ONLY from the provided list.
 - Use exact terms only (no new labels).
 - If multiple: join with " | ".
 - If one: return it as a single string.
+
+Difficulty Rules (STRICT):
+- early = pure recall (definitions, lists, single facts, no reasoning)
+- mid = requires understanding OR 1-step reasoning (explain, compare, mechanism)
+- advanced = requires multi-step reasoning OR clinical decision OR case interpretation
+
+Hard constraints:
+- If NO reasoning → MUST be early
+- If ONE reasoning step → mid
+- If MULTI-step reasoning or clinical thinking → advanced
+- DO NOT default to mid
 
 General Rules:
 - estimated_difficulty = early for definitions, lists, basic facts, and foundation-level content.
