@@ -145,11 +145,11 @@ Format:
 """
 
 
+
 def analyze_text_metadata(text_content):
     text_content = normalize_text_content(text_content)
 
     analysis_prompt = f"""
-
 Return ONLY a JSON object with this exact structure:
 {{
 "domain": "medicine",
@@ -160,18 +160,24 @@ Return ONLY a JSON object with this exact structure:
 "confidence": 0.0
 }}
 
-Rules:
-estimated_difficulty = early for definitions, lists, basic facts, and foundation-level content.
-estimated_difficulty = mid for conceptual or moderate reasoning content.
-estimated_difficulty = advanced for clinical cases, management, differential diagnosis, or multi-step reasoning.
-source_mode = textbook if the text is factual and non-case-based.
-source_mode = case_based if the text is a patient scenario.
-confidence must be between 0 and 1.
+Rules for Subject Selection:
+- You MUST select one or more values ONLY from subject list.
+- Do NOT use any terms outside this list.
+- If the text covers multiple subjects, join them using a pipe separator with spaces (e.g., "subject1 | subject2").
+- If only one subject applies, return it as a single string (e.g., "pathology").
 
+General Rules:
+- estimated_difficulty = early for definitions, lists, basic facts, and foundation-level content.
+- estimated_difficulty = mid for conceptual or moderate reasoning content.
+- estimated_difficulty = advanced for clinical cases, management, differential diagnosis, or multi-step reasoning.
+- source_mode = textbook if the text is factual and non-case-based.
+- source_mode = case_based if the text is a patient scenario.
+- confidence must be between 0 and 1.
 
-content:
+Content:
 {text_content[:1200]}
 """
+    
     raw_response = generate_smart_response(analysis_prompt)
     parsed_response = parse_llm_json(raw_response)
 
