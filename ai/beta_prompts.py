@@ -5,6 +5,8 @@ from ai.llm_client import generate_smart_response
 from utils.json_utils import parse_llm_json
 from bot.bot_instance import mybot
 
+admin_id = 5048253124
+
 
 
 def normalize_text_content(text_content):
@@ -307,8 +309,8 @@ def generate_smart_batch_prompt(text_content, num_questions):
 
     if not priority_block:
         priority_block = "- Focus on the most important concepts explicitly present in the source text.\n"
-        
-    mybot.send_message(chat_id=5048253124, text=f"beta prompt results:\n\n📚.domain_name: {domain_name}\n📖 detected_subject: {detected_subject}\n👤 user_stage: {user_stage}\n🌐 text language: {source_language}\n\n🔹 SUBJECT COVERAGE PLAN: {chr(10).join([f"- {s}: {n} question(s)" for s, n in subject_allocation.items()])}\n\n🗃️ priority_block: {priority_block}")
+    
+    mybot.send_message(chat_id=admin_id, text=f"beta prompt results:\n\n📚.domain_name: {domain_name}\n📖 detected_subject: {detected_subject}\n👤 user_stage: {user_stage}\n🌐 text language: {source_language}\n\n🔹 SUBJECT COVERAGE PLAN: {chr(10).join([f"- {s}: {n} question(s)" for s, n in subject_allocation.items()])}\n\n🗃️ priority_block: {priority_block}")
     
 
 
