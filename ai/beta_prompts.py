@@ -266,7 +266,7 @@ def sanitize_generated_questions(items, num_questions):
     return cleaned[:num_questions]
 
 
-def generate_smart_batch_prompt(text_content, num_questions=4):
+def generate_smart_batch_prompt(text_content, num_questions):
     text_content = normalize_text_content(text_content)
     metadata = analyze_text_metadata(text_content)
 
