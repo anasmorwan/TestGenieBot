@@ -1,7 +1,7 @@
 # session_store.py
 user_states = {}
 temp_texts = {}
-
+user_selections = {}
 
 def get_state_safe(user_id):
     data = user_states.get(user_id)
