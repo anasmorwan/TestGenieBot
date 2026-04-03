@@ -393,6 +393,9 @@ SYSTEM ROLE: Expert {config['title']} Professor.
 GOAL: Generate {num_questions} MCQs from the SOURCE TEXT.
 TARGET LEVEL: {user_stage.upper()}
 
+CONTEXT:
+- Subjects: {", ".join(subjects)}
+
 CONSTRAINTS:
 - Language: {source_language}
 - Exactly {num_questions} questions.
