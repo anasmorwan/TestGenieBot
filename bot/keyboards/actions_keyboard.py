@@ -22,3 +22,15 @@ def escape_action_keyboard():
 
     markup.add(btn_cancel)
     return markup
+
+def quiz_refill_keyboard():
+    markup = InlineKeyboardMarkup(row_width=1)
+
+    
+    btn_refill = InlineKeyboardButton("✅ نعم أريد", callback_data=f"refill_quiz")
+
+    
+
+    markup.add(btn_cancel)
+    return markup
+                                  
