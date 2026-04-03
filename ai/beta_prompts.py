@@ -156,7 +156,7 @@ Format:
 """
 
 def analyze_text_metadata(text_content, allowed_subjects):
-    text_content = normalize_text_content(text_content)
+    
     subjects_list = " | ".join(allowed_subjects)
     analysis_prompt = f"""
 Return ONLY a JSON object.
@@ -211,6 +211,19 @@ Content:
 
 
     
+def get_style_patterns(config, question_plan):
+    # استخراج الأنماط الفريدة المطلوبة بناءً على الخطة
+    required_types = set(item['type'] for item in question_plan)
+    mapping = config.get("pattern_mapping", {})
+    patterns_text = "STYLE GUIDELINES PER TYPE:\n"
+    
+    for q_type in required_types:
+        pattern_key = mapping.get(q_type)
+        if pattern_key and pattern_key in config:
+            examples = "\n".join(config[pattern_key][:2]) # نأخذ مثالين فقط للاختصار
+            patterns_text += f"Type '{q_type}':\n{examples}\n"
+            
+    return patterns_text
     
 
 
@@ -235,6 +248,36 @@ def build_exact_question_plan(stage_weights, num_questions):
             slot += 1
 
     return counts, plan
+
+def normalize_stage_smart(metadata, config):
+    # مصفوفة الرتب لتسهيل المقارنة الرياضية
+    rank = {"early": 1, "mid": 2, "advanced": 3}
+    
+    ai_difficulty = metadata.get("estimated_difficulty", "early")
+    cognitive_level = metadata.get("cognitive_level", "recall")
+    
+    # 1. تحديد أعلى Bias للمواد المكتشفة
+    detected_subjects = parse_subject_field(metadata.get("subject", ""), available_subjects=config["subjects"])
+    subject_biases = config.get("subject_bias", {})
+    
+    max_bias_rank = 1
+    for s in detected_subjects:
+        b = subject_biases.get(s, "early")
+        max_bias_rank = max(max_bias_rank, rank.get(b, 1))
+
+    # 2. منطق الرفع (Promotion Logic)
+    current_rank = rank.get(ai_difficulty, 1)
+    
+    # إذا كانت المادة صعبة بطبعها (مثل Pathology) والنموذج قال early، نرفعها لـ Mid
+    final_rank_val = max(current_rank, max_bias_rank)
+    
+    # إذا كان المستوى المعرفي هو 'evaluation' (اتخاذ قرار)، يجب أن تكون حتماً advanced
+    if cognitive_level == "evaluation":
+        final_rank_val = 3
+
+    reverse_rank = {1: "early", 2: "mid", 3: "advanced"}
+    return reverse_rank.get(final_rank_val, "early")
+
 
 
 def normalize_stage_with_heuristics(text_content, metadata):
@@ -286,124 +329,86 @@ def sanitize_generated_questions(items, num_questions):
     return cleaned[:num_questions]
 
 
+
 def generate_smart_batch_prompt(text_content, num_questions):
     text_content = normalize_text_content(text_content)
-    metadata = analyze_text_metadata(text_content)
-
-    domain_name = metadata.get("domain", "medicine")
-    print(f"📚 Domain : {domain_name}", flush=True)
-    detected_subject = metadata.get("subject", "clinical_medicine")
-    print(f"📖 subject : {detected_subject}", flush=True)
-    user_stage = normalize_stage_with_heuristics(text_content, metadata)
-    print(f"📊 current user_stage : {user_stage}", flush=True)
-    source_language = detect_source_language(text_content)
-    print(f"🌐 source_language is : {source_language}", flush=True)
-
+    
+    # تحميل الإعدادات أولاً (نفترض الطب كافتراضي حالياً)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    json_path = os.path.join(current_dir, "domain_profile.json")
+    with open(os.path.join(current_dir, "domain_profile.json"), "r", encoding="utf-8") as f:
+        full_config = json.load(f)
+        config = full_config["medicine"] # يمكن جعلها ديناميكية لاحقاً
 
-    with open(json_path, "r", encoding="utf-8") as f:
-        full_json = json.load(f)
-        config = full_json[domain_name]
-
+    # 1. التحليل المبدئي
+    metadata = analyze_text_metadata(text_content, config)
+    
+    # 2. التطبيع الاحترافي للمستوى
+    user_stage = normalize_stage_smart(metadata, config)
+    
+    # 3. جلب التخصصات وتوزيع الأسئلة
+    subjects = parse_subject_field(metadata.get("subject", "clinical_medicine"), available_subjects=config["subjects"])
+    subject_allocation = build_subject_allocation(subjects, num_questions)
+    
+    # 4. بناء خطة الأسئلة بناءً على أوزان الـ Stage المختار
     stage_weights = config["stages"][user_stage]["weights"]
     counts, question_plan = build_exact_question_plan(stage_weights, num_questions)
 
+    # 5. استخراج "الأنماط" لتعزيز جودة الصياغة
+    style_patterns = ""
+    mapping = config.get("pattern_mapping", {})
+    for q_type in counts.keys():
+        pattern_key = mapping.get(q_type)
+        if pattern_key and pattern_key in config:
+            example = config[pattern_key][0] # نأخذ أول مثال كنمط صياغة
+            style_patterns += f"- For '{q_type}': Use style like '{example}'\n"
 
-    distractors_text = "\n".join([f"- {rule}" for rule in config["generate_distractors"]])
-    
-    available_subjects = list(config.get("subject_type_matrix", {}).keys())
-    subjects = parse_subject_field(metadata.get("subject", "general"), available_subjects=available_subjects, fallback="general")
-    subject_allocation = build_subject_allocation(subjects, num_questions)
+    # 6. دمج مصفوفة الأولويات (Subject Matrix)
     subject_bundle = merge_subject_matrices(config, subjects)
-    high_priority_items = clean_priority_list(subject_bundle["high"])
-    medium_priority_items = clean_priority_list(subject_bundle["medium"])
+    priority_block = f"HIGH PRIORITY CONCEPTS: {', '.join(subject_bundle['high'])}\n"
+    priority_block += f"MEDIUM PRIORITY: {', '.join(subject_bundle['medium'])}"
 
-    priority_block = ""
-    if high_priority_items:
-        priority_block += f"- High priority: {', '.join(high_priority_items)}\n"
-    if medium_priority_items:
-        priority_block += f"- Medium priority: {', '.join(medium_priority_items)}\n"
-
-    if not priority_block:
-        priority_block = "- Focus on the most important concepts explicitly present in the source text.\n"
+    source_language = detect_source_language(text_content)
     
-    mybot.send_message(chat_id=admin_id, text=f"beta prompt results:\n\n📚.domain_name: {domain_name}\n📖 detected_subject: {detected_subject}\n👤 user_stage: {user_stage}\n🌐 text language: {source_language}\n\n🔹 SUBJECT COVERAGE PLAN: {chr(10).join([f"- {s}: {n} question(s)" for s, n in subject_allocation.items()])}\n\n🗃️ priority_block: {priority_block}")
-    
+    # إرسال تقرير للمشرف (Admin Log)
+    log_msg = (f"🚀 Generating {num_questions} Qs\n"
+               f"📚 Subjects: {', '.join(subjects)}\n"
+               f"📊 Final Stage: {user_stage}\n"
+               f"🧠 Cog Level: {metadata.get('cognitive_level')}")
+    mybot.send_message(chat_id=admin_id, text=log_msg)
 
-
-    if user_stage == "early":
-        question_style_rule = (
-            "Use direct academic questions. "
-            "Avoid patient vignettes unless the source text is case-based. "
-            "Prefer recall, definition, identification, and basic concept questions."
-        )
-    elif user_stage == "mid":
-        question_style_rule = (
-            "Mix direct questions and light reasoning. "
-            "Use a short vignette only when it helps understanding."
-        )
-    else:
-        question_style_rule = (
-            "Use clinical reasoning when appropriate. "
-            "Keep one best answer only."
-        )
-
-    plan_text = "\n".join([f"{item['slot']}. {item['type']}" for item in question_plan])
-
+    # 7. البرومبت النهائي (التحفة الفنية)
     final_prompt = f"""
-SYSTEM ROLE: You are an expert {config['title']} Education Specialist.
+SYSTEM ROLE: Expert {config['title']} Professor.
 
-CONTEXT:
-- Subjects: {", ".join(subjects)}
-- Student stage: {user_stage}
-- Source mode: {metadata.get('source_mode', 'textbook')}
-- Source language: {source_language}
-- Key concepts: {", ".join(metadata.get('concepts', []))}
+GOAL: Generate {num_questions} MCQs from the SOURCE TEXT.
+TARGET LEVEL: {user_stage.upper()}
 
-TASK:
-Generate exactly {num_questions} MCQs based ONLY on the SOURCE TEXT.
+CONSTRAINTS:
+- Language: {source_language}
+- Exactly {num_questions} questions.
+- Exactly 4 options per question.
+- No facts outside the provided source.
 
-HARD RULES:
-- Return exactly {num_questions} items, no more and no less.
-- Each question MUST have exactly 4 options (no more, no less).
-- Output language must match the SOURCE LANGUAGE.
-- If the source text is English, write question, options, and explanation in English.
-- If the source text is Arabic, write them in Arabic.
-- Do not invent facts outside the source.
-- Each question must have one best answer and plausible distractors.
-- Keep explanations short.
+QUESTION TYPES TO GENERATE:
+{chr(10).join([f"- {item['slot']}. {item['type']}" for item in question_plan])}
 
-EXACT QUESTION PLAN:
-{plan_text}
+STYLE & PATTERN GUIDES:
+{style_patterns}
 
-SUBJECT COVERAGE PLAN:
-{chr(10).join([f"- {s}: {n} question(s)" for s, n in subject_allocation.items()])}
-
-QUESTION PRIORITIES:
+CONTENT PRIORITIES:
 {priority_block}
 
 DISTRACTOR RULES:
-{distractors_text}
+{chr(10).join(config['generate_distractors'])}
 
-QUESTION STYLE:
-{question_style_rule}
-
-EXPLANATION RULE:
+EXPLANATION GUIDELINES:
 {explanation_style_guidelines}
 
 SOURCE TEXT:
 {text_content}
 
-OUTPUT FORMAT:
-Return ONLY a valid JSON array.
-Each object must have:
-- question
-- options
-- correct_index
-- explanation
-- type
-- difficulty
+OUTPUT FORMAT: Return ONLY a JSON array of objects with: 
+(question, options, correct_index, explanation, type, difficulty)
 """
     return final_prompt
-
+            
