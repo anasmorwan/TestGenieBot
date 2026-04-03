@@ -18,7 +18,7 @@ def send_main_menu(chat_id, message_id=None):
     
     # النص المتغير (التحية أو مقدمة مخصصة)
     welcome_new_user = "<b>👋 مرحباً بك في TestGenie</b>\n\n"
-    welcome_returning_user = "<b>👋 مرحباً بك مجددًا في TestGenie</b>\n\nما الذي ترغب في القيام به اليوم؟\n\n"
+    welcome_returning_user = "<b>أهلاً بك، أنا Qube.. كيف يمكنني أن أختبر ذكاءك اليوم؟\n\n"
 
     
     if is_user_exist(chat_id):
