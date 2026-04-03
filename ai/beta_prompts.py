@@ -325,6 +325,7 @@ Generate exactly {num_questions} MCQs based ONLY on the SOURCE TEXT.
 
 HARD RULES:
 - Return exactly {num_questions} items, no more and no less.
+- Each question MUST have exactly 4 options (no more, no less).
 - Output language must match the SOURCE LANGUAGE.
 - If the source text is English, write question, options, and explanation in English.
 - If the source text is Arabic, write them in Arabic.
