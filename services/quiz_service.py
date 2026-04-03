@@ -31,7 +31,8 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             bot.edit_message_text(
             chat_id=user_id,
             message_id=msg_id,
-            text=selected_text
+            text=selected_text,
+            parse_mode="HTML"
             )            
         raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
         
@@ -58,7 +59,8 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             bot.edit_message_text(
             chat_id=user_id,
             message_id=msg_id,
-            text=selected_text
+            text=selected_text,
+            parse_mode="HTML"
             )            
         prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
         
