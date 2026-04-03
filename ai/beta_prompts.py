@@ -155,55 +155,63 @@ Format:
 ❌ Why not others:
 """
 
-
-def analyze_text_metadata(text_content):
+def analyze_text_metadata(text_content, allowed_subjects):
     text_content = normalize_text_content(text_content)
-
+    subjects_list = " | ".join(allowed_subjects)
     analysis_prompt = f"""
-Return ONLY a JSON object with this exact structure:
+Return ONLY a JSON object.
+Subjects allowed: {subjects_list}
+
+Structure:
 {{
 "domain": "medicine",
-"subject": "anatomy | physiology | biochemistry | pathology | pharmacology | microbiology | clinical_medicine",
+"subject": "exact subject from list",
 "concepts": ["concept1", "concept2"],
 "estimated_difficulty": "early | mid | advanced",
+"cognitive_level": "recall | application | evaluation",
 "source_mode": "textbook | mixed | case_based",
-"confidence": 0.0
+"confidence": 0.5
 }}
 
-Select subject(s) ONLY from the provided list.
-- Use exact terms only (no new labels).
-- If multiple: join with " | ".
-- If one: return it as a single string.
+STRICT RULES:
+1. Use ONLY the subjects provided above.
+2. If multiple subjects apply, join them with " | ".
+3. Cognitive Level Guide:
+   - recall: facts/definitions.
+   - application: mechanisms/understanding.
+   - evaluation: clinical judgment/decisions.
 
 Difficulty Rules (STRICT):
 - early = pure recall (definitions, lists, single facts, no reasoning)
 - mid = requires understanding OR 1-step reasoning (explain, compare, mechanism)
-- advanced = requires multi-step reasoning OR clinical decision OR case interpretation
+- advanced = requires multi-step reasoning OR decision OR case interpretation
 
 Hard constraints:
 - If NO reasoning → MUST be early
 - If ONE reasoning step → mid
-- If MULTI-step reasoning or clinical thinking → advanced
+- If MULTI-step reasoning or thinking → advanced
 - DO NOT default to mid
 
 General Rules:
-- estimated_difficulty = early for definitions, lists, basic facts, and foundation-level content.
-- estimated_difficulty = mid for conceptual or moderate reasoning content.
-- estimated_difficulty = advanced for clinical cases, management, differential diagnosis, or multi-step reasoning.
 - source_mode = textbook if the text is factual and non-case-based.
-- source_mode = case_based if the text is a patient scenario.
+- source_mode = case_based if the text is a case scenario.
 - confidence must be between 0 and 1.
 
+
 Content:
-{text_content[:1200]}
+{text_content[:1500]}
 """
-    
     raw_response = generate_smart_response(analysis_prompt)
     parsed_response = parse_llm_json(raw_response)
 
     if isinstance(parsed_response, str):  
         return json.loads(parsed_response)  
     return parsed_response
+
+
+
+    
+    
 
 
 def build_exact_question_plan(stage_weights, num_questions):
