@@ -274,19 +274,15 @@ def generate_smart_batch_prompt(text_content, num_questions=4):
     stage_weights = config["stages"][user_stage]["weights"]
     counts, question_plan = build_exact_question_plan(stage_weights, num_questions)
 
-    subject_matrix = config["subject_type_matrix"].get(detected_subject, {})
-    high_priority = ", ".join(subject_matrix.get("high", ["general concepts"]))
-    print(f"🔸 high_priority : {high_priority}", flush=True)
-    medium_priority = ", ".join(subject_matrix.get("medium", [])) or "general concepts"
-
     print(f"🔹 medium_priority : {medium_priority}", flush=True)
     distractors_text = "\n".join([f"- {rule}" for rule in config["generate_distractors"]])
-    mybot.send_message(chat_id=5048253124, text=f"beta prompt results:\n\n1.domain_name: {domain_name}\n2.detected_subject: {detected_subject}\n3. user_stage: {user_stage}\n4. text language: {source_language}\n5. subject matrix: {subject_matrix}\n 6.high_priority: {high_priority}\n\7.medium_priority: {medium_priority}")
     
     available_subjects = list(config.get("subject_type_matrix", {}).keys())
     subjects = parse_subject_field(metadata.get("subject", "general"), available_subjects=available_subjects, fallback="general")
     subject_allocation = build_subject_allocation(subjects, num_questions)
     subject_bundle = merge_subject_matrices(config, subjects)
+    mybot.send_message(chat_id=5048253124, text=f"beta prompt results:\n\n1.domain_name: {domain_name}\n2.detected_subject: {detected_subject}\n3. user_stage: {user_stage}\n4. text language: {source_language}\n5. available_subjects: {available_subjects}\n 6.subject_allocation: {subject_allocation}\n\7.subject_bundle: {subject_bundle}")
+    
 
 
     if user_stage == "early":
