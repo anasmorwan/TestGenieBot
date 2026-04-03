@@ -12,7 +12,7 @@ from bot.keyboards.premium_info_keyboard import premium_info_keyboard
 from bot.keyboards.plans_keyboard import paid_plans_keyboard
 from bot.keyboards.how_it_works_keyboard import how_it_works_keyboard
 from bot.keyboards.referral_keyboard import referral_keyboard
-from bot.keyboards.account_status_keyboard import account_status_keyboard
+from bot.keyboards.account_status_keyboard import account_status_keyboard, plan_update_keyboard_pro
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
@@ -229,8 +229,10 @@ def register(bot):
                     "expires_at": sub["expires_at"],
                     "referrals": referrals
                 })
-
-                keyboard = account_status_keyboard(user_id)
+                if is_paid_user_active(user_id):
+                    keyboard = plan_update_keyboard_pro(user_id)
+                else:
+                    keyboard = account_status_keyboard(user_id)
 
                 bot.edit_message_text(
                     chat_id=chat_id,
@@ -265,7 +267,11 @@ def register(bot):
                 })
                 message += f"\n\n⏱ آخر تحديث: {now}"
 
-                keyboard = account_status_keyboard(user_id)
+                if is_paid_user_active(user_id):
+                    keyboard = plan_update_keyboard_pro(user_id)
+                else:
+                    keyboard = account_status_keyboard(user_id)
+
 
                 try:
                     bot.edit_message_text(
