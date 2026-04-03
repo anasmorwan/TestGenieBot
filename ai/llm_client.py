@@ -78,6 +78,7 @@ def generate_smart_response(prompt: str) -> str:
 
             if response and response.text:
                 logging.info("✅ Success with Cohere.")
+                print("✅ Success with Cohere", flush=True)
                 return response.text.strip()
 
             logging.warning("❌ Cohere returned empty response. Trying fallback...")
@@ -98,6 +99,7 @@ def generate_smart_response(prompt: str) -> str:
 
             if response and response.text:
                 logging.info("✅ Success with Gemini.")
+                print("✅ Success with Gemini", flush=True)
                 return response.text.strip()
 
             logging.warning("❌ Gemini returned empty response. Trying fallback...")
@@ -121,6 +123,7 @@ def generate_smart_response(prompt: str) -> str:
 
             if result:
                 logging.info("✅ Success with Groq.")
+                print("✅ Success with Groq", flush=True)
                 return result.strip()
 
             logging.warning("❌ Groq returned empty response. Trying fallback...")
@@ -161,6 +164,7 @@ def generate_smart_response(prompt: str) -> str:
 
             if result_text:
                 logging.info("✅ Success with OpenRouter.")
+                print("✅ Success with OpenRouter", flush=True)
                 return result_text.strip()
 
             logging.warning("❌ OpenRouter returned empty response.")
