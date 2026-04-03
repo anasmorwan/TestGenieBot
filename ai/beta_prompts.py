@@ -4,12 +4,121 @@ from ai.llm_client import generate_smart_response
 from utils.json_utils import parse_llm_json
 from bot.bot_instance import mybot
 
+
+
 def normalize_text_content(text_content):
     if isinstance(text_content, tuple):
         return " ".join(map(str, text_content))
     if text_content is None:
         return ""
     return str(text_content)
+
+
+def canonicalize_key(value):
+    """
+    Convert any text to a stable config key:
+    - lowercase
+    - trim
+    - normalize spaces/dashes
+    - convert separators to underscore
+    """
+    value = normalize_text_content(value).strip().lower()
+    value = re.sub(r"[\s\-]+", " ", value)
+    value = re.sub(r"\s+", " ", value)
+    return value.replace(" ", "_")
+
+
+def parse_subject_field(subject_value, available_subjects=None, fallback="general"):
+    """
+    Accepts:
+    - "anatomy | pathology"
+    - "anatomy/pathology"
+    - ["anatomy", "pathology"]
+
+    Returns normalized subjects matched against available_subjects if provided.
+    """
+    if isinstance(subject_value, list):
+        raw_parts = subject_value
+    else:
+        text = normalize_text_content(subject_value)
+        raw_parts = re.split(r"\s*[|,/;&]\s*|\s+\band\b\s+", text, flags=re.IGNORECASE)
+
+    available_map = {}
+    if available_subjects:
+        for s in available_subjects:
+            available_map[canonicalize_key(s)] = s
+
+    cleaned = []
+    for part in raw_parts:
+        key = canonicalize_key(part)
+        if not key:
+            continue
+
+        # If config has this key, use the exact config key
+        if available_map:
+            matched = available_map.get(key)
+            if matched and matched not in cleaned:
+                cleaned.append(matched)
+        else:
+            if key not in cleaned:
+                cleaned.append(key)
+
+    return cleaned or [fallback]
+
+
+def build_subject_allocation(subjects, num_questions):
+    """
+    Fair split across multiple subjects.
+    """
+    subjects = subjects or ["general"]
+    base = num_questions // len(subjects)
+    remainder = num_questions % len(subjects)
+
+    allocation = {s: base for s in subjects}
+    for i, s in enumerate(subjects):
+        if i < remainder:
+            allocation[s] += 1
+
+    return allocation
+
+
+def merge_subject_matrices(config, subjects):
+    """
+    Merge high/medium/low priorities across multiple subjects.
+    """
+    high, medium, low = [], [], []
+    subject_blocks = []
+
+    for subject in subjects:
+        matrix = config.get("subject_type_matrix", {}).get(subject, {})
+        s_high = matrix.get("high", [])
+        s_medium = matrix.get("medium", [])
+        s_low = matrix.get("low", [])
+
+        high.extend(s_high)
+        medium.extend(s_medium)
+        low.extend(s_low)
+
+        subject_blocks.append(
+            f"- {subject}: high = {', '.join(s_high) if s_high else 'general concepts'}; "
+            f"medium = {', '.join(s_medium) if s_medium else 'general concepts'}"
+        )
+
+    def dedupe(items):
+        seen = set()
+        out = []
+        for x in items:
+            if x not in seen:
+                seen.add(x)
+                out.append(x)
+        return out
+
+    return {
+        "high": dedupe(high) or ["general concepts"],
+        "medium": dedupe(medium) or ["general concepts"],
+        "low": dedupe(low),
+        "subject_blocks": subject_blocks,
+    }
 
 
 def detect_source_language(text_content):
@@ -42,7 +151,7 @@ def analyze_text_metadata(text_content):
 Return ONLY a JSON object with this exact structure:
 {{
   "domain": "medicine",
-  "subject": "anatomy | physiology | biochemistry | pathology | pharmacology | microbiology | clinical_medicine",
+  "subject": "one or more subjects separated by | when needed",
   "concepts": ["concept1", "concept2"],
   "estimated_difficulty": "early | mid | advanced",
   "source_mode": "textbook | mixed | case_based",
@@ -50,6 +159,7 @@ Return ONLY a JSON object with this exact structure:
 }}
 
 Rules:
+- If the text spans more than one subject, return them separated by |, for example: "anatomy | pathology".
 - estimated_difficulty = early for definitions, lists, basic facts, and foundation-level content.
 - estimated_difficulty = mid for conceptual or moderate reasoning content.
 - estimated_difficulty = advanced for clinical cases, management, differential diagnosis, or multi-step reasoning.
@@ -172,6 +282,11 @@ def generate_smart_batch_prompt(text_content, num_questions=4):
     distractors_text = "\n".join([f"- {rule}" for rule in config["generate_distractors"]])
     mybot.send_message(chat_id=5048253124, text=f"beta prompt results:\n\n1.domain_name: {domain_name}\n2.detected_subject: {detected_subject}\n3. user_stage: {user_stage}\n4. text language: {source_language}\n5. subject matrix: {subject_matrix}\n 6.high_priority: {high_priority}\n\7.medium_priority: {medium_priority}")
     
+    available_subjects = list(config.get("subject_type_matrix", {}).keys())
+    subjects = parse_subject_field(metadata.get("subject", "general"), available_subjects=available_subjects, fallback="general")
+    subject_allocation = build_subject_allocation(subjects, num_questions)
+    subject_bundle = merge_subject_matrices(config, subjects)
+
 
     if user_stage == "early":
         question_style_rule = (
@@ -196,7 +311,7 @@ def generate_smart_batch_prompt(text_content, num_questions=4):
 SYSTEM ROLE: You are an expert {config['title']} Education Specialist.
 
 CONTEXT:
-- Subject: {detected_subject}
+- Subjects: {", ".join(subjects)}
 - Student stage: {user_stage}
 - Source mode: {metadata.get('source_mode', 'textbook')}
 - Source language: {source_language}
@@ -217,9 +332,8 @@ HARD RULES:
 EXACT QUESTION PLAN:
 {plan_text}
 
-QUESTION PRIORITIES:
-- High priority: {high_priority}
-- Medium priority: {medium_priority}
+SUBJECT COVERAGE PLAN:
+{chr(10).join([f"- {s}: {n} question(s)" for s, n in subject_allocation.items()])}
 
 DISTRACTOR RULES:
 {distractors_text}
