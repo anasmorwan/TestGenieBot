@@ -17,7 +17,6 @@ def init_db():
         user_id INTEGER PRIMARY KEY,
         last_text TEXT,
         specialty TEXT,
-        correct_count INTEGER DEFAULT 0,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
@@ -31,6 +30,7 @@ def init_db():
         correct_index INTEGER,
         explanation TEXT,
         fail_count INTEGER DEFAULT 1,
+        correct_count INTEGER DEFAULT 0,
         last_failed TEXT
     )
     """)
