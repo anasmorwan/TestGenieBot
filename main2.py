@@ -67,7 +67,7 @@ poll_answer_handler.register(mybot)
 chat_shared_handler.register(mybot)
 
 migrate_users_to_trap()
-send_daily_engagement()
+send_daily_message()
 
 
 
