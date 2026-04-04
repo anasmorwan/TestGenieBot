@@ -57,6 +57,7 @@ class QuizManager:
                 "questions": questions,
                 "index": 0,
                 "score": 0,
+                "extended": False,
                 "quiz_code": quiz_code,
                 "wrong_count": 0,
                 "is_shared_user": is_shared_user   # ✅ أضف هذا السطر
@@ -281,7 +282,7 @@ class QuizManager:
         feedback_line = get_feedback_line(score, total)
         streak, xp = update_progress(chat_id)
         weakness_line = get_weakness_line(chat_id, wrong)
-        prepared_text = build_result_message(user_id, score, total, streak, xp)
+        prepared_text = build_result_message(chat_id, score, total, streak, xp)
         
 
         
@@ -383,5 +384,14 @@ class QuizManager:
 
 
 quiz_manager = QuizManager()
+"""
+remaining = len(state["questions"]) - state["index"]
 
+if remaining == 1 and not state.get("extended"):
+    new_questions = get_generated_questions(user_id)
 
+    if new_questions:
+        state["questions"].extend(new_questions)
+        state["extended"] = True
+
+"""
