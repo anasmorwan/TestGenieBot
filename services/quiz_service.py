@@ -5,7 +5,7 @@ from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
 from storage.messages import get_message
-
+from storage.session_store import user_messages_remaining
 
 import random
 import threading
@@ -23,7 +23,7 @@ messages = [
     get_message("FINAL_FILE_MSG3")
 ]
 
-user_messages_remaining = {}
+
 
 
 
