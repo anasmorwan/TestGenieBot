@@ -203,7 +203,7 @@ class QuizManager:
         q = state["questions"][state["index"]]
 
         if state.get("source") == "mistakes_pool":   
-            if is_correct:
+            if selected_option == q.correct_index:
                 # إذا أجاب صح على سؤال كان خطأ سابقاً، نزيد عداد الإتقان
                 self.increment_correct_count(chat_id, q.question)
             else:
