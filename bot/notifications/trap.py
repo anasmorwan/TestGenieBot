@@ -23,7 +23,7 @@ def send_streak(user_id, streak, xp):
 
 
 
-def send_daily_engagement():
+def send_daily_message():
     user_ids = [5048253124, 6948343253]
     for user_id in user_ids:
         
@@ -34,7 +34,16 @@ def send_daily_engagement():
         user_streak[user_id] = date.today()
 
 
-
+def send_daily_challenge(review_count, new_count, challenge_count):
+                
+    if review_count > 0:
+        mistakes = get_recent_mistakes(user_id, review_count)
+                    
+        QuizManager.start_mistakes_review(chat_id, mistakes, bot)
+    if new_count > 0:
+        pass
+    if challenge_count > 0:
+        pass
                 
 
 def get_all_user_ids():
