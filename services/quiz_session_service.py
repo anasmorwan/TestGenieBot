@@ -64,6 +64,19 @@ class QuizManager:
 
         return True
 
+    def start_mistakes_review(self, chat_id, questions, bot):
+        # هذه دالة جديدة تبدأ اختباراً من الأخطاء فقط
+        with self.lock:
+            self.sessions[chat_id] = {
+                "questions": questions,
+                "index": 0,
+                "score": 0,
+                "source": "mistakes_pool", # 👈 هنا نضع العلامة
+                "quiz_code": "REVIEW_MODE"
+            }
+        self.send_current_question(chat_id, bot)
+    
+
     def load_quiz(self, quiz_code):
         with self.lock:
             conn = get_connection()
@@ -101,6 +114,7 @@ class QuizManager:
 
         self.send_quiz_poll(bot, chat_id, q)
 
+        
     def save_mistake(self, user_id, q_obj):
         conn = get_connection()
         c = conn.cursor()
@@ -126,6 +140,44 @@ class QuizManager:
     
         conn.commit()
         conn.close()
+
+    
+    def increment_correct_count(self, user_id, question_text):
+        conn = get_connection()
+        c = conn.cursor()
+    
+        # زيادة العداد
+        c.execute("""
+            UPDATE user_mistakes 
+            SET correct_count = correct_count + 1 
+            WHERE user_id = ? AND question_text = ?
+        """, (user_id, question_text))
+    
+        # حذف الأسئلة التي أتقنها المستخدم (أجاب عليها صح مرتين مثلاً)
+        c.execute("DELETE FROM user_mistakes WHERE correct_count >= 2")
+    
+        conn.commit()
+        conn.close()
+
+    
+    def reset_correct_count(self, user_id, question_text):
+        """إعادة تعيين عداد الإتقان للصفر لأن المستخدم أخطأ في السؤال مجدداً"""
+        conn = get_connection()
+        c = conn.cursor()
+        try:
+            c.execute("""
+                UPDATE user_mistakes 
+                SET correct_count = 0, 
+                   last_failed = ? 
+                WHERE user_id = ? AND question_text = ?
+            """, (datetime.now().isoformat(), user_id, str(question_text)))
+            conn.commit()
+        except Exception as e:
+            print(f"❌ Error resetting count: {e}")
+        finally:
+            conn.close()
+        
+    
     
     
 
@@ -139,12 +191,21 @@ class QuizManager:
 
         q = state["questions"][state["index"]]
 
+        if state.get("source") == "mistakes_pool":   
+            if is_correct:
+                # إذا أجاب صح على سؤال كان خطأ سابقاً، نزيد عداد الإتقان
+                self.increment_correct_count(chat_id, q.question)
+            else:
+                # إذا أخطأ فيه مجدداً، نعيد تصفير العداد لضمان بقائه في التدريب
+                self.reset_correct_count(chat_id, q.question)
+        else:
+            # إذا كان اختباراً عادياً (ليس مراجعة) وأخطأ المستخدم
+            if not is_correct:
+                self.save_mistake(chat_id, q)
+            
+
         if selected_option == q.correct_index:
             state["score"] += 1
-
-        else:
-            # 🔴 هنا نسجل الخطأ
-            self.save_mistake(chat_id, q)
 
         state["index"] += 1
 
@@ -275,3 +336,5 @@ class QuizManager:
 
 
 quiz_manager = QuizManager()
+
+
