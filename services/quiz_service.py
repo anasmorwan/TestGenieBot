@@ -64,7 +64,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         selected_text = get_unique_random_message(user_id)
         
         # دالة Pro ترجع قاموساً فيه metadata و questions
-        prompt = generate_smart_batch_prompt(content, num_questions=question_count)
+        prompt = generate_smart_batch_prompt(user_id, content, num_questions=question_count)
         if msg_id:
                         
             bot.edit_message_text(
