@@ -112,8 +112,8 @@ def build_pro_quiz_prompt(content: str, num_questions: int, lang: str) -> str:
 Return ONLY a JSON object in this structure:
 
 {{
-  "domain": "e.g: Medicine",
   "metadata": {{
+    "domain": "e.g: Medicine",
     "topics": ["..."],
     "difficulty": "Medium",
     "discipline": "..."
