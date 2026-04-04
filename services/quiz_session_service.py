@@ -201,9 +201,10 @@ class QuizManager:
         shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
 
         q = state["questions"][state["index"]]
+        is_correct = (selected_option == q.correct_index) 
 
         if state.get("source") == "mistakes_pool":   
-            if selected_option == q.correct_index:
+            if is_correct:
                 # إذا أجاب صح على سؤال كان خطأ سابقاً، نزيد عداد الإتقان
                 self.increment_correct_count(chat_id, q.question)
             else:
