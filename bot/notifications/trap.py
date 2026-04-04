@@ -2,6 +2,8 @@ from bot.bot_instance import mybot
 from services.user_trap import should_show_daily, update_progress
 from storage.sqlite_db import get_connection
 from storage.session_store import user_streak
+from datetime import timedelta, datetime, date
+
 
 
 def send_daily_engagement():
@@ -9,17 +11,19 @@ def send_daily_engagement():
     for user_id in user_ids:
         if should_show_daily(user_id):
             try:
+                send_streak()
                 mybot.send_message(chat_id=user_id, text="🔥 تحدي اليوم جاهز!")
-                user_streak[user_id] = 
+                user_streak[user_id] = date.today()
+                
             except Exception as e:
                 print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
         
 
 def send_streak():
-    user_ids = get_all_user_ids(cursor)
+    user_ids = get_all_user_ids()
         for user_id in user_ids:
-            streak, xp = update_progress(...)
-            send(f"🔥 streak: {streak} | +{xp} XP")
+            streak, xp = update_progress(user_id, )
+            mybot.send_message(chat_id=user_id, text=f"🔥 streak: {streak} | +{xp} XP")
 
 
 
