@@ -6,8 +6,8 @@ from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
 from storage.messages import get_message
 from storage.session_store import user_messages_remaining
-from storage.sqlite_db import update_user_major, save_user_knowledge
-
+from storage.sqlite_db import update_user_major
+from services.user_trap import save_user_knowledge
 import random
 import threading
 import time
