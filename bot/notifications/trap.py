@@ -3,10 +3,17 @@ from services.user_trap import should_show_daily
 from storage.sqlite_db import get_connection
 
 
-if should_show_daily(user_id):
-    user_ids = get_all_user_ids(cursor)
-    for user_id in user_ids
-    mybot.send_message(chat_id =user_id, "🔥 تحدي اليوم جاهز!")
+def send_daily_challenge():
+    if should_show_daily(user_id):
+        try:
+            user_ids = get_all_user_ids(cursor)
+            for user_id in user_ids
+            mybot.send_message(chat_id =user_id, "🔥 تحدي اليوم جاهز!")
+        
+        except Exception as e:
+            print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
+        
+        
 
 
 def get_all_user_ids():
