@@ -12,6 +12,30 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_knowledge (
+        user_id INTEGER PRIMARY KEY,
+        last_text TEXT,
+        specialty TEXT,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_mistakes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        question_text TEXT,
+        options TEXT, -- JSON string
+        correct_index INTEGER,
+        explanation TEXT,
+        fail_count INTEGER DEFAULT 1,
+        last_failed TEXT
+    )
+    """)
+    
+    
+
     # جدول لتخزين نقاط التخصصات لكل مستخدم
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_interests (
