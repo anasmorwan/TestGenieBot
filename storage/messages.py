@@ -25,7 +25,7 @@ MESSAGES = {
             "<b>⚡ +{xp} XP</b>\n\n"
             "<b>👇 ضعف في:</b> {weakness_line}\n\n"
             "👇 لا تفقد تقدمك:"
-        )
+        ),
         
         "UX_TEXT": (
             "<b>💠 أهلاً بك في Qube</b>\n\n"
