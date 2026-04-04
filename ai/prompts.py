@@ -384,7 +384,8 @@ Output JSON format:
   {
     "question": "...",
     "options": ["A", "B", "C", "D"],
-    "correct_index": 0
+    "correct_index": 0,
+    "domain" "e.g: Medicine"
   }
 ]
 
