@@ -70,7 +70,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         
         threading.Thread(
             target=delayed_message,
-            args=(bot, user_id, 5, selected_text)
+            args=(bot, user_id, 3, selected_text)
         ).start()
 
 
