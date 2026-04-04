@@ -378,20 +378,19 @@ Rules:
 """.strip()
 
 QUIZ_FORMAT = """
-Output JSON format:
-
-[
-  {
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "correct_index": 0,
-    "domain" "e.g: Medicine"
-  }
-]
-
-Return ONLY valid JSON.
-No markdown.
+{
+  "domain": "Medicine",
+  "questions": [
+    {
+      "question": "...",
+      "options": ["A", "B", "C", "D"],
+      "correct_index": 0
+    }
+  ]
+}
+Return ONLY valid JSON. No markdown.
 """.strip()
+
 
 
     
