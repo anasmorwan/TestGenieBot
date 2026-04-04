@@ -214,7 +214,8 @@ def build_result_message(user_id, score, total, streak, xp):
 
 
 
-
+def send_daily_challenge():
+    
 
 def get_dynamic_level(user_id):
     conn = get_connection()
