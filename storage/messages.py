@@ -238,10 +238,25 @@ MESSAGES = {
     }
 }
 
+def get_message(key, lang="ar", **kwargs):
+    text = MESSAGES.get(lang, {}).get(key, key)
+    try:
+        # استبدل {variable} بالقيم مع حماية القيم التي تحتوي على {}
+        return text.format_map(SafeDict(**kwargs))
+    except KeyError:
+        return text
 
+class SafeDict(dict):
+    """قاموس آمن لا يفسر الأقواس في القيم"""
+    def __missing__(self, key):
+        return '{' + key + '}'
+
+"""
 def get_message(key, lang="ar", **kwargs):
     text = MESSAGES.get(lang, {}).get(key, key)
     try:
         return text.format(**kwargs)
     except KeyError:
+
+"""
         return text
