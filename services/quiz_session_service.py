@@ -270,20 +270,18 @@ class QuizManager:
         total = len(state["questions"])
         quiz_code = state.get("quiz_code")   
         shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
-        text = f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
-
+        
 
         
         if not is_paid_user_active(chat_id) and not shared:
-            extra_quiz_msg = get_message("QUIZ_LIMIT")
-            if extra_quiz_msg:
-                text += f"\n\n{extra_quiz_msg}"
-
+            feedback_line =
+            streak, xp =
+            weakness_line =
             keyboard = share_quiz_button(quiz_code)
             try:
                 bot.send_message(
                     chat_id=chat_id,
-                    text=text,
+                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line)
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
