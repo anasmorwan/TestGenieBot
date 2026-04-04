@@ -121,6 +121,21 @@ class QuizManager:
     
         options_json = json.dumps(q_obj.options)
     
+        # التحقق: هل المستخدم غير نشط (مجاني)؟
+        if not is_paid_user_active(user_id):
+            # للمستخدم المجاني: احسب عدد أخطائه أولاً
+            c.execute("""
+                SELECT COUNT(*) FROM user_mistakes 
+                WHERE user_id = ?
+            """, (user_id,))
+        
+            mistake_count = c.fetchone()[0]
+        
+            # إذا وصل للحد الأقصى (10)، لا تحفظ الخطأ الجديد
+            if mistake_count >= 10:
+                conn.close()
+                return False  # لم يتم الحفظ
+    
         # محاولة التحديث أولاً
         c.execute("""
             UPDATE user_mistakes 
@@ -140,6 +155,7 @@ class QuizManager:
     
         conn.commit()
         conn.close()
+        return True
 
     
     def increment_correct_count(self, user_id, question_text):
