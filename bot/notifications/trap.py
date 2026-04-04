@@ -4,6 +4,7 @@ from storage.sqlite_db import get_connection
 from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
 from bot.keyboards.actions_keyboard import streak_keyboard
+from services.quiz_session_service import QuizManager
 
 
 def send_streak(user_id, streak, xp):
