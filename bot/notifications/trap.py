@@ -7,7 +7,8 @@ from bot.keyboards.actions_keyboard import streak_keyboard
 
 
 def send_streak(user_id, streak, xp):
-    keyboard = streak_keyboard()
+    quiz_code = "quiz_sample"
+    keyboard = streak_keyboard(quiz_code)
     text = f"🔥 <b>تحدي اليوم جاهز!</b>\n\n💡 هل يمكنك الحفاظ على سلسلة 🔥 <b>{streak}</b> أيام؟\n\nابدأ الآن واختبر نفسك 👇"
     
     # user_ids = get_all_user_ids(cursor)   
