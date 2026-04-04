@@ -4,7 +4,8 @@ import json
 from ai.llm_client import generate_smart_response
 from utils.json_utils import parse_llm_json
 from bot.bot_instance import mybot
-from storage.sqlite_db import update_user_major, save_user_knowledge
+from storage.sqlite_db import update_user_major
+from services.user_trap import save_user_knowledge
 
 admin_id = 5048253124
 
