@@ -58,6 +58,7 @@ class QuizManager:
                 "index": 0,
                 "score": 0,
                 "quiz_code": quiz_code,
+                "wrong_count": 0,
                 "is_shared_user": is_shared_user   # ✅ أضف هذا السطر
             }
         
@@ -74,6 +75,7 @@ class QuizManager:
                 "questions": questions,
                 "index": 0,
                 "score": 0,
+                "wrong_count": 0,
                 "source": "mistakes_pool", # 👈 هنا نضع العلامة
                 "quiz_code": "REVIEW_MODE"
             }
@@ -225,8 +227,12 @@ class QuizManager:
         # إذا لم يُمرر is_shared_user كمعامل، نقرأه من الجلسة
         shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
 
+        
+
         q = state["questions"][state["index"]]
         is_correct = (selected_option == q.correct_index) 
+        if not is_correct:
+            state["wrong_count"] += 1   # 👈 احسب الأخطاء هنا
 
         if state.get("source") == "mistakes_pool":   
             if is_correct:
