@@ -6,7 +6,7 @@ from storage.sqlite_db import get_connection
 if should_show_daily(user_id):
     user_ids = get_all_user_ids(cursor)
     for user_id in user_ids
-    mybot.send_message(chat_id =user_id, )
+    mybot.send_message(chat_id =user_id, "🔥 تحدي اليوم جاهز!")
 
 
 def get_all_user_ids():
