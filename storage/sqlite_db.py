@@ -391,7 +391,7 @@ def get_recent_mistakes(user_id, limit=10):
         mistakes.append({
             "id": row[0],
             "questions": {
-                "question_text": row[1],
+                "question": row[1],
                 "options": json.loads(row[2]),
                 "correct_index": row[3],
                 "explanation": row[4]
