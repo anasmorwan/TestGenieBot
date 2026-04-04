@@ -5,6 +5,8 @@ from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
 from bot.keyboards.actions_keyboard import streak_keyboard
 from services.quiz_session_service import QuizManager
+import threading
+from services.quiz_service import generate_quizzes_from_text
 
 
 def send_streak(user_id, streak, xp):
@@ -36,11 +38,14 @@ def send_daily_message():
 
 
 def send_daily_challenge(review_count, new_count, challenge_count):
-                
+
+    threading.Thread(target=generate_quizzes_from_text, args=(user_id,)).start()
+    
     if review_count > 0:
         mistakes = get_recent_mistakes(user_id, review_count)
                     
         QuizManager.start_mistakes_review(chat_id, mistakes, bot)
+        
     if new_count > 0:
         pass
     if challenge_count > 0:
