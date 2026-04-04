@@ -113,6 +113,7 @@ Return ONLY a JSON object in this structure:
 
 {{
   "metadata": {{
+    "domain": "e.g: Medicine",
     "topics": ["..."],
     "difficulty": "Medium",
     "discipline": "..."
