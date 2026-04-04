@@ -67,7 +67,7 @@ class QuizManager:
 
     def start_mistakes_review(self, chat_id, object, bot):
         # هذه دالة جديدة تبدأ اختباراً من الأخطاء فقط
-        questions = object.get("question_text")
+        questions = object.get("questions")
         with self.lock:
             self.sessions[chat_id] = {
                 "questions": questions,
