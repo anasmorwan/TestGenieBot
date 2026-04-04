@@ -182,6 +182,23 @@ def init_db():
     conn.commit()
     conn.close()
 
+def save_mistake(self, user_id, q_obj):
+    conn = get_connection()
+    c = conn.cursor()
+    
+    # تحويل الخيارات إلى نص JSON ليتم تخزينها
+    options_json = json.dumps(q_obj.options)
+    
+    # استخدام INSERT OR REPLACE أو تحديث عداد الفشل
+    c.execute("""
+        INSERT INTO user_mistakes (user_id, question_text, options, correct_index, explanation, last_failed)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (user_id, q_obj.question, options_json, q_obj.correct_index, q_obj.explanation, datetime.now().isoformat()))
+    
+    conn.commit()
+    conn.close()
+
+
 
 def table_exists(table):
     """التحقق من وجود جدول في قاعدة البيانات"""
