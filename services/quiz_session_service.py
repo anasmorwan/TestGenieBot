@@ -280,7 +280,7 @@ class QuizManager:
         shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
         feedback_line = get_feedback_line(score, total)
         streak, xp = update_progress(chat_id)
-        weakness_line = get_weakness_line(chat_ud, wrong)
+        weakness_line = get_weakness_line(chat_id, wrong)
         prepared_text = build_result_message(user_id, score, total, streak, xp)
         
 
