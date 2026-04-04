@@ -3,6 +3,7 @@
 import sqlite3
 import json
 from datetime import datetime, timedelta
+from services.usage import is_paid_user_active
 
 DB_PATH = "quiz_users.db"
 
