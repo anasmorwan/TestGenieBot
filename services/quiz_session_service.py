@@ -105,17 +105,28 @@ class QuizManager:
         conn = get_connection()
         c = conn.cursor()
     
-        # تحويل الخيارات إلى نص JSON ليتم تخزينها
         options_json = json.dumps(q_obj.options)
     
-        # استخدام INSERT OR REPLACE أو تحديث عداد الفشل
+        # محاولة التحديث أولاً
         c.execute("""
-            INSERT INTO user_mistakes (user_id, question_text, options, correct_index, explanation, last_failed)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (user_id, q_obj.question, options_json, q_obj.correct_index, q_obj.explanation, datetime.now().isoformat()))
+            UPDATE user_mistakes 
+            SET options = ?, correct_index = ?, explanation = ?, 
+                last_failed = ?, fail_count = fail_count + 1
+            WHERE user_id = ? AND question_text = ?
+        """, (options_json, q_obj.correct_index, q_obj.explanation, 
+              datetime.now().isoformat(), user_id, q_obj.question))
+    
+        # إذا لم يتم تحديث أي صف (يعني السؤال غير موجود)
+        if c.rowcount == 0:
+            c.execute("""
+                INSERT INTO user_mistakes (user_id, question_text, options, correct_index, explanation, last_failed, fail_count)
+                VALUES (?, ?, ?, ?, ?, ?, 1)
+            """, (user_id, q_obj.question, options_json, q_obj.correct_index, 
+                  q_obj.explanation, datetime.now().isoformat()))
     
         conn.commit()
         conn.close()
+    
     
 
     def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
