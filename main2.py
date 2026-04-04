@@ -10,7 +10,7 @@ from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import safe_add_column, safe_add_table
 from bot.handlers import chat_shared_handler 
 from bot.handlers import admin_commands, bot_commands
-
+from bot.notifications.trap import send_daily_engagement
 print("main starting...", flush=True)
 
 
@@ -67,7 +67,7 @@ poll_answer_handler.register(mybot)
 chat_shared_handler.register(mybot)
 
 
-
+send_daily_engagement()
 
 
 
