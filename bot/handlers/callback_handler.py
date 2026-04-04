@@ -19,7 +19,7 @@ from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat, log_quiz_share, is_quiz_expired
 from bot.handlers.chat_shared_handler import publish_interactive_link
 from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
-
+from services.quiz_session import QuizManager 
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
@@ -176,6 +176,7 @@ def register(bot):
                 if distribution["review_count"] > 0:
                     mistakes = get_recent_mistakes(user_id, distribution["review_count"])
                     quiz["review_questions"] = mistakes
+                    QuizManager.start_mistakes_review()
                 
 
             if data.startswith("start_quiz"):
