@@ -63,7 +63,7 @@ def init_db():
     )
     """)
     cursor.execute("""
-    CREATE TABLE quiz_history (
+    CREATE TABLE IF NOT EXISTS quiz_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
     correct_answers INTEGER,
