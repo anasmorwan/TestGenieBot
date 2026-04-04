@@ -10,7 +10,7 @@ def get_or_create_user(user_id):
     conn = get_connection()
     cursor = conn.cursor()
     
-    cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
+    cursor.execute("SELECT * FROM users_trap WHERE user_id=?", (user_id,))
     user = cursor.fetchone()
     if not user:
         cursor.execute(
@@ -45,7 +45,7 @@ def is_yesterday(date_str):
 def update_progress(user_id, correct, total):
     conn = get_connection()
     cursor = conn.cursor()
-    cursor.execute("SELECT streak, last_quiz_date, xp FROM users WHERE user_id=?", (user_id,))
+    cursor.execute("SELECT streak, last_quiz_date, xp FROM users_trap WHERE user_id=?", (user_id,))
     streak, last_date, xp = cursor.fetchone()
 
     today = str(date.today())
@@ -63,7 +63,7 @@ def update_progress(user_id, correct, total):
     xp += gained_xp
 
     cursor.execute("""
-        UPDATE users 
+        UPDATE users_trap
         SET streak=?, last_quiz_date=?, xp=?
         WHERE user_id=?
     """, (streak, today, xp, user_id))
