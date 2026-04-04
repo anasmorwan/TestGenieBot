@@ -1,6 +1,8 @@
 # storage/sqlite_db.py
 
 import sqlite3
+import json
+from datetime import datetime, timedelta
 
 DB_PATH = "quiz_users.db"
 
@@ -302,6 +304,141 @@ def log_new_user():
     )
     conn.commit()
 
+
+
+def get_user_mistakes_stats(user_id):
+    """ترجع إحصائيات الأخطاء للمستخدم"""
+    conn = get_connection()
+    c = conn.cursor()
+    
+    # العدد الإجمالي للأخطاء الفريدة (سؤال واحد يحسب مرة)
+    c.execute("""
+        SELECT COUNT(*) FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0
+    """, (user_id,))
+    
+    total_mistakes = c.fetchone()[0]
+    
+    # الأخطاء الحديثة (آخر 7 أيام)
+    week_ago = (datetime.now() - timedelta(days=7)).isoformat()
+    c.execute("""
+        SELECT COUNT(*) FROM user_mistakes 
+        WHERE user_id = ? AND last_failed > ?
+    """, (user_id, week_ago))
+    
+    recent_mistakes = c.fetchone()[0]
+    
+    # متوسط تكرار الخطأ لكل سؤال
+    c.execute("""
+        SELECT AVG(fail_count) FROM user_mistakes 
+        WHERE user_id = ?
+    """, (user_id,))
+    
+    avg_fail = c.fetchone()[0] or 0
+    
+    conn.close()
+    
+    return {
+        "total_mistakes": total_mistakes,
+        "recent_mistakes": recent_mistakes,
+        "avg_fail_count": round(avg_fail, 2)
+    }
+
+def get_user_mistakes_by_age(user_id):
+    """ترجع الأخطاء مرتبة حسب القدم (الأقدم أولاً)"""
+    conn = get_connection()
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, question_text, options, correct_index, explanation, 
+               fail_count, last_failed, created_at
+        FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0
+        ORDER BY created_at ASC
+    """, (user_id,))
+    
+    mistakes = []
+    for row in c.fetchall():
+        mistakes.append({
+            "id": row[0],
+            "question_text": row[1],
+            "options": json.loads(row[2]),
+            "correct_index": row[3],
+            "explanation": row[4],
+            "fail_count": row[5],
+            "last_failed": row[6],
+            "created_at": row[7]
+        })
+    
+    conn.close()
+    return mistakes
+
+def get_recent_mistakes(user_id, limit=10):
+    """ترجع أحدث الأخطاء للمراجعة"""
+    conn = get_connection()
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT id, question_text, options, correct_index, explanation, fail_count
+        FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0
+        ORDER BY last_failed DESC
+        LIMIT ?
+    """, (user_id, limit))
+    
+    mistakes = []
+    for row in c.fetchall():
+        mistakes.append({
+            "id": row[0],
+            "question_text": row[1],
+            "options": json.loads(row[2]),
+            "correct_index": row[3],
+            "explanation": row[4],
+            "fail_count": row[5]
+        })
+    
+    conn.close()
+    return mistakes
+
+def get_question_distribution(user_id, total_questions=10):
+    """تحديد نسبة الأسئلة حسب حالة المستخدم"""
+    stats = get_user_mistakes_stats(user_id)
+    
+    mistakes_count = stats["total_mistakes"]
+    recent_count = stats["recent_mistakes"]
+    
+    # تحديد الحالة
+    if mistakes_count >= 5:  # أخطاء كثيرة
+        # 🟢 الحالة 1: أخطاء كثيرة
+        review_percent = 0.40
+        new_percent = 0.40
+        challenge_percent = 0.20
+        
+    elif mistakes_count > 0:  # أخطاء قليلة
+        # 🟡 الحالة 2: أخطاء قليلة
+        review_percent = 0.20
+        new_percent = 0.60
+        challenge_percent = 0.20
+        
+    else:  # لا توجد أخطاء
+        # 🔴 الحالة 3: لا توجد أخطاء
+        review_percent = 0.00
+        new_percent = 0.80
+        challenge_percent = 0.20
+    
+    # حساب العدد الفعلي
+    review_count = round(total_questions * review_percent)
+    new_count = round(total_questions * new_percent)
+    challenge_count = total_questions - review_count - new_count
+    
+    return {
+        "status": "many_mistakes" if mistakes_count >= 5 else "few_mistakes" if mistakes_count > 0 else "no_mistakes",
+        "review_count": review_count,
+        "new_count": new_count,
+        "challenge_count": challenge_count,
+        "total_mistakes": mistakes_count,
+        "recent_mistakes": recent_count
+    }
 
 
 # --------------------------
