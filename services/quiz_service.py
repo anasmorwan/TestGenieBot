@@ -120,9 +120,10 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         
 
         
-        quizzes = parse_llm_json(raw_response)
-        detected_domain = quizzes.get("domain")
+        response_data = parse_llm_json(raw_response)
+        detected_domain = response_data.get("domain", "General")
         update_user_major(user_id, detected_domain)
+        quizzes = response_data.get("questions", [])
         
 
         
@@ -130,6 +131,3 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             return []
             
         return quizzes[:num_quizzes]
-
-
-
