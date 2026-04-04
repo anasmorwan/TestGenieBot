@@ -12,6 +12,7 @@ from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_v
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
 from bot.keyboards.quiz_buttons import share_quiz_button
 from services.usage import is_paid_user_active
+from services.user_trap import update_progress
 import random
 import time
 
@@ -270,13 +271,15 @@ class QuizManager:
         total = len(state["questions"])
         quiz_code = state.get("quiz_code")   
         shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
+        feedback_line =
+        streak, xp = update_progress(user_id)
+        weakness_line =
         
 
         
         if not is_paid_user_active(chat_id) and not shared:
-            feedback_line =
-            streak, xp =
-            weakness_line =
+            
+            
             keyboard = share_quiz_button(quiz_code)
             try:
                 bot.send_message(
