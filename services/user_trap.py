@@ -38,13 +38,24 @@ def save_user_knowledge(user_id, last_text, specialty):
             """, (user_id, count - 10))
     
     else:
-        # المستخدم العادي: يخزن آخر نص فقط
-        c.execute("""
-            INSERT OR REPLACE INTO user_knowledge (user_id, last_text, specialty, updated_at)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-        """, (user_id, last_text, specialty))
-        conn.commit()
-        conn.close()
+        # المستخدم العادي: يخزن آخر نص فقط (يستبدل كل مرة)
+        # أولاً: جلب الـ id القديم إن وجد
+        c.execute("SELECT id FROM user_knowledge WHERE user_id = ?", (user_id,))
+        existing = c.fetchone()
+    
+        if existing:
+            # تحديث السجل الموجود
+            c.execute("""
+                UPDATE user_knowledge 
+                SET last_text = ?, specialty = ?, updated_at = CURRENT_TIMESTAMP
+                WHERE user_id = ?
+            """, (last_text, specialty, user_id))
+        else:
+            # إدراج سجل جديد
+            c.execute("""
+                INSERT INTO user_knowledge (user_id, last_text, specialty, updated_at)
+                VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            """, (user_id, last_text, specialty))
 
 
 def get_or_create_user(user_id):
