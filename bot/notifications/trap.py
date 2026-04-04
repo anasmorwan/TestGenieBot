@@ -6,26 +6,34 @@ from datetime import timedelta, datetime, date
 
 
 
-def send_daily_engagement():
+def send_intial_message():
     user_ids = get_all_user_ids(cursor)
-    for user_id in user_ids:
-        if should_show_daily(user_id):
-            try:
-                send_streak()
-                mybot.send_message(chat_id=user_id, text="🔥 تحدي اليوم جاهز!")
-                user_streak[user_id] = date.today()
+    for user_id in user_ids:  
+        try:
+            mybot.send_message(chat_id=user_id, text="🔥 تحدي اليوم جاهز!")
                 
-            except Exception as e:
-                print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
+        except Exception as e:
+            print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
         
 
 def send_streak():
     user_ids = get_all_user_ids()
         for user_id in user_ids:
-            streak, xp = update_progress(user_id, )
+            streak, xp = update_progress(user_id, correct, total)
             mybot.send_message(chat_id=user_id, text=f"🔥 streak: {streak} | +{xp} XP")
 
 
+
+
+def send_daily_engagement(user_id):
+    if should_show_daily(user_id):
+        send_intial_message()
+        
+    user_streak[user_id] = date.today()
+
+
+
+                
 
 def get_all_user_ids():
     conn = get_connection
