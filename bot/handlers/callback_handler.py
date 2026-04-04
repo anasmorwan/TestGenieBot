@@ -174,7 +174,7 @@ def register(bot):
                 
                 
                 if review_count > 0:
-                    mistakes = get_recent_mistakes(user_id, distribution["review_count"])
+                    mistakes = get_recent_mistakes(user_id, review_count)
                     
                     QuizManager.start_mistakes_review(chat_id, mistakes, bot)
                 if new_count > 0:
