@@ -12,7 +12,7 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
-    c.execute("""
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_knowledge (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER,
