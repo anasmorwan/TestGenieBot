@@ -1,15 +1,17 @@
+import random
+from storage.sqlite_db import get_connection
+from datetime import timedelta, datetime, date
 
 
-import sqlite3
-from datetime import datetime, date
 
-conn = sqlite3.connect("bot.db", check_same_thread=False)
-cursor = conn.cursor()
+
 
 def get_or_create_user(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
     cursor.execute("SELECT * FROM users WHERE user_id=?", (user_id,))
     user = cursor.fetchone()
-
     if not user:
         cursor.execute(
             "INSERT INTO users (user_id) VALUES (?)",
@@ -31,7 +33,7 @@ def should_show_daily(user):
     return is_new_day(last_quiz_date)
 
 
-from datetime import timedelta
+
 
 def is_yesterday(date_str):
     if not date_str:
@@ -41,6 +43,8 @@ def is_yesterday(date_str):
 
 
 def update_progress(user_id, correct, total):
+    conn = get_connection()
+    cursor = conn.cursor()
     cursor.execute("SELECT streak, last_quiz_date, xp FROM users WHERE user_id=?", (user_id,))
     streak, last_date, xp = cursor.fetchone()
 
@@ -70,6 +74,8 @@ def update_progress(user_id, correct, total):
 
 
 def save_quiz(user_id, correct, total, quiz_type="daily"):
+    conn = get_connection()
+    cursor = conn.cursor()
     cursor.execute("""
         INSERT INTO quiz_history (user_id, correct_answers, total_questions, quiz_type)
         VALUES (?, ?, ?, ?)
@@ -78,6 +84,12 @@ def save_quiz(user_id, correct, total, quiz_type="daily"):
     conn.commit()
 
 
+
+
+# ---------------------------
+#   🔹  helping functions.  
+# ---------------------------
+
 if should_show_daily(user):
     send("🔥 تحدي اليوم جاهز!")
 
@@ -85,7 +97,7 @@ streak, xp = update_progress(...)
 send(f"🔥 streak: {streak} | +{xp} XP")
 
 
-import random
+
 
 def get_dynamic_level(user_level):
     levels = ["easy", "medium", "hard"]
