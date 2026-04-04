@@ -3,10 +3,11 @@ from services.user_trap import should_show_daily, update_progress
 from storage.sqlite_db import get_connection
 from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
+from bot.keyboards.actions_keyboard import streak_keyboard
 
 
-
-def send_intial_message():
+def send_streak():
+    text = "
     user_ids = get_all_user_ids(cursor)
     for user_id in user_ids:  
         try:
@@ -16,16 +17,13 @@ def send_intial_message():
             print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
         
 
-def send_streak():
-    user_ids = get_all_user_ids()
-        for user_id in user_ids:
-            streak, xp = update_progress(user_id, correct, total)
-            mybot.send_message(chat_id=user_id, text=f"🔥 streak: {streak} | +{xp} XP")
 
 
 
 
 def send_daily_engagement(user_id):
+    keyboard = streak_keyboard()
+
     if should_show_daily(user_id):
         send_intial_message()
         
