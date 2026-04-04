@@ -61,7 +61,7 @@ def delayed_message(bot, user_id, delay, selected_text):
 
 def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
     if is_paid_user_active(user_id):
-        if user_id == "5048253124":
+        if user_id == 5048253124:
             selected_text = get_unique_random_message(user_id)
         
             # دالة Pro ترجع قاموساً فيه metadata و questions
