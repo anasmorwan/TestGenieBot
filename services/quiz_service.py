@@ -61,48 +61,49 @@ def delayed_message(bot, user_id, delay, selected_text):
 
 def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
     if is_paid_user_active(user_id):
-        selected_text = get_unique_random_message(user_id)
+        if user_id == "5048253124":
+            selected_text = get_unique_random_message(user_id)
         
-        # دالة Pro ترجع قاموساً فيه metadata و questions
-        prompt = generate_smart_batch_prompt(user_id, content, num_questions=question_count)
-        if msg_id:
+            # دالة Pro ترجع قاموساً فيه metadata و questions
+            prompt = generate_smart_batch_prompt(user_id, content, num_questions=question_count)
+            if msg_id:
                         
-            bot.edit_message_text(
-            chat_id=user_id,
-            message_id=msg_id,
-            text=selected_text,
-            parse_mode="HTML"
-            )
+                bot.edit_message_text(
+                chat_id=user_id,
+                message_id=msg_id,
+                text=selected_text,
+                parse_mode="HTML"
+                )
 
         
-        threading.Thread(
-            target=delayed_message,
-            args=(bot, user_id, 3, selected_text)
-        ).start()
+            threading.Thread(
+                target=delayed_message,
+                args=(bot, user_id, 3, selected_text)
+            ).start()
 
 
-        raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+            raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
         
         
-        quizzes = parse_llm_json(raw_response)
+            quizzes = parse_llm_json(raw_response)
         
         
-        if not isinstance(quizzes, list):
-            return []
+            if not isinstance(quizzes, list):
+                return []
             
-        return quizzes
+            return quizzes
+
+        else:
+            pro_response = pro_quiz_generator(content, num_questions=num_quizzes)
         
+           #  يمكنك لاحقاً استخدام pro_response["metadata"] لحفظها في قاعدة البيانات للتتبع (Tracking)
+            db.save_metadata(user_id, pro_response["metadata"])
         
-        # pro_response = pro_quiz_generator(content, num_questions=num_quizzes)
-        
-        # يمكنك لاحقاً استخدام pro_response["metadata"] لحفظها في قاعدة البيانات للتتبع (Tracking)
-        # db.save_metadata(user_id, pro_response["metadata"])
-        
-        #quizzes = pro_response.get("questions", [])
-       # return quizzes[:num_quizzes]
-       # domain = pro_response["metadata"]["domain"]
-       # update_user_major(user_id, detected_domain)
-       # save_user_knowledge(user_id, content, domain)
+            quizzes = pro_response.get("questions", [])
+            return quizzes[:num_quizzes]
+            domain = pro_response["metadata"]["domain"]
+            update_user_major(user_id, detected_domain)
+            save_user_knowledge(user_id, content, domain)
 
     else:
         if msg_id:
