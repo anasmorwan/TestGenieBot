@@ -35,11 +35,11 @@ def quiz_refill_keyboard():
     markup.add(btn_refill, btn_new_quiz)
     return markup
                                   
-def streak_keyboard():
+def streak_keyboard(quiz_code):
     markup = InlineKeyboardMarkup(row_width=1)
 
     
-    btn_refill = InlineKeyboardButton("🔥 إبدأ التحدي", callback_data=f"refill_quiz")
+    btn_refill = InlineKeyboardButton("🔥 إبدأ التحدي", callback_data=f"start_challenge:{quiz_code}")
     
 
     markup.add(btn_refill)
