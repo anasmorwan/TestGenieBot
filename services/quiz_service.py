@@ -8,6 +8,8 @@ from storage.messages import get_message
 
 
 import random
+import threading
+import time
 
 messages = [
     get_message("FINAL_FILE_MSG"),
@@ -15,25 +17,63 @@ messages = [
     get_message("FINAL_FILE_MSG3")
 ]
 
-# weights → كلما زاد الرقم زادت فرصة الاختيار
-weights = [0.6, 0.25, 0.15]  # الأول له النسبة الأكبر
+user_messages_remaining = {}
 
-selected_text = random.choices(messages, weights=weights, k=1)[0]
+def get_unique_random_message(user_id):
+    global user_messages_remaining
+    
+    # إذا لم يكن المستخدم في القاموس أو القائمة فارغة، أعد تعيين القائمة
+    if user_id not in user_messages_remaining or not user_messages_remaining[user_id]:
+        user_messages_remaining[user_id] = messages.copy()  # نسخة من القائمة الأصلية
+    
+    # اختر عشوائيًا من القائمة المتبقية
+    selected = random.choice(user_messages_remaining[user_id])
+    
+    # أزل الرسالة المختارة حتى لا تتكرر
+    user_messages_remaining[user_id].remove(selected)
+    
+    return selected
+
+
+
+
+# weights = [0.6, 0.25, 0.15]  # الأول له النسبة الأكبر
+
+# selected_text = random.choices(messages, weights=weights, k=1)[0]
 
 
 question_count = 10
 
+
+def delayed_message(bot, user_id, delay, selected_text):
+    time.sleep(delay)
+    bot.edit_message_text(user_id, selected_text, parse_mode="HTML")
+
+
+
+
 def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
     if is_paid_user_active(user_id):
+        selected_text = get_unique_random_message(user_id)
+        
         # دالة Pro ترجع قاموساً فيه metadata و questions
         prompt = generate_smart_batch_prompt(content, num_questions=question_count)
         if msg_id:
+                        
             bot.edit_message_text(
             chat_id=user_id,
             message_id=msg_id,
-            text=selected_text,
+            text=get_message("FINAL_FILE_MSG"),
             parse_mode="HTML"
-            )            
+            )
+
+        
+        threading.Thread(
+            target=delayed_message,
+            args=(bot, user_id, 5, selected_text)
+        ).start()
+
+
         raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
         
         
