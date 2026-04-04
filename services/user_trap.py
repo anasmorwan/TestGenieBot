@@ -99,13 +99,22 @@ send(f"🔥 streak: {streak} | +{xp} XP")
 
 
 
-def get_dynamic_level(user_level):
+def get_dynamic_level(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT difficulty FROM users WHERE user_id=?", (user_id,))
+    user_level = cursor.fetchone()
+    if not user_level:
+        user_level = "mid"
+
+    
     levels = ["easy", "medium", "hard"]
 
-    if user_level == "beginner":
+    if user_level == "early":
         return random.choices(levels, weights=[0.7, 0.2, 0.1])[0]
 
-    elif user_level == "intermediate":
+    elif user_level == "mid":
         return random.choices(levels, weights=[0.2, 0.6, 0.2])[0]
 
     else:
