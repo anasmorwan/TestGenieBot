@@ -100,6 +100,8 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         
         #quizzes = pro_response.get("questions", [])
        # return quizzes[:num_quizzes]
+       # detected_domain = pro_response.get("domain", "General")
+       # update_user_major(user_id, detected_domain)
 
     else:
         if msg_id:
