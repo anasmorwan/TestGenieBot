@@ -69,7 +69,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             bot.edit_message_text(
             chat_id=user_id,
             message_id=msg_id,
-            text=selected_text
+            text=selected_text,
             parse_mode="HTML"
             )
 
