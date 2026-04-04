@@ -13,6 +13,29 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
+    CREATE TABLE users_tarp (
+        user_id INTEGER PRIMARY KEY,
+        level TEXT DEFAULT 'beginner',
+        specialization TEXT,
+        last_topic TEXT,
+        xp INTEGER DEFAULT 0,
+        streak INTEGER DEFAULT 0,
+        last_quiz_date TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+    cursor.execute("""
+    CREATE TABLE quiz_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    correct_answers INTEGER,
+    total_questions INTEGER,
+    quiz_type TEXT,  -- daily / normal
+    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         user_id INTEGER PRIMARY KEY,
         major TEXT,
