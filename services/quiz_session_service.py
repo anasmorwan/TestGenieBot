@@ -12,7 +12,7 @@ from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_v
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
 from bot.keyboards.quiz_buttons import share_quiz_button
 from services.usage import is_paid_user_active
-from services.user_trap import update_progress, get_weakness_line, get_feedback_line
+from services.user_trap import update_progress, get_weakness_line, get_feedback_line, build_result_message
 import random
 import time
 
@@ -275,11 +275,13 @@ class QuizManager:
         # ✅ استخراج جميع البيانات مرة واحدة في البداية
         score = state.get("score", 0)
         total = len(state["questions"])
-        quiz_code = state.get("quiz_code")   
+        quiz_code = state.get("quiz_code")
+        wrong = state.get("wrong_count", 0)
         shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
         feedback_line = get_feedback_line(score, total)
         streak, xp = update_progress(chat_id)
-        weakness_line = get_weakness_line(score, total)
+        weakness_line = get_weakness_line(chat_ud, wrong)
+        prepared_text = build_result_message(user_id, score, total, streak, xp)
         
 
         
@@ -290,7 +292,7 @@ class QuizManager:
             try:
                 bot.send_message(
                     chat_id=chat_id,
-                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line)
+                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
@@ -303,14 +305,13 @@ class QuizManager:
         
         elif is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
-            if extra_quiz_msg:
-                text += f"\n\n{extra_quiz_msg}"
+            
             keyboard = share_quiz_button(quiz_code)
             
             try:
                 bot.send_message(
                     chat_id=chat_id,
-                    text=text,
+                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
@@ -322,9 +323,17 @@ class QuizManager:
         
         elif shared:
             try:
+                keyboard = share_quiz_button(quiz_code)
+
                 if quiz_code:
                     creator_id = get_quiz_creator(quiz_code)
-                    log_quiz_attempt(chat_id, quiz_code, score, total)            
+                    log_quiz_attempt(chat_id, quiz_code, score, total)
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
             except Exception as e:
                 print(f"❌ فشل إرسال التقرير: {e}")
                 bot.send_message(chat_id, f"خطأ: {str(e)}")
