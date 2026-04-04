@@ -51,7 +51,7 @@ def init_db():
 
 
     cursor.execute("""
-    CREATE TABLE users_trap (
+    CREATE TABLE IF NOT EXISTS users_trap (
         user_id INTEGER PRIMARY KEY,
         level TEXT DEFAULT 'beginner',
         specialization TEXT,
