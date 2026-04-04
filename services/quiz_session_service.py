@@ -232,22 +232,18 @@ class QuizManager:
         # ✅ استخراج جميع البيانات مرة واحدة في البداية
         score = state.get("score", 0)
         total = len(state["questions"])
-        quiz_code = state.get("quiz_code")  # استخراج quiz_code
-    
-        # إذا لم تُمرر القيمة، نستخدم المخزنة في الجلسة (احتياطي)
+        quiz_code = state.get("quiz_code")   
         shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
-
-        # بناء النص الأساسي
         text = f"انتهى الاختبار\n\nالنتيجة: {score}/{total}"
 
+
+        
         if not is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if extra_quiz_msg:
                 text += f"\n\n{extra_quiz_msg}"
 
             keyboard = share_quiz_button(quiz_code)
-    
-            # ✅ إرسال الرسالة وتسجيل المحاولة
             try:
                 bot.send_message(
                     chat_id=chat_id,
@@ -255,22 +251,19 @@ class QuizManager:
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
-                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")
-        
-            
+                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")          
             except Exception as e:
                 print(f"❌ فشل إرسال النتيجة: {e}")
                 bot.send_message(chat_id, f"خطأ: {str(e)}")
+
 
         
         elif is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if extra_quiz_msg:
                 text += f"\n\n{extra_quiz_msg}"
-
             keyboard = share_quiz_button(quiz_code)
-    
-            # ✅ إرسال الرسالة وتسجيل المحاولة
+            
             try:
                 bot.send_message(
                     chat_id=chat_id,
@@ -278,22 +271,17 @@ class QuizManager:
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
-                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")
-        
-            
+                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")           
             except Exception as e:
                 print(f"❌ فشل إرسال النتيجة: {e}")
                 bot.send_message(chat_id, f"خطأ: {str(e)}")
-                
-
 
         
         elif shared:
             try:
                 if quiz_code:
                     creator_id = get_quiz_creator(quiz_code)
-                    log_quiz_attempt(chat_id, quiz_code, score, total)
-                    
+                    log_quiz_attempt(chat_id, quiz_code, score, total)            
             except Exception as e:
                 print(f"❌ فشل إرسال التقرير: {e}")
                 bot.send_message(chat_id, f"خطأ: {str(e)}")
