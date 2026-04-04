@@ -10,7 +10,7 @@ from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import safe_add_column, safe_add_table
 from bot.handlers import chat_shared_handler 
 from bot.handlers import admin_commands, bot_commands
-from bot.notifications.trap import send_daily_engagement
+from bot.notifications.trap import send_daily_message
 print("main starting...", flush=True)
 
 
