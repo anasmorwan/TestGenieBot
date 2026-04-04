@@ -90,11 +90,8 @@ def save_quiz(user_id, correct, total, quiz_type="daily"):
 #   🔹  helping functions.  
 # ---------------------------
 
-if should_show_daily(user):
-    send("🔥 تحدي اليوم جاهز!")
 
-streak, xp = update_progress(...)
-send(f"🔥 streak: {streak} | +{xp} XP")
+
 
 
 
