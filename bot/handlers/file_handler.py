@@ -14,6 +14,7 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
+
 import threading
     
 
@@ -128,7 +129,8 @@ def register(bot):
             quiz_code = store_quiz(user_id, quizzes)
             # backup_all()
             quiz_len = len(quizzes)
-
+            
+            
             bot.delete_message(chat_id, message_id=waiting_msg.message_id)
             
 
