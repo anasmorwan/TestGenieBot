@@ -1,7 +1,18 @@
 # session_store.py
 user_states = {}
+
+
 temp_texts = {}
+
 user_selections = {}
+
+# services/quiz_service.py:
+user_messages_remaining = {}
+
+
+
+
+
 
 def get_state_safe(user_id):
     data = user_states.get(user_id)
