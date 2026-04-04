@@ -25,9 +25,12 @@ def send_streak(streak, xp):
 
 
 def send_daily_engagement():
-    if should_show_daily(user_id):
-        streak, xp = update_progress(user_id)
-        send_streak(streak, xp)
+    user_ids = [5048253124, 6948343253]
+    for user_id in user_ids:
+        
+        if should_show_daily(user_id):
+            streak, xp = update_progress(user_id)
+            send_streak(streak, xp)
         
         user_streak[user_id] = date.today()
 
