@@ -13,7 +13,7 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
-    CREATE TABLE users_tarp (
+    CREATE TABLE users_trap (
         user_id INTEGER PRIMARY KEY,
         level TEXT DEFAULT 'beginner',
         specialization TEXT,
