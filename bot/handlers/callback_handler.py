@@ -19,7 +19,7 @@ from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat, log_quiz_share, is_quiz_expired
 from bot.handlers.chat_shared_handler import publish_interactive_link
 from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
-from services.quiz_session import QuizManager 
+from services.quiz_session_service import QuizManager 
 
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
@@ -168,15 +168,20 @@ def register(bot):
 
             if data == "start_challenge":
                 distribution = get_question_distribution(user_id, total_questions=3)
-                quiz = {
-                    "review_questions": [],    # من user_mistakes
-                    "new_questions": [],       # من مصدر الأسئلة العامة
-                    "challenge_questions": []  # أسئلة أصعب
-                }
-                if distribution["review_count"] > 0:
+                review_count = distribution["review_count"]
+                challenge_count = distribution["challenge_count"]
+                new_count = distribution["new_count"]
+                
+                
+                if review_count > 0:
                     mistakes = get_recent_mistakes(user_id, distribution["review_count"])
-                    quiz["review_questions"] = mistakes
-                    QuizManager.start_mistakes_review()
+                    
+                    QuizManager.start_mistakes_review(chat_id, mistakes, bot)
+                if new_count > 0:
+                    pass
+                if challenge_count > 0:
+                    pass
+                    
                 
 
             if data.startswith("start_quiz"):
