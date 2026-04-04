@@ -2,7 +2,7 @@
 import os
 from bot.bot_instance import mybot, set_webhook
 from bot.handlers import start, text_handler, file_handler, image_handler, group_messages_handler, callback_handler, pre_checkout_query_handler, payment_handler
-from storage.sqlite_db import init_db
+from storage.sqlite_db import init_db, migrate_users_to_trap
 from bot.handlers import poll_answer_handler
 from bot import flask
 from services.backup_service import restore_if_needed, start_auto_backup
@@ -66,7 +66,7 @@ payment_handler.register(mybot); print("payment_handler.register done", flush=Tr
 poll_answer_handler.register(mybot)
 chat_shared_handler.register(mybot)
 
-
+migrate_users_to_trap()
 send_daily_engagement()
 
 
