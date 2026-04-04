@@ -2,7 +2,53 @@ import random
 from storage.sqlite_db import get_connection
 from datetime import timedelta, datetime, date
 from storage.session_store import user_streak
+from services.usage import is_paid_user_active
 
+def save_user_knowledge(user_id, last_text, specialty):
+    conn = get_connection()
+    c = conn.cursor()
+    
+    # التحقق من حالة المستخدم
+    if is_paid_user_active(user_id):
+        # المستخدم المدفوع: يخزن 10 نصوص
+        
+        # إدراج النص الجديد
+        c.execute("""
+            INSERT INTO user_knowledge (user_id, last_text, specialty, updated_at)
+            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+        """, (user_id, last_text, specialty))
+        
+        # التحقق من العدد الإجمالي
+        c.execute("""
+            SELECT COUNT(*) FROM user_knowledge WHERE user_id = ?
+        """, (user_id,))
+        
+        count = c.fetchone()[0]
+        
+        # إذا تجاوز 10، احذف الأقدم
+        if count > 10:
+            c.execute("""
+                DELETE FROM user_knowledge 
+                WHERE id IN (
+                    SELECT id FROM user_knowledge 
+                    WHERE user_id = ? 
+                    ORDER BY updated_at ASC 
+                    LIMIT ?
+                )
+            """, (user_id, count - 10))
+    
+    else:
+        # المستخدم العادي: يخزن آخر نص فقط (يستبدل كل مرة)
+        c.execute("""
+            INSERT OR REPLACE INTO user_knowledge (id, user_id, last_text, specialty, updated_at)
+            VALUES (
+                COALESCE((SELECT id FROM user_knowledge WHERE user_id = ?), NULL),
+                ?, ?, ?, CURRENT_TIMESTAMP
+            )
+        """, (user_id, user_id, last_text, specialty))
+    
+    conn.commit()
+    conn.close()
 
 
 def get_or_create_user(user_id):
