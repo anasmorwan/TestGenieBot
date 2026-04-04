@@ -144,7 +144,7 @@ def register(bot):
                     reply_markup=quiz_keyboard(quiz_code), 
                     parse_mode="HTML"
                 )
-                time.sleep(1)
+                time.sleep(2)
                 if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False):
                     bot.edit_message_text(
                     chat_id=chat_id,
