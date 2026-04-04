@@ -11,6 +11,12 @@ import random
 import threading
 import time
 
+done_event = threading.Event()
+# weights = [0.6, 0.25, 0.15]  # الأول له النسبة الأكبر
+
+# selected_text = random.choices(messages, weights=weights, k=1)[0]
+question_count = 10
+
 messages = [
     get_message("FINAL_FILE_MSG"),
     get_message("FINAL_FILE_MSG2"),
@@ -18,6 +24,9 @@ messages = [
 ]
 
 user_messages_remaining = {}
+
+
+
 
 def get_unique_random_message(user_id):
     global user_messages_remaining
@@ -34,20 +43,17 @@ def get_unique_random_message(user_id):
     
     return selected
 
-
-
-
-# weights = [0.6, 0.25, 0.15]  # الأول له النسبة الأكبر
-
-# selected_text = random.choices(messages, weights=weights, k=1)[0]
-
-
-question_count = 10
-
-
 def delayed_message(bot, user_id, delay, selected_text):
     time.sleep(delay)
-    bot.edit_message_text(user_id, selected_text, parse_mode="HTML")
+    if not done_event.is_set():
+        try:
+            bot.edit_message_text(
+                user_id,
+                selected_text,
+                parse_mode="HTML"
+            )
+        except:
+            pass
 
 
 
