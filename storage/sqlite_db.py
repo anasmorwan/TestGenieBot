@@ -226,7 +226,29 @@ def safe_add_table():
     
 
 
-
+def migrate_users_to_trap():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # جلب جميع المستخدمين من الجدول القديم
+    cursor.execute("SELECT user_id FROM users")
+    users = cursor.fetchall()
+    
+    count = 0
+    for user_row in users:
+        user_id = user_row[0]
+        
+        # إدراج المستخدم في الجدول الجديد إذا لم يكن موجوداً
+        cursor.execute("""
+            INSERT OR IGNORE INTO users_trap (user_id, xp, streak, last_quiz_date)
+            VALUES (?, 0, 0, NULL)
+        """, (user_id,))
+        
+        if cursor.rowcount > 0:
+            count += 1
+    
+    conn.commit()
+    print(f"✅ تم نقل {count} مستخدم إلى جدول users_trap")
 
     
 
