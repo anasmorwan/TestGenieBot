@@ -101,6 +101,23 @@ class QuizManager:
 
         self.send_quiz_poll(bot, chat_id, q)
 
+    def save_mistake(self, user_id, q_obj):
+        conn = get_connection()
+        c = conn.cursor()
+    
+        # تحويل الخيارات إلى نص JSON ليتم تخزينها
+        options_json = json.dumps(q_obj.options)
+    
+        # استخدام INSERT OR REPLACE أو تحديث عداد الفشل
+        c.execute("""
+            INSERT INTO user_mistakes (user_id, question_text, options, correct_index, explanation, last_failed)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (user_id, q_obj.question, options_json, q_obj.correct_index, q_obj.explanation, datetime.now().isoformat()))
+    
+        conn.commit()
+        conn.close()
+    
+
     def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
         state = self.sessions.get(chat_id)
         if not state:
@@ -113,6 +130,10 @@ class QuizManager:
 
         if selected_option == q.correct_index:
             state["score"] += 1
+
+        else:
+            # 🔴 هنا نسجل الخطأ
+            self.save_mistake(chat_id, q)
 
         state["index"] += 1
 
@@ -243,4 +264,3 @@ class QuizManager:
 
 
 quiz_manager = QuizManager()
-
