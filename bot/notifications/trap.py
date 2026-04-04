@@ -3,7 +3,7 @@ from services.user_trap import should_show_daily
 from storage.sqlite_db import get_connection
 
 
-def send_daily_engaggement():
+def send_daily_engagement():
     if should_show_daily(user_id):
         try:
             user_ids = get_all_user_ids(cursor)
