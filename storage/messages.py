@@ -257,6 +257,7 @@ def get_message(key, lang="ar", **kwargs):
     try:
         return text.format(**kwargs)
     except KeyError:
+        return text
 
 """
-        return text
+        
