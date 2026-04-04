@@ -1,6 +1,7 @@
 # session_store.py
 user_states = {}
 
+user_streak = {}
 
 temp_texts = {}
 
