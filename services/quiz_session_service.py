@@ -216,7 +216,13 @@ class QuizManager:
         
         else:
             self.send_current_question(chat_id, bot)
-         
+
+
+
+
+
+
+    
     def finish_quiz(self, chat_id, bot, is_shared_user=None):
     
         state = self.sessions.pop(chat_id, None)
