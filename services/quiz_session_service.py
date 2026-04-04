@@ -293,7 +293,7 @@ class QuizManager:
             try:
                 bot.send_message(
                     chat_id=chat_id,
-                    text=prepared_text,
+                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
