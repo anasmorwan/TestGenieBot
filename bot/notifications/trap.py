@@ -1,5 +1,5 @@
 from bot.bot_instance import mybot
-from services.user_trap import should_show_daily
+from services.user_trap import should_show_daily, update_progress
 from storage.sqlite_db import get_connection
 
 
@@ -13,6 +13,13 @@ def send_daily_engagement():
             except Exception as e:
                 print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
         
+
+def send_streak():
+    user_ids = get_all_user_ids(cursor)
+        for user_id in user_ids:
+            streak, xp = update_progress(...)
+            send(f"🔥 streak: {streak} | +{xp} XP")
+
 
 
 def get_all_user_ids():
