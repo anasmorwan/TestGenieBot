@@ -12,6 +12,18 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
+    # جدول لتخزين نقاط التخصصات لكل مستخدم
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_interests (
+        user_id INTEGER,
+        domain_name TEXT,
+        points INTEGER DEFAULT 0,
+        PRIMARY KEY (user_id, domain_name),
+        FOREIGN KEY (user_id) REFERENCES users(user_id)
+    )
+    """)
+
+
     cursor.execute("""
     CREATE TABLE users_trap (
         user_id INTEGER PRIMARY KEY,
