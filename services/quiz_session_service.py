@@ -122,41 +122,35 @@ class QuizManager:
     
         options_json = json.dumps(q_obj.options)
     
-        # التحقق: هل المستخدم غير نشط (مجاني)؟
-        if not is_paid_user_active(user_id):
-            # للمستخدم المجاني: احسب عدد أخطائه أولاً
-            c.execute("""
-                SELECT COUNT(*) FROM user_mistakes 
-                WHERE user_id = ?
-            """, (user_id,))
-        
-            mistake_count = c.fetchone()[0]
-        
-            # إذا وصل للحد الأقصى (10)، لا تحفظ الخطأ الجديد
-            if mistake_count >= 10:
-                conn.close()
-                return False  # لم يتم الحفظ
-    
-        # محاولة التحديث أولاً
+        # التحقق من وجود السؤال
         c.execute("""
-            UPDATE user_mistakes 
-            SET options = ?, correct_index = ?, explanation = ?, 
-                last_failed = ?, fail_count = fail_count + 1
+            SELECT id, fail_count FROM user_mistakes 
             WHERE user_id = ? AND question_text = ?
-        """, (options_json, q_obj.correct_index, q_obj.explanation, 
-              datetime.now().isoformat(), user_id, q_obj.question))
+        """, (user_id, q_obj.question))
     
-        # إذا لم يتم تحديث أي صف (يعني السؤال غير موجود)
-        if c.rowcount == 0:
+        existing = c.fetchone()
+    
+        if existing:
+            # تحديث الخطأ الموجود
             c.execute("""
-                INSERT INTO user_mistakes (user_id, question_text, options, correct_index, explanation, last_failed, fail_count)
-                VALUES (?, ?, ?, ?, ?, ?, 1)
+                UPDATE user_mistakes 
+                SET options = ?, correct_index = ?, explanation = ?, 
+                   last_failed = ?, fail_count = fail_count + 1
+                WHERE user_id = ? AND question_text = ?
+            """, (options_json, q_obj.correct_index, q_obj.explanation, 
+                  datetime.now().isoformat(), user_id, q_obj.question))
+        else:
+            # إدراج خطأ جديد مع created_at
+            c.execute("""
+                INSERT INTO user_mistakes 
+                (user_id, question_text, options, correct_index, explanation, 
+                 last_failed, created_at, fail_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
             """, (user_id, q_obj.question, options_json, q_obj.correct_index, 
-                  q_obj.explanation, datetime.now().isoformat()))
+                  q_obj.explanation, datetime.now().isoformat(), datetime.now().isoformat()))
     
         conn.commit()
         conn.close()
-        return True
 
     
     def increment_correct_count(self, user_id, question_text):
