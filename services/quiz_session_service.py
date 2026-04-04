@@ -304,6 +304,7 @@ class QuizManager:
 
     def send_quiz_poll(self, bot, chat_id, q):
         try:
+            
             # 1. الوصول للبيانات عبر الكائن (Object Attributes) وليس القاموس
             # نستخدم getattr كإجراء أمان إضافي أو الوصول المباشر
             q_text = getattr(q, 'question', 'سؤال بدون عنوان')
