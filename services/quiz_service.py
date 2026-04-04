@@ -6,6 +6,7 @@ from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
 from storage.messages import get_message
 from storage.session_store import user_messages_remaining
+from storage.sqlite_db import update_user_major
 
 import random
 import threading
@@ -120,6 +121,9 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 
         
         quizzes = parse_llm_json(raw_response)
+        detected_domain = quizzes.get("domain")
+        update_user_major(user_id, detected_domain)
+        
 
         
         if not isinstance(quizzes, list):
