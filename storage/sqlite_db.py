@@ -236,7 +236,29 @@ def safe_add_table():
     conn.close()
 
     
-
+def update_user_major(user_id, detected_domain):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO user_interests (user_id, domain_name, points)
+        VALUES (?, ?, 1)
+        ON CONFLICT(user_id, domain_name) 
+        DO UPDATE SET points = points + 1
+    """, (user_id, detected_domain))
+    
+    # 2. جلب التخصص الذي يملك أعلى عدد نقاط لهذا المستخدم
+    cursor.execute("""
+        SELECT domain_name FROM user_interests 
+        WHERE user_id = ? 
+        ORDER BY points DESC LIMIT 1
+    """, (user_id,))
+    
+    top_major = cursor.fetchone()[0]
+    
+    # 3. تحديث الجدول الرئيسي للمستخدمين ليعكس التخصص الطاغي
+    cursor.execute("UPDATE users SET major = ? WHERE user_id = ?", (top_major, user_id))
+    conn.commit()
+    
 
 def migrate_users_to_trap():
     conn = get_connection()
