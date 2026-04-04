@@ -23,6 +23,7 @@ def init_db():
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
+    cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_id ON user_knowledge(user_id)")
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_mistakes (
