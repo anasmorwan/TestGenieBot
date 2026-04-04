@@ -80,6 +80,7 @@ def register(bot):
                     chat_id,
                     message_id
                 )
+                user_texts = content
                 try:
                     results = detect_quiz_pattern(content)
                     confidence = result.get("confidence", 0)
