@@ -25,6 +25,7 @@ from services.usage import get_subscription_full, get_usage, build_status_messag
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
 from storage.session_store import user_selections
+from storage.sqlite_db import get_question_distribution, get_recent_mistakes
 import random
 import json
 import time
@@ -164,6 +165,18 @@ def register(bot):
             quiz_code = None
             if ":" in data:
                 quiz_code = data.split(":")[1]
+
+            if data == "start_challenge":
+                distribution = get_question_distribution(user_id, total_questions=3)
+                quiz = {
+                    "review_questions": [],    # من user_mistakes
+                    "new_questions": [],       # من مصدر الأسئلة العامة
+                    "challenge_questions": []  # أسئلة أصعب
+                }
+                if distribution["review_count"] > 0:
+                    mistakes = get_recent_mistakes(user_id, distribution["review_count"])
+                    quiz["review_questions"] = mistakes
+                
 
             if data.startswith("start_quiz"):
                 parts = data.split(":")
