@@ -102,6 +102,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 
     else:
         if msg_id:
+            selected_text = get_unique_random_message(user_id)
             bot.edit_message_text(
             chat_id=user_id,
             message_id=msg_id,
@@ -109,6 +110,10 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             parse_mode="HTML"
             )            
         prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
+        threading.Thread(
+            target=delayed_message,
+            args=(bot, user_id, 3, selected_text)
+        ).start()
         
         raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
         
