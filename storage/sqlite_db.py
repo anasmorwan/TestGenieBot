@@ -182,22 +182,85 @@ def init_db():
     conn.commit()
     conn.close()
 
-def save_mistake(self, user_id, q_obj):
+#--------------------------
+#    🔹 دوال مساعدة
+#--------------------------
+def update_user_major(user_id, detected_domain):
     conn = get_connection()
-    c = conn.cursor()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO user_interests (user_id, domain_name, points)
+        VALUES (?, ?, 1)
+        ON CONFLICT(user_id, domain_name) 
+        DO UPDATE SET points = points + 1
+    """, (user_id, detected_domain))
     
-    # تحويل الخيارات إلى نص JSON ليتم تخزينها
-    options_json = json.dumps(q_obj.options)
+    # 2. جلب التخصص الذي يملك أعلى عدد نقاط لهذا المستخدم
+    cursor.execute("""
+        SELECT domain_name FROM user_interests 
+        WHERE user_id = ? 
+        ORDER BY points DESC LIMIT 1
+    """, (user_id,))
     
-    # استخدام INSERT OR REPLACE أو تحديث عداد الفشل
-    c.execute("""
-        INSERT INTO user_mistakes (user_id, question_text, options, correct_index, explanation, last_failed)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (user_id, q_obj.question, options_json, q_obj.correct_index, q_obj.explanation, datetime.now().isoformat()))
+    top_major = cursor.fetchone()[0]
+    
+    # 3. تحديث الجدول الرئيسي للمستخدمين ليعكس التخصص الطاغي
+    cursor.execute("UPDATE users SET major = ? WHERE user_id = ?", (top_major, user_id))
+    conn.commit()
+    
+
+def migrate_users_to_trap():
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # جلب جميع المستخدمين من الجدول القديم
+    cursor.execute("SELECT user_id FROM users")
+    users = cursor.fetchall()
+    
+    count = 0
+    for user_row in users:
+        user_id = user_row[0]
+        
+        # إدراج المستخدم في الجدول الجديد إذا لم يكن موجوداً
+        cursor.execute("""
+            INSERT OR IGNORE INTO users_trap (user_id, xp, streak, last_quiz_date)
+            VALUES (?, 0, 0, NULL)
+        """, (user_id,))
+        
+        if cursor.rowcount > 0:
+            count += 1
     
     conn.commit()
-    conn.close()
+    print(f"✅ تم نقل {count} مستخدم إلى جدول users_trap")
 
+    
+
+
+
+def is_user_exist(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,))
+    return cursor.fetchone() is not None
+
+def log_new_user():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "INSERT INTO users (user_id, last_reset) VALUES (?, ?)",
+        (user_id, datetime.utcnow().isoformat())
+    )
+    conn.commit()
+
+
+
+# --------------------------
+#----------          -------
+#    <🔹 دوال تعديل sqlite >
+#-------------------
+# --------------------------
 
 
 def table_exists(table):
@@ -277,74 +340,6 @@ def safe_add_table():
     conn.close()
 
     
-def update_user_major(user_id, detected_domain):
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO user_interests (user_id, domain_name, points)
-        VALUES (?, ?, 1)
-        ON CONFLICT(user_id, domain_name) 
-        DO UPDATE SET points = points + 1
-    """, (user_id, detected_domain))
-    
-    # 2. جلب التخصص الذي يملك أعلى عدد نقاط لهذا المستخدم
-    cursor.execute("""
-        SELECT domain_name FROM user_interests 
-        WHERE user_id = ? 
-        ORDER BY points DESC LIMIT 1
-    """, (user_id,))
-    
-    top_major = cursor.fetchone()[0]
-    
-    # 3. تحديث الجدول الرئيسي للمستخدمين ليعكس التخصص الطاغي
-    cursor.execute("UPDATE users SET major = ? WHERE user_id = ?", (top_major, user_id))
-    conn.commit()
-    
-
-def migrate_users_to_trap():
-    conn = get_connection()
-    cursor = conn.cursor()
-    
-    # جلب جميع المستخدمين من الجدول القديم
-    cursor.execute("SELECT user_id FROM users")
-    users = cursor.fetchall()
-    
-    count = 0
-    for user_row in users:
-        user_id = user_row[0]
-        
-        # إدراج المستخدم في الجدول الجديد إذا لم يكن موجوداً
-        cursor.execute("""
-            INSERT OR IGNORE INTO users_trap (user_id, xp, streak, last_quiz_date)
-            VALUES (?, 0, 0, NULL)
-        """, (user_id,))
-        
-        if cursor.rowcount > 0:
-            count += 1
-    
-    conn.commit()
-    print(f"✅ تم نقل {count} مستخدم إلى جدول users_trap")
-
-    
-
-
-
-def is_user_exist(user_id):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT 1 FROM users WHERE user_id = ?", (user_id,))
-    return cursor.fetchone() is not None
-
-def log_new_user():
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "INSERT INTO users (user_id, last_reset) VALUES (?, ?)",
-        (user_id, datetime.utcnow().isoformat())
-    )
-    conn.commit()
 
 
 
