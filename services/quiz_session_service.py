@@ -271,9 +271,9 @@ class QuizManager:
         total = len(state["questions"])
         quiz_code = state.get("quiz_code")   
         shared = is_shared_user if is_shared_user is not None else state.get("is_shared_user")
-        feedback_line = get_feedback_line(chat_id)
+        feedback_line = get_feedback_line(score, total)
         streak, xp = update_progress(chat_id)
-        weakness_line = get_weakness_line(chat_id)
+        weakness_line = get_weakness_line(score, total)
         
 
         
