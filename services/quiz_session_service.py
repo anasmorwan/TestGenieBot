@@ -123,50 +123,73 @@ class QuizManager:
     
         options_json = json.dumps(q_obj.options)
     
+        # 🔴 التحقق من الحد الأقصى للمستخدم المجاني
+        if not is_paid_user_active(user_id):
+            # حساب عدد الأخطاء الحالية
+            c.execute("""
+                SELECT COUNT(*) FROM user_mistakes 
+                WHERE user_id = ?
+            """, (user_id,))
+        
+            mistake_count = c.fetchone()[0]
+        
+            # إذا وصل للحد الأقصى (10)، لا تحفظ الخطأ الجديد
+            if mistake_count >= 10:
+                conn.close()
+                return False  # لم يتم الحفظ
+    
         # التحقق من وجود السؤال
         c.execute("""
-            SELECT id, fail_count FROM user_mistakes 
+            SELECT id, fail_count, correct_count FROM user_mistakes 
             WHERE user_id = ? AND question_text = ?
         """, (user_id, q_obj.question))
     
         existing = c.fetchone()
     
         if existing:
-            # تحديث الخطأ الموجود
+            # ✅ تحديث الخطأ الموجود: زيادة fail_count وإعادة تعيين correct_count
             c.execute("""
                 UPDATE user_mistakes 
-                SET options = ?, correct_index = ?, explanation = ?, 
-                   last_failed = ?, fail_count = fail_count + 1
+                SET options = ?, 
+                    correct_index = ?, 
+                    explanation = ?, 
+                    last_failed = ?, 
+                    fail_count = fail_count + 1,
+                    correct_count = 0
                 WHERE user_id = ? AND question_text = ?
             """, (options_json, q_obj.correct_index, q_obj.explanation, 
                   datetime.now().isoformat(), user_id, q_obj.question))
         else:
-            # إدراج خطأ جديد مع created_at
+            # ✅ إدراج خطأ جديد
             c.execute("""
                 INSERT INTO user_mistakes 
                 (user_id, question_text, options, correct_index, explanation, 
-                 last_failed, created_at, fail_count)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+                 last_failed, created_at, fail_count, correct_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0)
             """, (user_id, q_obj.question, options_json, q_obj.correct_index, 
                   q_obj.explanation, datetime.now().isoformat(), datetime.now().isoformat()))
     
         conn.commit()
         conn.close()
+        return True
 
     
     def increment_correct_count(self, user_id, question_text):
         conn = get_connection()
         c = conn.cursor()
     
-        # زيادة العداد
+        # زيادة العداد أولاً
         c.execute("""
             UPDATE user_mistakes 
             SET correct_count = correct_count + 1 
             WHERE user_id = ? AND question_text = ?
         """, (user_id, question_text))
     
-        # حذف الأسئلة التي أتقنها المستخدم (أجاب عليها صح مرتين مثلاً)
-        c.execute("DELETE FROM user_mistakes WHERE correct_count >= 2")
+        # حذف الأسئلة التي أتقنها المستخدم (أجاب عليها صح مرتين)
+        c.execute("""
+            DELETE FROM user_mistakes 
+            WHERE user_id = ? AND correct_count >= 2
+        """, (user_id,))
     
         conn.commit()
         conn.close()
