@@ -4,6 +4,7 @@ import json
 from ai.llm_client import generate_smart_response
 from utils.json_utils import parse_llm_json
 from bot.bot_instance import mybot
+from storage.sqlite_db import update_user_major, save_user_knowledge
 
 admin_id = 5048253124
 
@@ -333,7 +334,7 @@ def sanitize_generated_questions(items, num_questions):
 
 
 
-def generate_smart_batch_prompt(text_content, num_questions):
+def generate_smart_batch_prompt(user_id, text_content, num_questions):
     text_content = normalize_text_content(text_content)
     
     # تحميل الإعدادات أولاً (نفترض الطب كافتراضي حالياً)
@@ -344,6 +345,12 @@ def generate_smart_batch_prompt(text_content, num_questions):
 
     # 1. التحليل المبدئي
     metadata = analyze_text_metadata(text_content, config)
+
+
+    detected_domain = metadata.get("domain", "General")
+    update_user_major(user_id, detected_domain)
+    save_user_knowledge(user_id, content, detected_domain)
+        
     
     # 2. التطبيع الاحترافي للمستوى
     user_stage = normalize_stage_smart(metadata, config)
