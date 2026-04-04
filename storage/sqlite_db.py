@@ -390,10 +390,12 @@ def get_recent_mistakes(user_id, limit=10):
     for row in c.fetchall():
         mistakes.append({
             "id": row[0],
-            "question_text": row[1],
-            "options": json.loads(row[2]),
-            "correct_index": row[3],
-            "explanation": row[4],
+            "question": {
+                "question_text": row[1],
+                "options": json.loads(row[2]),
+                "correct_index": row[3],
+                "explanation": row[4]
+            },
             "fail_count": row[5]
         })
     
