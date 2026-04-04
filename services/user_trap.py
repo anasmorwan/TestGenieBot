@@ -1,7 +1,7 @@
 import random
 from storage.sqlite_db import get_connection
 from datetime import timedelta, datetime, date
-
+from session_store import user_session
 
 
 
@@ -29,7 +29,7 @@ def is_new_day(last_date):
 
 
 def should_show_daily(user):
-    last_quiz_date = user[4]  # حسب ترتيب الجدول
+    last_quiz_date = user_session.get(user)  # حسب ترتيب الجدول
     return is_new_day(last_quiz_date)
 
 
