@@ -42,35 +42,43 @@ def is_yesterday(date_str):
     return last == date.today() - timedelta(days=1)
 
 
-def update_progress(user_id, correct, total):
+def update_progress(user_id, correct=None, total=None):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT streak, last_quiz_date, xp FROM users_trap WHERE user_id=?", (user_id,))
-    streak, last_date, xp = cursor.fetchone()
-
+    result = cursor.fetchone()
+    
+    if result is None:
+        return None  # المستخدم غير موجود
+    
+    streak, last_date, xp = result
     today = str(date.today())
-
-    # streak logic
-    if last_date == today:
-        pass
-    elif is_yesterday(last_date):
-        streak += 1
+    
+    # تحديث الـ streak فقط إذا أردت (يعني عند أداء اختبار)
+    if correct is not None:
+        # streak logic
+        if last_date == today:
+            pass
+        elif is_yesterday(last_date):
+            streak += 1
+        else:
+            streak = 1
+        
+        # xp logic
+        gained_xp = correct * 10
+        xp += gained_xp
+        
+        cursor.execute("""
+            UPDATE users_trap
+            SET streak=?, last_quiz_date=?, xp=?
+            WHERE user_id=?
+        """, (streak, today, xp, user_id))
+        
+        conn.commit()
+        return streak, gained_xp
     else:
-        streak = 1
-
-    # xp logic
-    gained_xp = correct * 10
-    xp += gained_xp
-
-    cursor.execute("""
-        UPDATE users_trap
-        SET streak=?, last_quiz_date=?, xp=?
-        WHERE user_id=?
-    """, (streak, today, xp, user_id))
-
-    conn.commit()
-
-    return streak, gained_xp
+        # فقط جلب البيانات بدون تحديث
+        return streak, xp
 
 
 def save_quiz(user_id, correct, total, quiz_type="daily"):
