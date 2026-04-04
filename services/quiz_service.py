@@ -102,6 +102,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
        # return quizzes[:num_quizzes]
        # domain = pro_response["metadata"]["domain"]
        # update_user_major(user_id, detected_domain)
+       # save_user_knowledge(user_id, content, domain)
 
     else:
         if msg_id:
