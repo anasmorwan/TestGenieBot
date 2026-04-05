@@ -171,11 +171,11 @@ def register(bot):
                     distribution = get_question_distribution(user_id, total_questions=3)
                     review_count = distribution["review_count"]
                 
-                    if review_count > 0:
-                        mistakes = get_recent_mistakes(user_id, review_count)
                     
-                        quiz_manager = QuizManager()  # إنشاء كائن
-                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
+                    mistakes = get_recent_mistakes(user_id, review_count)
+                    
+                    quiz_manager = QuizManager()  # إنشاء كائن
+                    quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
                         
                 except Exception as e:
                     bot.send_message(chat_id, f"CALLBACK ERROR: {str(e)}")
