@@ -171,6 +171,11 @@ def register(bot):
                 review_count = distribution["review_count"]
                 challenge_count = distribution["challenge_count"]
                 new_count = distribution["new_count"]
+                if review_count > 0:
+                    mistakes = get_recent_mistakes(user_id, review_count)
+                    
+                    QuizManager.start_mistakes_review(chat_id, mistakes, bot)
+        
                 
                 send_daily_challenge(bot, user_id, review_count, new_count, challenge_count)
                 
