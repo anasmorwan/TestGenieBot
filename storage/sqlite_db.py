@@ -23,6 +23,8 @@ def init_db():
     )
     """)
     cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_id ON user_knowledge(user_id)")
+    # أضف هذا السطر لتصحيح القاعدة (شغله مرة واحدة)
+    cursor.execute("DROP INDEX IF EXISTS idx_user_id")
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_mistakes (
@@ -494,6 +496,7 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE user_mistakes ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP 
         """)
+
     conn.commit()
     conn.close()
     print("✅ Schema updated safely")
