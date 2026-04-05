@@ -16,7 +16,8 @@ from services.user_trap import update_progress, get_weakness_line, get_feedback_
 import random
 import time
 from bot.notifications.trap import send_daily_challenge
-    
+
+admin_id = 5048253124
 
 class QuizManager:
     def __init__(self):
@@ -27,55 +28,62 @@ class QuizManager:
         self.poll_map = {}
 
     def generate_and_store(self, bot=None, chat_id=None, user_id=None, message_id=None):
-        distribution = get_question_distribution(user_id, total_questions=3)
-        challenge_count = distribution["challenge_count"]
-        new_count = distribution["new_count"]
+        try:
+            distribution = get_question_distribution(user_id, total_questions=3)
+            challenge_count = distribution["challenge_count"]
+            new_count = distribution["new_count"]
         
-        if user_id is not None:
-            quizzes = generate_challenge_quiz(bot, user_id, new_count, challenge_count)
+            if user_id is not None:
+                quizzes = generate_challenge_quiz(bot, user_id, new_count, challenge_count)
 
-            with self.lock:
-                state = self.sessions.get(chat_id)
-                if not state:
-                    return
+                with self.lock:
+                    state = self.sessions.get(chat_id)
+                    if not state:
+                        return
         
-                state["questions"].extend(quizzes)
-                state["is_extended"] = True
-                state["waiting_for_extension"] = False
-                should_resume = state["index"] >= len(state["questions"]) - len(quizzes)
+                    state["questions"].extend(quizzes)
+                    state["is_extended"] = True
+                    state["waiting_for_extension"] = False
+                    should_resume = state["index"] >= len(state["questions"]) - len(quizzes)
 
-        # خارج lock
-        if should_resume:
-            if message_id:
-                bot.edit_message_text(chat_id, message_id=message_id, text="🔥 تم تجهيز أسئلة جديدة!")
-            self.send_current_question(chat_id, bot)
-            state["questions_resumed"] = True
+            # خارج lock
+            if should_resume:
+                if message_id:
+                    bot.edit_message_text(chat_id, message_id=message_id, text="🔥 تم تجهيز أسئلة جديدة!")
+                self.send_current_question(chat_id, bot)
+                state["questions_resumed"] = True
+        except Exception as e:
+            bot.send_message(chat_id=admin_id, text="generate_and_store_error: {str(e)}")
             
         
 
     def start_quiz(self, chat_id, quiz_code, bot, is_shared_user=None):
-        print("QUIZ CODE:", quiz_code, flush=True)
-        quiz_data = self.load_quiz(quiz_code)
-        print("LOADED QUIZ:", quiz_data, flush=True)
-        if not quiz_data:
-            print("❌ No quiz data", flush=True)
-            return False
+        try:
+            print("QUIZ CODE:", quiz_code, flush=True)
+            quiz_data = self.load_quiz(quiz_code)
+            print("LOADED QUIZ:", quiz_data, flush=True)
+            if not quiz_data:
+                print("❌ No quiz data", flush=True)
+                return False
 
     
-        questions = []
-        for q in quiz_data:
-            obj = QuizQuestion.from_raw(q)
-            print("RAW:", q, flush=True)
-            print("PARSED:", obj, flush=True)
-            if obj:
-                questions.append(obj)
+            questions = []
+            for q in quiz_data:
+                obj = QuizQuestion.from_raw(q)
+                print("RAW:", q, flush=True)
+                print("PARSED:", obj, flush=True)
+                if obj:
+                    questions.append(obj)
 
         
-        print("TOTAL QUESTIONS:", len(questions))
+            print("TOTAL QUESTIONS:", len(questions))
 
-        if not questions:
-            print("❌ No questions", flush=True)
-            return False
+            if not questions:
+                print("❌ No questions", flush=True)
+                return False
+        except Exception as e:
+            bot.send_message(chat_id=admin_id, text="start_quizError: {str(e)}")
+            
 
         
         
