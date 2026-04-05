@@ -102,7 +102,7 @@ class QuizManager:
 
             return True
         except Exception as e:
-            bot.send_message(chat_id=admin_id, text="start_quizError: {str(e)}")
+            print("start_quizError: {str(e)}")
             
 
     def start_mistakes_review(self, chat_id, mistakes_list, bot):
@@ -137,7 +137,7 @@ class QuizManager:
             # تصحيح: استخدام chat_id بدلاً من user_id
             threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
         except Exception as e:
-            bot.send_message(admin_id, f"start_mistakes_review error: {str(e)}")
+            print(f"start_mistakes_review error: {str(e)}")
     
 
     def load_quiz(self, quiz_code):
