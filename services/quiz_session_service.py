@@ -42,6 +42,7 @@ class QuizManager:
         
             state["questions"].extend(quizzes)
             state["is_extended"] = True
+            state["waiting_for_extension"] = False
 
     def start_quiz(self, chat_id, quiz_code, bot, is_shared_user=None):
         print("QUIZ CODE:", quiz_code, flush=True)
@@ -97,6 +98,7 @@ class QuizManager:
                 "review_count": review_count,
                 "wrong_count": 0,
                 "is_extended": False,
+                "waiting_for_extension": True,
                 "source": "mistakes_pool", # 👈 هنا نضع العلامة
                 "quiz_code": "REVIEW_MODE"
             }
@@ -271,21 +273,28 @@ class QuizManager:
         else:
             # إذا كان اختباراً عادياً (ليس مراجعة) وأخطأ المستخدم
             if not is_correct:
+                # تحتاج تعديل لضمان عدم حفظ الخطأ مرتين ❗
                 self.save_mistake(chat_id, q)
             
 
         if selected_option == q.correct_index:
             state["score"] += 1
 
-        state["index"] += 1
+        else:
+            state["index"] += 1
         
 
         if state["index"] >= len(state["questions"]):
+            if state.get("source") == "mistakes_pool":
 
-            if not state.get("is_extended"):
-                bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
-                return
+                if not state.get("is_extended"):
+                    if state.get("waiting_for_extension"):
+                        bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
+                        return
 
+                else:
+                    self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                    return
             else:
                 self.finish_quiz(chat_id, bot, is_shared_user=shared)
                 return
