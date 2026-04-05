@@ -6,6 +6,15 @@ class QuizQuestion:
         self.correct_index = correct_index
         self.explanation = explanation
 
+    # دالة التحويل لقاموس (للحفظ في القاعدة)
+    def to_dict(self):
+        return {
+            "question": self.question,
+            "options": self.options,
+            "correct_index": self.correct_index,
+            "explanation": self.explanation
+        }
+
     @classmethod
     def from_raw(cls, q):
 
@@ -21,3 +30,5 @@ class QuizQuestion:
             return cls(q[0], q[1], q[2], q[3] if len(q) > 3 else "")
 
         return None
+
+
