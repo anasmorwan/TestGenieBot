@@ -1,6 +1,6 @@
 from bot.bot_instance import mybot
 from services.user_trap import should_show_daily, update_progress
-from storage.sqlite_db import get_connection، get_user_content
+from storage.sqlite_db import get_connection, get_user_content
 from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
 from bot.keyboards.actions_keyboard import streak_keyboard
