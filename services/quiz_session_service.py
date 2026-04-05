@@ -360,18 +360,13 @@ class QuizManager:
                 # هنا ننتظر Thread الـ generate_and_store ليقوم بعمله
                 # (سيقوم هو باستدعاء send_current_question عندما ينتهي)
                 return
-            else:
-                if state.get("source") == "mistakes_pool" and state.get("has_saved_texts") is False:
-                    # تأخير بسيط لكي يقرأ المستخدم نتيجته أولاً
-                    import time
-                    time.sleep(1)
-                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
-                    return
-                else:
+            
                     
-                    # حالة ب: انتهت كل الأسئلة ولا يوجد تمديد
-                    self.finish_quiz(chat_id, bot, is_shared_user=shared)
-                    return
+                
+                    
+            # حالة ب: انتهت كل الأسئلة ولا يوجد تمديد
+            self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                return
 
         # 4. إذا لم ينتهِ الاختبار، أرسل السؤال التالي فوراً
         self.send_current_question(chat_id, bot)
@@ -397,61 +392,71 @@ class QuizManager:
         streak, xp = update_progress(chat_id)
         weakness_line = get_weakness_line(chat_id, wrong)
         prepared_text = build_result_message(chat_id, score, total, streak, xp)
-        
+        has_text = state.get("has_saved_texts")
+        source = state.get("source")
 
         
         if not is_paid_user_active(chat_id) and not shared:
+            if source == "mistakes_pool" and not has_text:
+                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+            else:
             
-            
-            keyboard = share_quiz_button(quiz_code)
-            try:
-                bot.send_message(
-                    chat_id=chat_id,
-                    text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
-                    reply_markup=keyboard,
-                    parse_mode="HTML"
-                )
-                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")          
-            except Exception as e:
-                print(f"❌ فشل إرسال النتيجة: {e}")
-                bot.send_message(chat_id, f"خطأ: {str(e)}")
+                keyboard = share_quiz_button(quiz_code)
+                try:
+                    bot.send_message(
+                        chat_id=chat_id,
+                        text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+                        reply_markup=keyboard,
+                        parse_mode="HTML"
+                    )
+                    print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")          
+                except Exception as e:
+                    print(f"❌ فشل إرسال النتيجة: {e}")
+                    bot.send_message(chat_id, f"خطأ: {str(e)}")
 
 
         
         elif is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
+            if source == "mistakes_pool" and not has_text:
+                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
             
-            keyboard = share_quiz_button(quiz_code)
+            else:
+                keyboard = share_quiz_button(quiz_code)
             
-            try:
-                bot.send_message(
-                    chat_id=chat_id,
-                    text=get_message("TRAP_MSG", total=total, score=score, xp=xp, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
-                    reply_markup=keyboard,
-                    parse_mode="HTML"
-                )
-                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")           
-            except Exception as e:
-                print(f"❌ فشل إرسال النتيجة: {e}")
-                bot.send_message(chat_id, f"خطأ: {str(e)}")
+                try:
+                    bot.send_message(
+                        chat_id=chat_id,
+                        text=get_message("TRAP_MSG", total=total, score=score, xp=xp, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+                        reply_markup=keyboard,
+                        parse_mode="HTML"
+                    )
+                    print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")           
+                except Exception as e:
+                    print(f"❌ فشل إرسال النتيجة: {e}")
+                    bot.send_message(chat_id, f"خطأ: {str(e)}")
 
         
         elif shared:
-            try:
-                keyboard = share_quiz_button(quiz_code)
-
-                if quiz_code:
-                    creator_id = get_quiz_creator(quiz_code)
-                    log_quiz_attempt(chat_id, quiz_code, score, total)
-                bot.send_message(
-                    chat_id=chat_id,
-                    text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
-                    reply_markup=keyboard,
-                    parse_mode="HTML"
-                )
-            except Exception as e:
-                print(f"❌ فشل إرسال التقرير: {e}")
-                bot.send_message(chat_id, f"خطأ: {str(e)}")
+            if quiz_code:
+                creator_id = get_quiz_creator(quiz_code)
+                log_quiz_attempt(chat_id, quiz_code, score, total)
+                
+            if source == "mistakes_pool" and not has_text:
+                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                
+            else:
+                try:
+                    keyboard = share_quiz_button(quiz_code)
+                    bot.send_message(
+                        chat_id=chat_id,
+                        text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+                        reply_markup=keyboard,
+                        parse_mode="HTML"
+                    )
+                except Exception as e:
+                    print(f"❌ فشل إرسال التقرير: {e}")
+                    bot.send_message(chat_id, f"خطأ: {str(e)}")
 
 
             
