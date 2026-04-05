@@ -10,7 +10,7 @@ from services.usage import is_paid_user_active
 import threading
 import time
 
-quiz_question = QuizQuestion()
+# quiz_question = QuizQuestion()
 #----------------------------
 #  🔹 توليد و حفظ ال QC
 #----------------------------
