@@ -324,76 +324,62 @@ class QuizManager:
         
     
     
-    
-
     def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
         state = self.sessions.get(chat_id)
         if not state:
             return
 
-        # إذا لم يُمرر is_shared_user كمعامل، نقرأه من الجلسة
         shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
-
-        
-
+    
+        # 1. الحصول على السؤال الحالي وحساب النتيجة
         q = state["questions"][state["index"]]
-        is_correct = (selected_option == q.correct_index) 
-        if not is_correct:
-            state["wrong_count"] += 1   # 👈 احسب الأخطاء هنا
-
-        if state.get("source") == "mistakes_pool":   
-            if is_correct:
-                # إذا أجاب صح على سؤال كان خطأ سابقاً، نزيد عداد الإتقان
-                self.increment_correct_count(chat_id, q.question)
-            else:
-                # إذا أخطأ فيه مجدداً، نعيد تصفير العداد لضمان بقائه في التدريب
-                self.reset_correct_count(chat_id, q.question)
-        else:
-            # إذا كان اختباراً عادياً (ليس مراجعة) وأخطأ المستخدم
-            if not is_correct:
-                # تحتاج تعديل لضمان عدم حفظ الخطأ مرتين ❗
-                self.save_mistake(chat_id, q)
-            
-
-        if selected_option == q.correct_index:
+        is_correct = (selected_option == q.correct_index)
+    
+        if is_correct:
             state["score"] += 1
-            state["index"] += 1
+            # إذا كان من مجمع الأخطاء، نزيد عداد الإتقان
+            if state.get("source") == "mistakes_pool":
+                self.increment_correct_count(chat_id, q.question)
         else:
             state["wrong_count"] += 1
-            state["index"] += 1
+            # حفظ الخطأ إذا لم يكن مراجعة أخطاء أصلاً
+            if state.get("source") != "mistakes_pool":
+                self.save_mistake(chat_id, q)
+            else:
+                self.reset_correct_count(chat_id, q.question)
 
-        
-        
+        # 2. الانتقال للسؤال التالي
+        state["index"] += 1
 
+        # 3. التحقق: هل وصلنا لنهاية القائمة الحالية؟
         if state["index"] >= len(state["questions"]):
-            
-            if state.get("source") == "mistakes_pool":
-                self.send_current_question(chat_id, bot)
-                if not state.get("has_saved_texts"):
+        
+            # حالة أ: ننتظر أسئلة إضافية من الذكاء الاصطناعي
+            if state.get("waiting_for_extension"):
+                bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
+                # هنا ننتظر Thread الـ generate_and_store ليقوم بعمله
+                # (سيقوم هو باستدعاء send_current_question عندما ينتهي)
+                return
+            else:
+                if state.get("source") == "mistakes_pool" and state.get("has_saved_texts") is False:
+                    # تأخير بسيط لكي يقرأ المستخدم نتيجته أولاً
+                    import time
+                    time.sleep(1)
                     bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
-                    
-                
-
-                if state.get("waiting_for_extension") and not state.get("is_extended"):
-                    challenge_q_msg = bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
-
-                    if state.get("questions_resumed"):
-                        message_id = challenge_q_msg.message_id
-                        
-                        self.generate_and_store(bot=bot, chat_id=chat_id, message_id=message_id)
-                        
-                        return
-
+                    return
                 else:
+                    
+                    # حالة ب: انتهت كل الأسئلة ولا يوجد تمديد
                     self.finish_quiz(chat_id, bot, is_shared_user=shared)
                     return
-            else:
-                self.finish_quiz(chat_id, bot, is_shared_user=shared)
-                return
 
-
+        # 4. إذا لم ينتهِ الاختبار، أرسل السؤال التالي فوراً
         self.send_current_question(chat_id, bot)
+        
 
+
+
+        
     
     def finish_quiz(self, chat_id, bot, is_shared_user=None):
     
@@ -512,3 +498,77 @@ class QuizManager:
 
 
 quiz_manager = QuizManager()
+
+
+"""
+def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
+        state = self.sessions.get(chat_id)
+        if not state:
+            return
+
+        # إذا لم يُمرر is_shared_user كمعامل، نقرأه من الجلسة
+        shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
+
+        
+
+        q = state["questions"][state["index"]]
+        is_correct = (selected_option == q.correct_index) 
+        if not is_correct:
+            state["wrong_count"] += 1   # 👈 احسب الأخطاء هنا
+
+        if state.get("source") == "mistakes_pool":   
+            if is_correct:
+                # إذا أجاب صح على سؤال كان خطأ سابقاً، نزيد عداد الإتقان
+                self.increment_correct_count(chat_id, q.question)
+            else:
+                # إذا أخطأ فيه مجدداً، نعيد تصفير العداد لضمان بقائه في التدريب
+                self.reset_correct_count(chat_id, q.question)
+        else:
+            # إذا كان اختباراً عادياً (ليس مراجعة) وأخطأ المستخدم
+            if not is_correct:
+                # تحتاج تعديل لضمان عدم حفظ الخطأ مرتين ❗
+                self.save_mistake(chat_id, q)
+            
+
+        if selected_option == q.correct_index:
+            state["score"] += 1
+            state["index"] += 1
+        else:
+            state["wrong_count"] += 1
+            state["index"] += 1
+
+        
+        
+
+        if state["index"] >= len(state["questions"]):
+            
+            if state.get("source") == "mistakes_pool":
+                self.send_current_question(chat_id, bot)
+                if not state.get("has_saved_texts"):
+                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                    
+                
+
+                if state.get("waiting_for_extension") and not state.get("is_extended"):
+                    challenge_q_msg = bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
+
+                    if state.get("questions_resumed"):
+                        message_id = challenge_q_msg.message_id
+                        
+                        self.generate_and_store(bot=bot, chat_id=chat_id, message_id=message_id)
+                        
+                        return
+
+
+
+    
+
+                else:
+                    self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                    return
+            else:
+                self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                return
+
+self.send_current_question(chat_id, bot)
+"""
