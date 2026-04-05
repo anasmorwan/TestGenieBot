@@ -105,42 +105,39 @@ class QuizManager:
             bot.send_message(chat_id=admin_id, text="start_quizError: {str(e)}")
             
 
-    def start_mistakes_review(self, chat_id, object, bot):  
+    def start_mistakes_review(self, chat_id, mistakes_list, bot):
         try:
-            # هذه دالة جديدة تبدأ اختباراً من الأخطاء فقط
-            quiz_data = object.get("questions")
             questions = []
-            for q in quiz_data:
-                obj = QuizQuestion.from_raw(q)
-                print("RAW:", q, flush=True)
-                print("PARSED:", obj, flush=True)
-                if obj:
-                    questions.append(obj)
-                    
-            review_count = len(questions)
+            for mistake in mistakes_list:
+                q_dict = mistake.get("questions")   # استخراج قاموس السؤال
+                if q_dict:
+                    obj = QuizQuestion.from_raw(q_dict)
+                    if obj:
+                        questions.append(obj)
+        
+            if not questions:
+                bot.send_message(chat_id, "لا توجد أسئلة للمراجعة.")
+                return
+        
             with self.lock:
                 self.sessions[chat_id] = {
                     "questions": questions,
                     "index": 0,
                     "score": 0,
-                    "review_count": review_count,
                     "wrong_count": 0,
+                    "source": "mistakes_pool",
+                    "quiz_code": "REVIEW_MODE",
                     "is_extended": False,
                     "waiting_for_extension": True,
-                    "questions_resumed": False,
-                    "source": "mistakes_pool", # 👈 هنا نضع العلامة
-                    "quiz_code": "REVIEW_MODE"
+                    "questions_resumed": False
                 }
-            state = self.sessions.get(chat_id)
         
             self.send_current_question(chat_id, bot)
-            threading.Thread(
-                target=self.generate_and_store,
-                args=(bot, chat_id, user_id)
-                ).start()
+        
+            # تصحيح: استخدام chat_id بدلاً من user_id
+            threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
         except Exception as e:
-            bot.send_message(chat_id=admin_id, text="generate_and_store_error: {str(e)}")
-            
+            bot.send_message(admin_id, f"start_mistakes_review error: {str(e)}")
     
 
     def load_quiz(self, quiz_code):
