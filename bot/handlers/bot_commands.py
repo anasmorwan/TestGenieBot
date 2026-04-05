@@ -3,7 +3,7 @@ from bot.keyboards.main_menu import main_menu_keyboard
 from storage.messages import get_message
 from storage.session_store import user_states
 from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
-
+from bot.helping_functions import truncate_text
 def register(bot):
   
     @bot.message_handler(commands=["menu"])
@@ -92,10 +92,6 @@ def register(bot):
 
 
 
-import telebot
-from telebot import types
-
-bot = telebot.TeleBot("YOUR_BOT_TOKEN")
 
 # قائمة معرفات الأدمن
 admin_ids = [123, 456]  # استبدل بالأرقام الحقيقية
@@ -176,35 +172,3 @@ def view_user_knowledge(msg):
     except Exception as e:
         bot.reply_to(msg, f"❌ حدث خطأ أثناء جلب البيانات: {str(e)}")
 
-
-def get_user_knowledge(user_id):
-    """جلب جميع النصوص المحفوظة لمستخدم معين"""
-    conn = get_connection()
-    c = conn.cursor()
-    
-    try:
-        c.execute("""
-            SELECT id, last_text, specialty, updated_at
-            FROM user_knowledge 
-            WHERE user_id = ?
-            ORDER BY updated_at DESC
-        """, (user_id,))
-        
-        rows = c.fetchall()
-        
-        knowledge_list = []
-        for row in rows:
-            knowledge_list.append({
-                'id': row[0],
-                'last_text': row[1],
-                'specialty': row[2],
-                'updated_at': row[3]
-            })
-        
-        return knowledge_list
-        
-    except Exception as e:
-        print(f"Error in get_user_knowledge: {e}")
-        return []
-    finally:
-        conn.close()
