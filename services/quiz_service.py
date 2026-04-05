@@ -11,7 +11,9 @@ from services.user_trap import save_user_knowledge
 import random
 import threading
 import time
- 
+from models.quiz import QuizQuestion
+
+
 done_event = threading.Event()
 # weights = [0.6, 0.25, 0.15]  # الأول له النسبة الأكبر
 
@@ -29,30 +31,26 @@ messages = [
 
 
 def normalize_quizzes(raw_data):
-    """
-    تحول أي مدخل (Dict أو List) إلى قائمة موحدة من الكائنات
-    """
-    if not raw_data:
-        return []
+    questions_list = []
     
-    # 1. إذا كان المدخل قاموساً يحتوي على مفتاح questions
+    # 1. استخراج القائمة سواء كان الرد Object كامل أو Array مباشر
     if isinstance(raw_data, dict):
         questions_list = raw_data.get("questions", [])
-    # 2. إذا كان المدخل قائمة مباشرة
     elif isinstance(raw_data, list):
         questions_list = raw_data
-    else:
-        return []
 
-    # 3. تحويل كل عنصر في القائمة إلى كائن QuizQuestion (لضمان توحيد الحقول)
+    # 2. تحويل كل عنصر إلى كائن باستخدام الكلاس الخاص بك
     normalized = []
     for q in questions_list:
-        # إذا كان العنصر أصلاً كائن، أضفه، وإذا كان dict حوله لكائن
-        obj = QuizQuestion.from_raw(q) if isinstance(q, dict) else q
-        if obj:
-            normalized.append(obj)
+        if isinstance(q, dict) or isinstance(q, list):
+            obj = QuizQuestion.from_raw(q)  # 👈 السحر يحدث هنا
+            if obj: 
+                normalized.append(obj)
+        elif isinstance(q, QuizQuestion):
+            normalized.append(q)
             
     return normalized
+ 
  
 def get_unique_random_message(user_id):
     global user_messages_remaining
