@@ -435,38 +435,3 @@ class QuizManager:
 
 
 quiz_manager = QuizManager()
-"""
-remaining = len(state["questions"]) - state["index"]
-
-if remaining == 1 and not state.get("extended"):
-    new_questions = get_generated_questions(user_id)
-
-    if new_questions:
-        state["questions"].extend(new_questions)
-        state["extended"] = True
-
-"""
-state["index"] += 1
-
-# 👇 هل انتهت كل الأسئلة الحالية؟
-if state["index"] >= len(state["questions"]):
-
-    if not state.get("is_extended"):
-        # لم تصل الأسئلة الجديدة بعد
-        
-        if state.get("waiting_for_extension"):
-            return  # ننتظر بدون إنهاء
-        
-        state["waiting_for_extension"] = True
-        
-        bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة جديدة لك...")
-
-        return
-
-    else:
-        # تم التمديد وانتهت أيضاً
-        self.finish_quiz(chat_id, bot, is_shared_user=shared)
-        return
-
-# 👇 إرسال السؤال التالي بشكل طبيعي
-self.send_current_question(chat_id, bot)
