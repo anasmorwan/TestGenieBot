@@ -49,6 +49,7 @@ def send_daily_challenge(bot, user_id, review_count, new_count, challenge_count)
             'is_pro': is_pro,
             'num_questions': num_quizzes
         }).start()
+        return num_quizzes
         
     
     if extended_quizzes is not None and len(extended_quizzes) > 0:
