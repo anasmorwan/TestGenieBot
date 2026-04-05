@@ -11,7 +11,7 @@ from services.user_trap import save_user_knowledge
 import random
 import threading
 import time
-
+ 
 done_event = threading.Event()
 # weights = [0.6, 0.25, 0.15]  # الأول له النسبة الأكبر
 
