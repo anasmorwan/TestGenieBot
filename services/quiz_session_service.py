@@ -369,7 +369,7 @@ class QuizManager:
             
             if state.get("source") == "mistakes_pool":
                 self.send_current_question(chat_id, bot)
-                if state.get("has_saved_texts"):
+                if not state.get("has_saved_texts"):
                     bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                     
                 
