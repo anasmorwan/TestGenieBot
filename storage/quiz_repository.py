@@ -20,32 +20,42 @@ def generate_quiz_code():
 
 
 def store_quiz(user_id, quizzes):
-
     conn = get_connection()
     c = conn.cursor()
 
     code = generate_quiz_code()
     is_paid = 1 if is_paid_user_active(user_id) else 0
 
+    # 1. تجهيز البيانات خارج الـ execute لضمان نظافة الكود
+    # نحول كل كائن QuizQuestion إلى قاموس (Dict) ليقبله الـ JSON
+    list_of_dicts = [q.to_dict() for q in quizzes]
+    json_data = json.dumps(list_of_dicts)
 
-    c.execute("""
-    INSERT INTO user_quizzes
-    (user_id, quiz_data, quiz_code, created_at, is_paid)
-    VALUES (?, ?, ?, ?, ?)
-    """, (
-        user_id,
-        json_data = json.dumps([q.to_dict() for q in quizzes]),
-        code,
-        datetime.now().isoformat(),
-        is_paid
-    ))
-    
-    print("🗑 old quizzes deleated", flush=True)
+    try:
+        c.execute("""
+        INSERT INTO user_quizzes
+        (user_id, quiz_data, quiz_code, created_at, is_paid)
+        VALUES (?, ?, ?, ?, ?)
+        """, (
+            user_id,
+            json_data,  # تمرير المتغير الجاهز هنا
+            code,
+            datetime.now().isoformat(),
+            is_paid
+        ))
+        
+        conn.commit()
+        print(f"✅ Quiz stored successfully with code: {code}", flush=True)
 
-    conn.commit()
-    conn.close()
+    except Exception as e:
+        print(f"❌ Error storing quiz: {e}", flush=True)
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
 
     return code
+    
 
 def store_content(user_id, content_data, content_type):
     conn = get_connection()
