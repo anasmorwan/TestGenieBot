@@ -125,78 +125,61 @@ def get_user_content(user_id):
         conn.close()
 
     
+
 def save_user_knowledge(user_id, last_text, specialty):
     conn = get_connection()
     c = conn.cursor()
     
     try:
-        # التحقق من حالة المستخدم
+        # تنظيف المدخلات (حل مشكلة الـ tuple التي واجهتها سابقاً)
+        if isinstance(last_text, (tuple, list)): last_text = last_text[0]
+        if isinstance(specialty, (tuple, list)): specialty = specialty[0]
+
         if is_paid_user_active(user_id):
-            # المستخدم المدفوع: يخزن 10 نصوص
-            
-            # إدراج النص الجديد
+            # 1. إدراج النص الجديد (مسموح بالتكرار هنا لأننا حذفنا الـ Unique Index)
             c.execute("""
                 INSERT INTO user_knowledge (user_id, last_text, specialty, updated_at)
                 VALUES (?, ?, ?, CURRENT_TIMESTAMP)
             """, (user_id, last_text, specialty))
             
-            # التحقق من العدد الإجمالي
-            c.execute("""
-                SELECT COUNT(*) FROM user_knowledge WHERE user_id = ?
-            """, (user_id,))
-            
+            # 2. فحص العدد للحذف الزائد (كودك الحالي سليم)
+            c.execute("SELECT COUNT(*) FROM user_knowledge WHERE user_id = ?", (user_id,))
             count = c.fetchone()[0]
             
-            # إذا تجاوز 10، احذف الأقدم
             if count > 10:
-                # احصل على IDs السجلات القديمة للحذف
                 c.execute("""
-                    SELECT id FROM user_knowledge 
-                    WHERE user_id = ? 
-                    ORDER BY updated_at ASC 
-                    LIMIT ?
+                    DELETE FROM user_knowledge WHERE id IN (
+                        SELECT id FROM user_knowledge 
+                        WHERE user_id = ? 
+                        ORDER BY updated_at ASC 
+                        LIMIT ?
+                    )
                 """, (user_id, count - 10))
-                
-                old_records = c.fetchall()
-                if old_records:
-                    # استخراج IDs كقائمة منفردة
-                    ids_to_delete = [record[0] for record in old_records]
-                    placeholders = ','.join(['?' for _ in ids_to_delete])
-                    
-                    c.execute(f"""
-                        DELETE FROM user_knowledge 
-                        WHERE id IN ({placeholders})
-                    """, ids_to_delete)
         
         else:
-            # المستخدم العادي: يخزن آخر نص فقط (يستبدل كل مرة)
-            
-            # أولاً: جلب السجل القديم إن وجد
+            # للمستخدم العادي: نريد دائماً صفاً واحداً فقط
             c.execute("SELECT id FROM user_knowledge WHERE user_id = ?", (user_id,))
             existing = c.fetchone()
             
             if existing:
-                # تحديث السجل الموجود
                 c.execute("""
                     UPDATE user_knowledge 
                     SET last_text = ?, specialty = ?, updated_at = CURRENT_TIMESTAMP
                     WHERE user_id = ?
                 """, (last_text, specialty, user_id))
             else:
-                # إدراج سجل جديد
                 c.execute("""
                     INSERT INTO user_knowledge (user_id, last_text, specialty, updated_at)
                     VALUES (?, ?, ?, CURRENT_TIMESTAMP)
                 """, (user_id, last_text, specialty))
         
         conn.commit()
-        
     except Exception as e:
-        raise ValueError(f"❌ Error in save_user_knowledge: {e}")
         conn.rollback()
         raise e
     finally:
         conn.close()
+        
 
 def get_or_create_user(user_id):
     conn = get_connection()
