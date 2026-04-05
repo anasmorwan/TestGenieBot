@@ -6,7 +6,7 @@ from datetime import timedelta, datetime, date
 from bot.keyboards.actions_keyboard import streak_keyboard
 from services.quiz_session_service import QuizManager
 import threading
-from services.quiz_service import generate_quizzes_from_text
+from services.quiz_service import generate_challenge_quiz
 
 
 def send_streak(user_id, streak, xp):
@@ -41,11 +41,10 @@ def send_daily_challenge(bot, user_id, review_count, new_count, challenge_count)
     content = get_user_content(user_id)
     if challenge_count and new_count > 0:
         num_quizzes = challenge_count + new_count
-        extended_quizzes = threading.Thread(target=generate_quizzes_from_text, kwargs={
+        extended_quizzes = threading.Thread(target=generate_challenge_quiz, kwargs={
             'content': content,
-            'user_id': user_id,
-            'bot': bot,
-            'num_quizzes': num_quizzes
+            'is_pro': True,
+            'num_questions': num_quizzes
         }).start()
         
     if review_count > 0:
