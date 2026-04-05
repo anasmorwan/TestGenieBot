@@ -4,7 +4,6 @@ from storage.sqlite_db import get_connection, get_user_content
 from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
 from bot.keyboards.actions_keyboard import streak_keyboard
-from services.quiz_session_service import QuizManager
 import threading
 from services.quiz_service import generate_challenge_quiz
 from services.usage import is_paid_user_active
