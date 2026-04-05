@@ -28,6 +28,17 @@ class QuizManager:
         # ✅ هذا هو الناقص
         self.poll_map = {}
 
+    def generate_and_store(self, bot, chat_id, user_id, num_quizzes):
+        quizzes = generate_challenge_quiz(bot, user_id, review_count, new_count, challenge_count)
+
+        with self.lock:
+            state = self.sessions.get(chat_id)
+            if not state:
+                return
+        
+            state["questions"].extend(quizzes)
+            state["is_extended"] = True
+
     def start_quiz(self, chat_id, quiz_code, bot, is_shared_user=None):
         print("QUIZ CODE:", quiz_code, flush=True)
         quiz_data = self.load_quiz(quiz_code)
@@ -88,13 +99,10 @@ class QuizManager:
         state = self.sessions.get(chat_id)
         
         self.send_current_question(chat_id, bot)
-        extended_quizzes = send_daily_challenge(bot, user_id, review_count, new_count, challenge_count)
-    
-    
-        if extended_quizzes is not None and len(extended_quizzes) > 0:
-            state["questions"].extend(extended_quizzes)
-            state["is_extended"] = True
-        
+        threading.Thread(
+            target=self.generate_and_store,
+            args=(chat_id, user_id, num_quizzes)
+            ).start()
     
 
     def load_quiz(self, quiz_code):
@@ -421,3 +429,27 @@ if remaining == 1 and not state.get("extended"):
         state["extended"] = True
 
 """
+state["index"] += 1
+
+# 👇 هل انتهت كل الأسئلة الحالية؟
+if state["index"] >= len(state["questions"]):
+
+    if not state.get("is_extended"):
+        # لم تصل الأسئلة الجديدة بعد
+        
+        if state.get("waiting_for_extension"):
+            return  # ننتظر بدون إنهاء
+        
+        state["waiting_for_extension"] = True
+        
+        bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة جديدة لك...")
+
+        return
+
+    else:
+        # تم التمديد وانتهت أيضاً
+        self.finish_quiz(chat_id, bot, is_shared_user=shared)
+        return
+
+# 👇 إرسال السؤال التالي بشكل طبيعي
+self.send_current_question(chat_id, bot)
