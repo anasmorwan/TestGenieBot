@@ -117,7 +117,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
                 )
                 print(f"✉️ first message sent 📤", flush=True)
             prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
-                threading.Thread(
+            threading.Thread(
                 target=delayed_message,
                 args=(bot, user_id, 3, selected_text)
             ).start()
