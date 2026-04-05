@@ -186,7 +186,7 @@ def generate_challenge_quiz(content, num_questions, is_pro):
         quizzes = response_data.get("questions", [])
         print(f"✉️ quizzes extracted successfully", flush=True)
         
-        return normalize_quizzes(quizzes)[:num_quizzes]
+        return normalize_quizzes(quizzes)
         
     except Exception as e:
         print(f"ERROR: {str(e)}")
