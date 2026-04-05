@@ -7,7 +7,7 @@ from bot.keyboards.actions_keyboard import streak_keyboard
 from services.quiz_session_service import QuizManager
 import threading
 from services.quiz_service import generate_challenge_quiz
-from services.usage importis_paid_user_active
+from services.usage import is_paid_user_active
 
 def send_streak(user_id, streak, xp):
     quiz_code = "quiz_sample"
