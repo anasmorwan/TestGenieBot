@@ -179,10 +179,7 @@ def register(bot):
                         
                 except Exception as e:
                     bot.send_message(chat_id, f"CALLBACK ERROR: {str(e)}")
-                finally:
-                    if review_count is not None and mistakes is not None:
-                        bot.send_message(chat_id, f"OPERATION started:\n\nالاخطاء: {mistakes}\n\nعدد الاسئلة: {review_count}")
-        
+                    print(f"CALLBACK ERROR: {str(e)}")
                 
                 
                 
