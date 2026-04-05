@@ -350,7 +350,7 @@ def generate_smart_batch_prompt(user_id, text_content, num_questions):
 
     detected_domain = metadata.get("domain", "General")
     update_user_major(user_id, detected_domain)
-    save_user_knowledge(user_id, content, detected_domain)
+    save_user_knowledge(user_id, text_content, detected_domain)
         
     
     # 2. التطبيع الاحترافي للمستوى
