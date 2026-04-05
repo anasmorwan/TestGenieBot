@@ -1,6 +1,6 @@
 # quiz_service.py
 from ai.llm_client import generate_smart_response
-from ai.prompts import build_quiz_prompt, pro_quiz_generator, safe_generate
+from ai.prompts import build_quiz_prompt, pro_quiz_generator, safe_generate, build_adaptive_quiz_prompt
 from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
@@ -147,3 +147,28 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             return []
             
         return quizzes[:num_quizzes]
+
+
+def generate_challenge_quiz(content, num_questions, is_pro):
+    try:
+        prompt = build_adaptive_quiz_prompt(content, num_questions, is_pro)
+        raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+        print(f"✉️ raw response message obtained", flush=True)        
+
+        
+        response_data = parse_llm_json(raw_response)
+        print(f"🗣️ response_data generated", flush=True)
+        
+    
+        quizzes = response_data.get("questions", [])
+        print(f"✉️ quizzes extracted successfully", flush=True)
+        
+        return quizzes
+        
+    except Exception as e:
+        print(f"ERROR: {str(e)}")
+
+
+
+
+
