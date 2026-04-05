@@ -149,7 +149,6 @@ class QuizManager:
                     "quiz_code": "REVIEW_MODE",
                     "is_extended": False,
                     "waiting_for_extension": True,
-                    "should_resume": False,
                     "questions_resumed": False
                 }
         
