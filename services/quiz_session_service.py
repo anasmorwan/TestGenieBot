@@ -170,7 +170,7 @@ class QuizManager:
                 if user_content is not None:
                     threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
                 else:
-                    bot.send_message(chat_id, "😄 هذا كل شئ لليوم، لم تقم بإنشاء أي إختبارات أُخرى. قم بإنشاء المزيد لنراجع أخطاءك مع بعض و نضع التحديات 🔥")
+                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
             else:
                 # ليس لديه أخطاء سابقة
                 if user_content:
