@@ -134,38 +134,58 @@ class QuizManager:
 
     def start_mistakes_review(self, chat_id, mistakes_list, bot):
         try:
+            # 1. تحويل الأخطاء لكائنات (حتى لو القائمة فارغة لن ينهار الكود)
             questions = []
-            for mistake in mistakes_list:
-                q_dict = mistake.get("questions")   # استخراج قاموس السؤال
-                if q_dict:
-                    obj = QuizQuestion.from_raw(q_dict)
-                    if obj:
-                        questions.append(obj)
-        
-            if not questions:
-                bot.send_message(chat_id, "لا توجد أسئلة للمراجعة.")
-                return
-        
+            if mistakes_list:
+                for mistake in mistakes_list:
+                    # التأكد من أن الخطأ يحتوي على بيانات سؤال
+                    q_data = mistake.get("questions") if isinstance(mistake, dict) else None
+                    if q_data:
+                        obj = QuizQuestion.from_raw(q_data)
+                        if obj:
+                            questions.append(obj)
+    
+            # 2. إنشاء الجلسة في كل الأحوال
             with self.lock:
                 self.sessions[chat_id] = {
-                    "questions": questions,
+                    "questions": questions, # قد تكون قائمة فارغة []
                     "index": 0,
                     "score": 0,
                     "wrong_count": 0,
-                    "source": "mistakes_pool",
-                    "quiz_code": "REVIEW_MODE",
+                    "source": "dynamic_mix",
+                    "quiz_code": "CHALLENGE_MODE",
                     "is_extended": False,
                     "waiting_for_extension": True,
                     "questions_resumed": False
                 }
-            if questions is not None:
+
+            # 3. التحقق من وجود "مادة علمية" (Knowledge) قبل بدء التوليد
+            user_content = get_user_content(chat_id) # chat_id هو نفسه user_id هنا عادة
+
+            if questions:
+                # إذا كان لديه أخطاء، نبدأ بها فوراً
                 self.send_current_question(chat_id, bot)
-        
-            # تصحيح: استخدام chat_id بدلاً من user_id
-            threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
+            
+                # إذا كان لديه مادة علمية، نشغل التوليد في الخلفية لزيادة الأسئلة
+                if user_content:
+                    threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
+                else:
+                    bot.send_message(chat_id, "😄 هذا كل شئ لليوم، لم تقم بإنشاء أي إختبارات أُخرى. قم بإنشاء المزيد لنراجع أخطاءك مع بعض و نضع التحديات 🔥")
+            else:
+                # ليس لديه أخطاء سابقة
+                if user_content:
+                    bot.send_message(chat_id, "🔍 جاري توليد أسئلة تحدي جديدة بناءً على تخصصك...")
+                    threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
+                else:
+                    # ليس لديه أخطاء وليس لديه مادة علمية!
+                    bot.send_message(chat_id, "⚠️ لا توجد أخطاء سابقة، ولم تقم بإضافة نصوص أو ملفات لتوليد أسئلة جديدة. يرجى إرسال نص أولاً!")
+                    # نحذف الجلسة لأنها لن تعمل
+                    with self.lock:
+                        self.sessions.pop(chat_id, None)
+
         except Exception as e:
-            print(f"start_mistakes_review error: {str(e)}")
-    
+            print(f"❌ Error in start_mistakes_review: {str(e)}")
+        
 
     def load_quiz(self, quiz_code):
         with self.lock:
