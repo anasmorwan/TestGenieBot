@@ -45,7 +45,9 @@ def send_daily_challenge(bot, user_id, new_count, challenge_count):
         num_quizzes = challenge_count + new_count
         extended_quizzes = generate_challenge_quiz(content, num_quizzes, is_pro)
         
-        return num_quizzes
+        return extended_quizzes  # ✅ ترجع القائمة، وليس العدد
+    
+    return []  # ✅ إرجاع قائمة فارغة إذا لم تكن الشروط مستوفاة
     
     
                 
