@@ -37,7 +37,8 @@ def send_daily_message():
         user_streak[user_id] = date.today()
 
 
-def send_daily_challenge(review_count, new_count, challenge_count):
+def send_daily_challenge(user_id, review_count, new_count, challenge_count):
+    content = get_user_contnet(user_id)
 
     threading.Thread(target=generate_quizzes_from_text, args=(user_id,)).start()
     
