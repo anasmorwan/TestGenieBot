@@ -106,37 +106,40 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             save_user_knowledge(user_id, content, domain)
 
     else:
-        if msg_id:
-            selected_text = get_unique_random_message(user_id)
-            bot.edit_message_text(
-            chat_id=user_id,
-            message_id=msg_id,
-            text=selected_text,
-            parse_mode="HTML"
-            )
-            print(f"✉️ first message sent 📤", flush=True)
-        prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
-        threading.Thread(
-            target=delayed_message,
-            args=(bot, user_id, 3, selected_text)
-        ).start()
-        print(f"✉️ second message sent 📤", flush=True)
+        try:
+            if msg_id:
+                selected_text = get_unique_random_message(user_id)
+                bot.edit_message_text(
+                chat_id=user_id,
+                message_id=msg_id,
+                text=selected_text,
+                parse_mode="HTML"
+                )
+                print(f"✉️ first message sent 📤", flush=True)
+            prompt = build_quiz_prompt(content, num_quizzes, user_instruction=user_instruction)
+                threading.Thread(
+                target=delayed_message,
+                args=(bot, user_id, 3, selected_text)
+            ).start()
+            print(f"✉️ second message sent 📤", flush=True)
         
-        raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
-        print(f"✉️ raw response message {raw_response[:50]}", flush=True)        
+            raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+            print(f"✉️ raw response message obtained", flush=True)        
 
         
-        response_data = parse_llm_json(raw_response)
-        print(f"🗣️ response_data {response_data[:10]}", flush=True)
-        detected_domain = response_data.get("domain", "General")
-        print(f"🎒 detected_domain {detected_domain}", flush=True)
-        update_user_major(user_id, detected_domain)
-        print(f"user major updated", flush=True)
-        quizzes = response_data.get("questions", [])
-        print(f"✉️ quizzes extracted successfully {quizzes[:50]}", flush=True)
+            response_data = parse_llm_json(raw_response)
+            print(f"🗣️ response_data generated", flush=True)
+            detected_domain = response_data.get("domain", "General")
+            print(f"🎒 detected_domain {detected_domain}", flush=True)
+            update_user_major(user_id, detected_domain)
+            print(f"user major updated", flush=True)
+            quizzes = response_data.get("questions", [])
+            print(f"✉️ quizzes extracted successfully", flush=True)
         
-        save_user_knowledge(user_id, content, detected_domain)
-        print(f"📖 raw user knowledge saved", flush=True)
+            save_user_knowledge(user_id, content, detected_domain)
+            print(f"📖 raw user knowledge saved", flush=True)
+        except Exception as e:
+            print(f"ERROR: {str(e)}")
         
 
         
