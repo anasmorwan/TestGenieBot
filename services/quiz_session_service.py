@@ -15,8 +15,10 @@ from services.usage import is_paid_user_active
 from services.user_trap import update_progress, get_weakness_line, get_feedback_line, build_result_message
 import random
 import time
-
-
+from bot.notifications.trap import send_daily_challenge
+    
+    
+    
 
 class QuizManager:
     def __init__(self):
@@ -71,17 +73,28 @@ class QuizManager:
     def start_mistakes_review(self, chat_id, object, bot):
         # هذه دالة جديدة تبدأ اختباراً من الأخطاء فقط
         questions = object.get("questions")
+        review_count = len(questions)
         with self.lock:
             self.sessions[chat_id] = {
                 "questions": questions,
                 "index": 0,
                 "score": 0,
+                "review_count": review_count,
                 "wrong_count": 0,
                 "is_extended": False,
                 "source": "mistakes_pool", # 👈 هنا نضع العلامة
                 "quiz_code": "REVIEW_MODE"
             }
+        state = self.sessions.get(chat_id)
+        
         self.send_current_question(chat_id, bot)
+        extended_quizzes = send_daily_challenge(bot, user_id, review_count, new_count, challenge_count)
+    
+    
+        if extended_quizzes is not None and len(extended_quizzes) > 0:
+            state["questions"].extend(extended_quizzes)
+            state["is_extended"] = True
+        
     
 
     def load_quiz(self, quiz_code):
@@ -257,15 +270,22 @@ class QuizManager:
         remaining = len(state["questions"]) - state["index"]
 
         
-        if state["index"] >= len(state["questions"]):
+        if state["index"] >= state["review_count"]:
             
+            if state["is_extended"]:
+                state["index"] += 1
                 
-            
-            self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                
+            else:
+                time.sleep(3)
+                if state["is_extended"]:
+                    state["index"] += 1
+                else:
+                    self.finish_quiz(chat_id, bot, is_shared_user=shared)
 
         
-        else:
-            self.send_current_question(chat_id, bot)
+        
+        self.send_current_question(chat_id, bot)
 
 
 
