@@ -187,6 +187,44 @@ def init_db():
     conn.commit()
     conn.close()
 
+
+#--------------------------
+#    🔹 دوال الادمن المساعدة
+#--------------------------
+
+def get_user_knowledge(user_id):
+    """جلب جميع النصوص المحفوظة لمستخدم معين"""
+    conn = get_connection()
+    c = conn.cursor()
+    
+    try:
+        c.execute("""
+            SELECT id, last_text, specialty, updated_at
+            FROM user_knowledge 
+            WHERE user_id = ?
+            ORDER BY updated_at DESC
+        """, (user_id,))
+        
+        rows = c.fetchall()
+        
+        knowledge_list = []
+        for row in rows:
+            knowledge_list.append({
+                'id': row[0],
+                'last_text': row[1],
+                'specialty': row[2],
+                'updated_at': row[3]
+            })
+        
+        return knowledge_list
+        
+    except Exception as e:
+        print(f"Error in get_user_knowledge: {e}")
+        return []
+    finally:
+        conn.close()
+        
+
 #--------------------------
 #    🔹 دوال مساعدة
 #--------------------------
