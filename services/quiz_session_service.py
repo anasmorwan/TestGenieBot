@@ -50,6 +50,8 @@ class QuizManager:
                     if not state:
                         print(f"⚠️ [WARN] State not found for chat_id: {chat_id}. Aborting.", flush=True)
                         return
+
+                    current_count = len(state["questions"])
     
                     # إضافة الأسئلة الجديدة للقائمة الحالية
                     state["questions"].extend(quizzes)
@@ -57,8 +59,9 @@ class QuizManager:
                     state["waiting_for_extension"] = False
                 
                     # التحقق هل كان البوت متوقفاً عند آخر سؤال (يحتاج استئناف)
-                    should_resume = state["index"] >= len(state["questions"]) - len(quizzes)
+                    should_resume = (current_count == 0) or (state["index"] >= current_count)
                     print(f"📝 [STATE] Questions extended. Should resume: {should_resume}", flush=True)
+                    state["questions_resumed"] = True
 
             # خارج lock
             if should_resume:
@@ -328,18 +331,21 @@ class QuizManager:
 
         if selected_option == q.correct_index:
             state["score"] += 1
+            state["index"] += 1
         else:
             state["wrong_count"] += 1
+            state["index"] += 1
 
-        state["index"] += 1
+        
         
 
         if state["index"] >= len(state["questions"]):
+            
             if state.get("source") == "mistakes_pool":
+                self.send_current_question(chat_id, bot)
 
-                if not state.get("is_extended"):
-                    if state.get("waiting_for_extension"):
-                        challenge_q_msg = bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
+                if state.get("waiting_for_extension") and not state.get("is_extended"):
+                    challenge_q_msg = bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
 
                     if state.get("questions_resumed"):
                         message_id = challenge_q_msg.message_id
