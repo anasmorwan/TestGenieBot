@@ -111,8 +111,8 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             quizzes = parse_llm_json(raw_response)
         
         
-            if not isinstance(quizzes, list):
-                return []
+            # if not isinstance(quizzes, list):
+               # return []
             
             return normalize_quizzes(quizzes)
         else:
@@ -166,8 +166,8 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         
 
         
-        if not isinstance(quizzes, list):
-            return []
+        # if not isinstance(quizzes, list):
+            #return []
             
         return normalize_quizzes(quizzes)[:num_quizzes]
 
@@ -175,23 +175,32 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 def generate_challenge_quiz(content, num_questions, is_pro):
     try:
         prompt = build_adaptive_quiz_prompt(content, num_questions, is_pro)
-        raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
-        print(f"✉️ raw response message obtained", flush=True)        
+        raw_response = safe_generate(prompt)
+        
+        # 🧪 اطبع الرد الخام فوراً قبل أي معالجة
+        print(f"DEBUG: Raw AI Response: {raw_response[:200]}...", flush=True)
 
+        if not raw_response or len(raw_response.strip()) < 10:
+            print("❌ AI returned empty or very short string", flush=True)
+            return []
+
+        # محاولة التحويل لـ JSON
+        try:
+            data = parse_llm_json(raw_response)
+        except Exception as json_err:
+            print(f"❌ JSON Parse Error: {json_err}", flush=True)
+            return []
+
+        # 🧪 اطبع نوع البيانات المستخرجة
+        print(f"DEBUG: Parsed Data Type: {type(data)}", flush=True)
+
+        # استخدام الـ Normalize "الذكي" الذي لا يقتل البيانات
+        quizzes = normalize_quizzes(data)
         
-        response_data = parse_llm_json(raw_response)
-        print(f"🗣️ response_data generated", flush=True)
-        
-    
-        quizzes = response_data.get("questions", [])
-        print(f"✉️ quizzes extracted successfully", flush=True)
-        
-        return normalize_quizzes(quizzes)
+        print(f"✅ Extracted {len(quizzes)} quiz objects", flush=True)
+        return quizzes
         
     except Exception as e:
-        print(f"ERROR: {str(e)}")
-
-
-
-
-
+        print(f"❌ Critical Error in generator: {str(e)}", flush=True)
+        return []
+        
