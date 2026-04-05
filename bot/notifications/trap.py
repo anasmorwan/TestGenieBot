@@ -37,26 +37,17 @@ def send_daily_message():
         user_streak[user_id] = date.today()
 
 
-def send_daily_challenge(bot, user_id, review_count, new_count, challenge_count):
+def send_daily_challenge(bot, user_id, new_count, challenge_count):
     content = get_user_content(user_id)
     
     if challenge_count and new_count > 0:
         is_pro = is_paid_user_active(user_id)
         
         num_quizzes = challenge_count + new_count
-        extended_quizzes = threading.Thread(target=generate_challenge_quiz, kwargs={
-            'content': content,
-            'is_pro': is_pro,
-            'num_questions': num_quizzes
-        }).start()
-        return num_quizzes
+        extended_quizzes = target=generate_challenge_quiz(is_pro)
         
+        return num_quizzes
     
-    if extended_quizzes is not None and len(extended_quizzes) > 0:
-        pass
-    if challenge_count > 0:
-        pass
-
     
                 
 
