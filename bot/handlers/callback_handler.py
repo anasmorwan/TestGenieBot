@@ -167,13 +167,19 @@ def register(bot):
                 quiz_code = data.split(":")[1]
 
             if data == "start_challenge":
-                distribution = get_question_distribution(user_id, total_questions=3)
-                review_count = distribution["review_count"]
+                try:
+                    distribution = get_question_distribution(user_id, total_questions=3)
+                    review_count = distribution["review_count"]
                 
-                if review_count > 0:
-                    mistakes = get_recent_mistakes(user_id, review_count)
+                    if review_count > 0:
+                        mistakes = get_recent_mistakes(user_id, review_count)
                     
-                    QuizManager.start_mistakes_review(chat_id, mistakes, bot)
+                        QuizManager.start_mistakes_review(chat_id, mistakes, bot)
+                except Exception as e:
+                    bot.send_message(chat_id, f"CALLBACK ERROR: {str(e)}")
+                finally:
+                    if review_count is not None and mistakes is not None:
+                        bot.send_message(chat_id, f"OPERATION started:\n\nالاخطاء: {mistakes}\n\nعدد الاسئلة: {review_count}")
         
                 
                 
