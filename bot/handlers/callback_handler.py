@@ -174,8 +174,9 @@ def register(bot):
                     if review_count > 0:
                         mistakes = get_recent_mistakes(user_id, review_count)
                     
-                        QuizManager.start_mistakes_review(chat_id, mistakes, bot)
-                        start_mistakes_review(self, chat_id, object, bot):
+                        quiz_manager = QuizManager()  # إنشاء كائن
+                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
+                        
                 except Exception as e:
                     bot.send_message(chat_id, f"CALLBACK ERROR: {str(e)}")
                 finally:
