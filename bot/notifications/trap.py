@@ -37,7 +37,7 @@ def send_daily_message():
         user_streak[user_id] = date.today()
 
 
-def send_daily_challenge(user_id, review_count, new_count, challenge_count):
+def send_daily_challenge(bot, user_id, review_count, new_count, challenge_count):
     content = get_user_content(user_id)
     if challenge_count and new_count > 0:
         num_quizzes = challenge_count + new_count
