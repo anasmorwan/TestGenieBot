@@ -72,7 +72,7 @@ def save_user_knowledge(user_id, last_text, specialty):
         conn.commit()
         
     except Exception as e:
-        riase ValueError(f"❌ Error in save_user_knowledge: {e}")
+        raise ValueError(f"❌ Error in save_user_knowledge: {e}")
         conn.rollback()
         raise e
     finally:
