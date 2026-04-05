@@ -172,7 +172,7 @@ def register(bot):
                 challenge_count = distribution["challenge_count"]
                 new_count = distribution["new_count"]
                 
-                send_daily_challenge(review_count, new_count, challenge_count)
+                send_daily_challenge(user_id, review_count, new_count, challenge_count)
                 
                 
                        
