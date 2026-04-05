@@ -53,7 +53,7 @@ class QuizManager:
                 self.send_current_question(chat_id, bot)
                 state["questions_resumed"] = True
         except Exception as e:
-            bot.send_message(chat_id=admin_id, text="generate_and_store_error: {str(e)}")
+            print(f"generate_and_store_error: {str(e)}")
             
         
 
