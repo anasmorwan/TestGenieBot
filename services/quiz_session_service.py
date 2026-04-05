@@ -1,5 +1,5 @@
 import sqlite3
-from storage.sqlite_db import get_connection
+from storage.sqlite_db import get_connection, get_question_distribution
 import json
 from datetime import datetime
 from models.quiz import QuizQuestion
@@ -28,8 +28,12 @@ class QuizManager:
         # ✅ هذا هو الناقص
         self.poll_map = {}
 
-    def generate_and_store(self, bot, chat_id, user_id, num_quizzes):
-        quizzes = generate_challenge_quiz(bot, user_id, review_count, new_count, challenge_count)
+    def generate_and_store(self, bot, chat_id, user_id):
+        distribution = get_question_distribution(user_id, total_questions=3)
+        challenge_count = distribution["challenge_count"]
+        new_count = distribution["new_count"]
+        
+        quizzes = generate_challenge_quiz(bot, user_id, new_count, challenge_count)
 
         with self.lock:
             state = self.sessions.get(chat_id)
@@ -81,7 +85,7 @@ class QuizManager:
 
         return True
 
-    def start_mistakes_review(self, chat_id, object, bot):
+    def start_mistakes_review(self, chat_id, object, bot):   
         # هذه دالة جديدة تبدأ اختباراً من الأخطاء فقط
         questions = object.get("questions")
         review_count = len(questions)
@@ -101,7 +105,7 @@ class QuizManager:
         self.send_current_question(chat_id, bot)
         threading.Thread(
             target=self.generate_and_store,
-            args=(chat_id, user_id, num_quizzes)
+            args=(bot, chat_id, user_id)
             ).start()
     
 
