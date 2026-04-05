@@ -40,7 +40,8 @@ class QuizManager:
     
             if user_id is not None:
                 print(f"📡 [API] Requesting quizzes from AI...", flush=True)
-                quizzes = send_daily_challenge(bot, user_id, new_count, challenge_count)
+                raw_quizzes = send_daily_challenge(bot, user_id, new_count, challenge_count)
+                quizzes = normalize_quizzes(raw_quizzes) 
                 print(f"✅ [API] Received {len(quizzes)} quizzes.", flush=True)
 
                 with self.lock:
