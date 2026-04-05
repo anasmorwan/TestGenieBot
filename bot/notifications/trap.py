@@ -7,7 +7,7 @@ from bot.keyboards.actions_keyboard import streak_keyboard
 from services.quiz_session_service import QuizManager
 import threading
 from services.quiz_service import generate_challenge_quiz
-
+from services.usage importis_paid_user_active
 
 def send_streak(user_id, streak, xp):
     quiz_code = "quiz_sample"
@@ -39,11 +39,14 @@ def send_daily_message():
 
 def send_daily_challenge(bot, user_id, review_count, new_count, challenge_count):
     content = get_user_content(user_id)
+    
     if challenge_count and new_count > 0:
+        is_pro = is_paid_user_active(user_id)
+        
         num_quizzes = challenge_count + new_count
         extended_quizzes = threading.Thread(target=generate_challenge_quiz, kwargs={
             'content': content,
-            'is_pro': True,
+            'is_pro': is_pro,
             'num_questions': num_quizzes
         }).start()
         
@@ -52,7 +55,7 @@ def send_daily_challenge(bot, user_id, review_count, new_count, challenge_count)
                     
         QuizManager.start_mistakes_review(chat_id, mistakes, bot)
         
-    if new_count > 0:
+    if extended_quizzes is not None and len(extended_quizzes) > 0:
         pass
     if challenge_count > 0:
         pass
