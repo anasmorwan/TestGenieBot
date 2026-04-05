@@ -289,9 +289,10 @@ class QuizManager:
 
         if selected_option == q.correct_index:
             state["score"] += 1
-
         else:
-            state["index"] += 1
+            state["wrong_count"] += 1
+
+        state["index"] += 1
         
 
         if state["index"] >= len(state["questions"]):
