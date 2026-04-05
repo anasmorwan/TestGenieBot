@@ -12,7 +12,7 @@ from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_v
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
 from bot.keyboards.quiz_buttons import share_quiz_button
 from services.usage import is_paid_user_active
-from services.user_trap import update_progress, get_weakness_line, get_feedback_line, build_result_message
+from services.user_trap import update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
 from services.quiz_service import normalize_quizzes
 import random
 import time
@@ -167,7 +167,7 @@ class QuizManager:
                 self.send_current_question(chat_id, bot)
             
                 # إذا كان لديه مادة علمية، نشغل التوليد في الخلفية لزيادة الأسئلة
-                if user_content:
+                if user_content is not None:
                     threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
                 else:
                     bot.send_message(chat_id, "😄 هذا كل شئ لليوم، لم تقم بإنشاء أي إختبارات أُخرى. قم بإنشاء المزيد لنراجع أخطاءك مع بعض و نضع التحديات 🔥")
