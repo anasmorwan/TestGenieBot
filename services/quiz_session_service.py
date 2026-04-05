@@ -110,12 +110,12 @@ class QuizManager:
             # هذه دالة جديدة تبدأ اختباراً من الأخطاء فقط
             quiz_data = object.get("questions")
             questions = []
-                for q in quiz_data:
-                    obj = QuizQuestion.from_raw(q)
-                    print("RAW:", q, flush=True)
-                    print("PARSED:", obj, flush=True)
-                    if obj:
-                        questions.append(obj)
+            for q in quiz_data:
+                obj = QuizQuestion.from_raw(q)
+                print("RAW:", q, flush=True)
+                print("PARSED:", obj, flush=True)
+                if obj:
+                    questions.append(obj)
                     
             review_count = len(questions)
             with self.lock:
