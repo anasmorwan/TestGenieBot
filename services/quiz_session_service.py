@@ -17,8 +17,6 @@ import random
 import time
 from bot.notifications.trap import send_daily_challenge
     
-    
-    
 
 class QuizManager:
     def __init__(self):
@@ -28,21 +26,32 @@ class QuizManager:
         # ✅ هذا هو الناقص
         self.poll_map = {}
 
-    def generate_and_store(self, bot, chat_id, user_id):
+    def generate_and_store(self, bot=None, chat_id=None, user_id=None, message_id=None):
         distribution = get_question_distribution(user_id, total_questions=3)
         challenge_count = distribution["challenge_count"]
         new_count = distribution["new_count"]
         
-        quizzes = generate_challenge_quiz(bot, user_id, new_count, challenge_count)
+        if user_id is not None:
+            quizzes = generate_challenge_quiz(bot, user_id, new_count, challenge_count)
 
-        with self.lock:
-            state = self.sessions.get(chat_id)
-            if not state:
-                return
+            with self.lock:
+                state = self.sessions.get(chat_id)
+                if not state:
+                    return
         
-            state["questions"].extend(quizzes)
-            state["is_extended"] = True
-            state["waiting_for_extension"] = False
+                state["questions"].extend(quizzes)
+                state["is_extended"] = True
+                state["waiting_for_extension"] = False
+                should_resume = state["index"] >= len(state["questions"]) - len(quizzes)
+
+        # خارج lock
+        if should_resume:
+            if message_id:
+                bot.edit_message_text(chat_id, message_id=message_id, text="🔥 تم تجهيز أسئلة جديدة!")
+            self.send_current_question(chat_id, bot)
+            state["questions_resumed"] = True
+            
+        
 
     def start_quiz(self, chat_id, quiz_code, bot, is_shared_user=None):
         print("QUIZ CODE:", quiz_code, flush=True)
@@ -99,6 +108,7 @@ class QuizManager:
                 "wrong_count": 0,
                 "is_extended": False,
                 "waiting_for_extension": True,
+                "questions_resumed": False,
                 "source": "mistakes_pool", # 👈 هنا نضع العلامة
                 "quiz_code": "REVIEW_MODE"
             }
@@ -289,7 +299,12 @@ class QuizManager:
 
                 if not state.get("is_extended"):
                     if state.get("waiting_for_extension"):
-                        bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
+                        challenge_q_msg = bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
+
+                    if state.get("questions_resumed"):
+                        message_id = challenge_q_msg.message_id
+                        self.generate_and_store(message_id=message_id)
+                        
                         return
 
                 else:
