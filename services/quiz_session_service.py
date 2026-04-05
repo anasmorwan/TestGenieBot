@@ -34,7 +34,7 @@ class QuizManager:
             new_count = distribution["new_count"]
         
             if user_id is not None:
-                quizzes = generate_challenge_quiz(bot, user_id, new_count, challenge_count)
+                quizzes = send_daily_challenge(bot, user_id, new_count, challenge_count)
 
                 with self.lock:
                     state = self.sessions.get(chat_id)
