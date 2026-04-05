@@ -53,7 +53,7 @@ class QuizManager:
                 self.send_current_question(chat_id, bot)
                 state["questions_resumed"] = True
         except Exception as e:
-            print(f"generate_and_store_error: {str(e)}")
+            raise ValueError(f"generate_and_store_error: {str(e)}")
             
         
 
@@ -102,7 +102,7 @@ class QuizManager:
 
             return True
         except Exception as e:
-            print("start_quizError: {str(e)}")
+            raise ValueError("start_quizError: {str(e)}")
             
 
     def start_mistakes_review(self, chat_id, mistakes_list, bot):
