@@ -18,6 +18,9 @@ import random
 import time
 from bot.notifications.trap import send_daily_challenge
 
+
+
+
 admin_id = 5048253124
 
 class QuizManager:
@@ -59,8 +62,9 @@ class QuizManager:
                     state["waiting_for_extension"] = False
                 
                     # التحقق هل كان البوت متوقفاً عند آخر سؤال (يحتاج استئناف)
-                    should_resume = (current_count == 0) or (state["index"] >= current_count)
-                    print(f"📝 [STATE] Questions extended. Should resume: {should_resume}", flush=True)
+                    should_resume = (current_count == 0) or (state["index"] >= current_count) or (state.get("waiting_for_extension") == True and state["index"] == 0)
+                    print(f"📝 [DEBUG] Index: {state['index']}, OldCount: {current_count}, NewTotal: {len(state['questions'])}, Resume: {should_resume}", flush=True)
+
                     state["questions_resumed"] = True
 
             # خارج lock
@@ -154,8 +158,8 @@ class QuizManager:
                     "waiting_for_extension": True,
                     "questions_resumed": False
                 }
-        
-            self.send_current_question(chat_id, bot)
+            if questions is not None:
+                self.send_current_question(chat_id, bot)
         
             # تصحيح: استخدام chat_id بدلاً من user_id
             threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
