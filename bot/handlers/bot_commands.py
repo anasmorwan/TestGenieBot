@@ -4,6 +4,12 @@ from storage.messages import get_message
 from storage.session_store import user_states
 from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
 from bot.helping_functions import truncate_text
+from storage.sqlite_db import get_user_knowledge
+
+# قائمة معرفات الأدمن
+admin_ids = [6948343253, 5048253124]  # استبدل بالأرقام الحقيقية
+
+
 def register(bot):
   
     @bot.message_handler(commands=["menu"])
@@ -92,83 +98,80 @@ def register(bot):
 
 
 
-
-# قائمة معرفات الأدمن
-admin_ids = [123, 456]  # استبدل بالأرقام الحقيقية
-
-
-
-@bot.message_handler(commands=["knowledge"])
-def view_user_knowledge(msg):
-    """الأمر: /knowledge <user_id> - يعرض النصوص المحفوظة لمستخدم معين"""
+    @bot.message_handler(commands=["knowledge"])
+    def view_user_knowledge(msg):
+        """الأمر: /knowledge <user_id> - يعرض النصوص المحفوظة لمستخدم معين"""
     
-    user_id = msg.from_user.id
+        user_id = msg.from_user.id
     
-    # التحقق من صلاحيات الأدمن
-    if user_id not in admin_ids:
-        bot.reply_to(msg, "⛔ هذا الأمر مخصص للأدمن فقط.")
-        return
+        # التحقق من صلاحيات الأدمن
+        if user_id not in admin_ids:
+            bot.reply_to(msg, "⛔ هذا الأمر مخصص للأدمن فقط.")
+            return
     
-    # استخراج معرف المستخدم من الأمر
-    parts = msg.text.split()
+        # استخراج معرف المستخدم من الأمر
+        parts = msg.text.split()
     
-    if len(parts) < 2:
-        bot.reply_to(
-            msg, 
-            "❌ الرجاء إدخال معرف المستخدم.\n\n"
-            "مثال: `/knowledge 123456789`",
-            parse_mode="Markdown"
-        )
-        return
-    
-    # التحقق من أن المعرف رقم
-    try:
-        target_user_id = int(parts[1])
-    except ValueError:
-        bot.reply_to(msg, "❌ معرف المستخدم يجب أن يكون رقماً.")
-        return
-    
-    # جلب البيانات من قاعدة البيانات
-    try:
-        knowledge_data = get_user_knowledge(target_user_id)
-        
-        if not knowledge_data:
+        if len(parts) < 2:
             bot.reply_to(
-                msg,
-                f"📭 لا توجد نصوص محفوظة للمستخدم `{target_user_id}`.",
+                msg, 
+                "❌ الرجاء إدخال معرف المستخدم.\n\n"
+                "مثال: `/knowledge 123456789`",
                 parse_mode="Markdown"
             )
             return
+    
+        # التحقق من أن المعرف رقم
+        try:
+            target_user_id = int(parts[1])
+        except ValueError:
+            bot.reply_to(msg, "❌ معرف المستخدم يجب أن يكون رقماً.")
+            return
+    
+        # جلب البيانات من قاعدة البيانات
+        try:
+            knowledge_data = get_user_knowledge(target_user_id)
         
-        # بناء الرسالة
-        message = f"📚 **نصوص المستخدم المحفوظة**\n"
-        message += f"👤 **المعرف:** `{target_user_id}`\n"
-        message += f"📊 **عدد النصوص:** {len(knowledge_data)}\n"
-        message += f"{'─' * 30}\n\n"
+            if not knowledge_data:
+                bot.reply_to(
+                    msg,
+                    f"📭 لا توجد نصوص محفوظة للمستخدم `{target_user_id}`.",
+                    parse_mode="Markdown"
+                )
+                return
         
-        for i, record in enumerate(knowledge_data, 1):
-            record_id = record.get('id')
-            last_text = record.get('last_text', 'لا يوجد نص')
-            specialty = record.get('specialty', 'غير محدد')
-            updated_at = record.get('updated_at', 'غير معروف')
+            # بناء الرسالة
+            message = f"📚 **نصوص المستخدم المحفوظة**\n"
+            message += f"👤 **المعرف:** `{target_user_id}`\n"
+            message += f"📊 **عدد النصوص:** {len(knowledge_data)}\n"
+            message += f"{'─' * 30}\n\n"
+        
+            for i, record in enumerate(knowledge_data, 1):
+                record_id = record.get('id')
+                last_text = record.get('last_text', 'لا يوجد نص')
+                specialty = record.get('specialty', 'غير محدد')
+                updated_at = record.get('updated_at', 'غير معروف')
             
 
-            # ✅ استخدام دالة الاختصار: السطر الأول فقط، بحد أقصى 100 حرف
-            last_text = truncate_text(last_text, max_length=100, keep_first_line=True)
+                # ✅ استخدام دالة الاختصار: السطر الأول فقط، بحد أقصى 100 حرف
+                last_text = truncate_text(last_text, max_length=100, keep_first_line=True)
             
-            message += f"**{i}.** 🆔 سجل رقم: `{record_id}`\n"
-            message += f"   📝 **النص:** {last_text}\n"
-            message += f"   🏷️ **التخصص:** `{specialty}`\n"
-            message += f"   🕒 **آخر تحديث:** `{updated_at}`\n"
-            message += f"   {'.' * 20}\n\n"
+                message += f"**{i}.** 🆔 سجل رقم: `{record_id}`\n"
+                message += f"   📝 **النص:** {last_text}\n"
+                message += f"   🏷️ **التخصص:** `{specialty}`\n"
+                message += f"   🕒 **آخر تحديث:** `{updated_at}`\n"
+                message += f"   {'.' * 20}\n\n"
             
-            # تجنب تجاوز حد طول الرسالة (4096 حرف)
-            if len(message) > 3800 and i < len(knowledge_data):
-                bot.reply_to(msg, message, parse_mode="Markdown")
-                message = f"📚 **نصوص المستخدم المحفوظة (تابع)**\n\n"
+                # تجنب تجاوز حد طول الرسالة (4096 حرف)
+                if len(message) > 3800 and i < len(knowledge_data):
+                    bot.reply_to(msg, message, parse_mode="Markdown")
+                    message = f"📚 **نصوص المستخدم المحفوظة (تابع)**\n\n"
         
-        bot.reply_to(msg, message, parse_mode="Markdown")
+            bot.reply_to(msg, message, parse_mode="Markdown")
         
-    except Exception as e:
-        bot.reply_to(msg, f"❌ حدث خطأ أثناء جلب البيانات: {str(e)}")
+        except Exception as e:
+            bot.reply_to(msg, f"❌ حدث خطأ أثناء جلب البيانات: {str(e)}")
+
+
+
 
