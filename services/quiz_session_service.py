@@ -154,6 +154,7 @@ class QuizManager:
                     "wrong_count": 0,
                     "source": "dynamic_mix",
                     "quiz_code": "CHALLENGE_MODE",
+                    "has_saved_texts": True,
                     "is_extended": False,
                     "waiting_for_extension": True,
                     "questions_resumed": False
@@ -161,6 +162,7 @@ class QuizManager:
 
             # 3. التحقق من وجود "مادة علمية" (Knowledge) قبل بدء التوليد
             user_content = get_user_content(chat_id) # chat_id هو نفسه user_id هنا عادة
+            state = self.sessions.get(chat_id)
 
             if questions:
                 # إذا كان لديه أخطاء، نبدأ بها فوراً
@@ -170,7 +172,7 @@ class QuizManager:
                 if user_content is not None:
                     threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
                 else:
-                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                    state["has_saved_texts"] = False        
             else:
                 # ليس لديه أخطاء سابقة
                 if user_content:
@@ -367,6 +369,10 @@ class QuizManager:
             
             if state.get("source") == "mistakes_pool":
                 self.send_current_question(chat_id, bot)
+                if state.get("has_saved_texts"):
+                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                    
+                
 
                 if state.get("waiting_for_extension") and not state.get("is_extended"):
                     challenge_q_msg = bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
