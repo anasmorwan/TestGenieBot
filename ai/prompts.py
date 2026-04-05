@@ -444,7 +444,50 @@ Content:
 
     return prompt
 
+def build_adaptive_quiz_prompt(content: str, num_questions: int, is_pro: bool) -> str:
+    """
+    بناء برومبت متكيف يوزع الأسئلة بناءً على هيكلية النص (عادي أو Pro)
+    """
+    # تحديد المهمة بناءً على نوع المستخدم
+    if is_pro:
+        distribution_logic = f"""
+[DISTRIBUTION STRATEGY - PRO USER]
+- Distributed over 3 distinct topics/timeframes (60% Recent, 20% Oldest, 20% Random).
+- Generate exactly {num_questions} questions proportionally:
+  * ~60% from the 'Latest' section.
+  * ~20% from the 'Oldest' section.
+  * ~20% from the 'Random' section (if found, IF NOT THEN 40% FROM OLDEST SECTION).
+- Create "Inter-topic" links if possible to enhance deep learning."""
+    else:
+        distribution_logic = f"""
+[DISTRIBUTION STRATEGY - BASIC USER]
+- Focus 100% on the provided 'Latest' content.
+- Generate exactly {num_questions} high-quality questions for immediate recall."""
 
+    # القواعد الصارمة (Strict Rules) بالإنجليزية لضمان انضباط الـ AI
+    strict_rules = """
+[STRICT OUTPUT RULES]
+1. OUTPUT: ONLY a valid JSON array. No conversational text.
+2. FORMAT: [{"question": "", "options": ["", "", "", ""], "correct_index": int, "explanation": ""}]
+3. LIMITS: Question < 250 chars. EACH option < 95 chars. Explanation < 200 chars.
+4. QUALITY: Avoid "All of the above". Focus on academic reasoning.
+5. LANGUAGE: Match the language of the 'Content' provided below."""
+
+    prompt = f"""
+{distribution_logic}
+
+{strict_rules}
+
+[OBJECTIVE]
+Act as an expert Academic Tutor. Your goal is to trigger 'Active Recall'. 
+Challenge the user's understanding, not just their memory.
+
+Content to analyze:
+{content}
+    """.strip()
+
+    return prompt
+    
 
 
 
