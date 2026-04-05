@@ -279,30 +279,19 @@ class QuizManager:
 
         state["index"] += 1
         
-        remaining = len(state["questions"]) - state["index"]
 
-        
-        if state["index"] >= state["review_count"]:
-            
-            if state["is_extended"]:
-                state["index"] += 1
-                
-                
+        if state["index"] >= len(state["questions"]):
+
+            if not state.get("is_extended"):
+                bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
+                return
+
             else:
-                time.sleep(3)
-                if state["is_extended"]:
-                    state["index"] += 1
-                else:
-                    self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                return
 
-        
-        
+
         self.send_current_question(chat_id, bot)
-
-
-
-
-
 
     
     def finish_quiz(self, chat_id, bot, is_shared_user=None):
