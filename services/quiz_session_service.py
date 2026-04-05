@@ -77,6 +77,7 @@ class QuizManager:
                 "index": 0,
                 "score": 0,
                 "wrong_count": 0,
+                "is_extended": False,
                 "source": "mistakes_pool", # 👈 هنا نضع العلامة
                 "quiz_code": "REVIEW_MODE"
             }
@@ -252,8 +253,13 @@ class QuizManager:
             state["score"] += 1
 
         state["index"] += 1
+        
+        remaining = len(state["questions"]) - state["index"]
 
+        
         if state["index"] >= len(state["questions"]):
+            
+                
             
             self.finish_quiz(chat_id, bot, is_shared_user=shared)
 
