@@ -3,7 +3,6 @@
 import sqlite3
 import json
 from datetime import datetime, timedelta
-from services.usage import is_paid_user_active
 DB_PATH = "quiz_users.db"
 
 def get_connection():
@@ -229,7 +228,7 @@ def get_user_knowledge(user_id):
 #    🔹 دوال مساعدة
 #--------------------------
 import random
-
+from services.usage import is_paid_user_active
 def get_user_content(user_id):
     """
     استرجاع محتوى المستخدم من قاعدة البيانات
