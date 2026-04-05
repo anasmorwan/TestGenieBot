@@ -447,7 +447,7 @@ def get_user_mistakes_by_age(user_id):
     return mistakes
 
 def get_recent_mistakes(user_id, limit=10):
-    """ترجع أحدث الأخطاء للمراجعة"""
+    """ترجع أحدث خطأ للمراجعة"""
     conn = get_connection()
     c = conn.cursor()
     
@@ -456,12 +456,14 @@ def get_recent_mistakes(user_id, limit=10):
         FROM user_mistakes 
         WHERE user_id = ? AND fail_count > 0
         ORDER BY last_failed DESC
-        LIMIT ?
-    """, (user_id, limit))
+        LIMIT 1
+    """, (user_id,))
     
-    mistakes = []
-    for row in c.fetchall():
-        mistakes.append({
+    row = c.fetchone()
+    conn.close()
+    
+    if row:
+        return {
             "id": row[0],
             "questions": {
                 "question": row[1],
@@ -470,10 +472,8 @@ def get_recent_mistakes(user_id, limit=10):
                 "explanation": row[4]
             },
             "fail_count": row[5]
-        })
-    
-    conn.close()
-    return mistakes
+        }
+    return None  # لا توجد أخطاء
 
 def get_question_distribution(user_id, total_questions=10):
     """تحديد نسبة الأسئلة حسب حالة المستخدم"""
