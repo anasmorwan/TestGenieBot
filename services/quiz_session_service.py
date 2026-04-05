@@ -81,52 +81,66 @@ class QuizManager:
             if not questions:
                 print("❌ No questions", flush=True)
                 return False
+        
+
+        
+        
+            with self.lock:
+                self.sessions[chat_id] = {
+                    "questions": questions,
+                    "index": 0,
+                    "score": 0,
+                    "extended": False,
+                    "quiz_code": quiz_code,
+                    "wrong_count": 0,
+                    "is_shared_user": is_shared_user   # ✅ أضف هذا السطر
+                }
+        
+        
+            self.send_current_question(chat_id, bot, is_shared_user=None)
+    
+
+            return True
         except Exception as e:
             bot.send_message(chat_id=admin_id, text="start_quizError: {str(e)}")
             
 
+    def start_mistakes_review(self, chat_id, object, bot):  
+        try:
+            # هذه دالة جديدة تبدأ اختباراً من الأخطاء فقط
+            quiz_data = object.get("questions")
+            questions = []
+                for q in quiz_data:
+                    obj = QuizQuestion.from_raw(q)
+                    print("RAW:", q, flush=True)
+                    print("PARSED:", obj, flush=True)
+                    if obj:
+                        questions.append(obj)
+                    
+            review_count = len(questions)
+            with self.lock:
+                self.sessions[chat_id] = {
+                    "questions": questions,
+                    "index": 0,
+                    "score": 0,
+                    "review_count": review_count,
+                    "wrong_count": 0,
+                    "is_extended": False,
+                    "waiting_for_extension": True,
+                    "questions_resumed": False,
+                    "source": "mistakes_pool", # 👈 هنا نضع العلامة
+                    "quiz_code": "REVIEW_MODE"
+                }
+            state = self.sessions.get(chat_id)
         
-        
-        with self.lock:
-            self.sessions[chat_id] = {
-                "questions": questions,
-                "index": 0,
-                "score": 0,
-                "extended": False,
-                "quiz_code": quiz_code,
-                "wrong_count": 0,
-                "is_shared_user": is_shared_user   # ✅ أضف هذا السطر
-            }
-        
-        
-        self.send_current_question(chat_id, bot, is_shared_user=None)
-
-        return True
-
-    def start_mistakes_review(self, chat_id, object, bot):   
-        # هذه دالة جديدة تبدأ اختباراً من الأخطاء فقط
-        questions = object.get("questions")
-        review_count = len(questions)
-        with self.lock:
-            self.sessions[chat_id] = {
-                "questions": questions,
-                "index": 0,
-                "score": 0,
-                "review_count": review_count,
-                "wrong_count": 0,
-                "is_extended": False,
-                "waiting_for_extension": True,
-                "questions_resumed": False,
-                "source": "mistakes_pool", # 👈 هنا نضع العلامة
-                "quiz_code": "REVIEW_MODE"
-            }
-        state = self.sessions.get(chat_id)
-        
-        self.send_current_question(chat_id, bot)
-        threading.Thread(
-            target=self.generate_and_store,
-            args=(bot, chat_id, user_id)
-            ).start()
+            self.send_current_question(chat_id, bot)
+            threading.Thread(
+                target=self.generate_and_store,
+                args=(bot, chat_id, user_id)
+                ).start()
+        except Exception as e:
+            bot.send_message(chat_id=admin_id, text="generate_and_store_error: {str(e)}")
+            
     
 
     def load_quiz(self, quiz_code):
