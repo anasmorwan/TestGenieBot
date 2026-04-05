@@ -366,7 +366,7 @@ class QuizManager:
                     
             # حالة ب: انتهت كل الأسئلة ولا يوجد تمديد
             self.finish_quiz(chat_id, bot, is_shared_user=shared)
-                return
+            return
 
         # 4. إذا لم ينتهِ الاختبار، أرسل السؤال التالي فوراً
         self.send_current_question(chat_id, bot)
