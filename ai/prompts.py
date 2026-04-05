@@ -465,7 +465,7 @@ def build_adaptive_quiz_prompt(content: str, num_questions: int, is_pro: bool) -
 - Generate exactly {num_questions} high-quality questions for immediate recall."""
 
     # القواعد الصارمة (Strict Rules) بالإنجليزية لضمان انضباط الـ AI
-    strict_rules = """
+    strict_rules = f"""
 [STRICT OUTPUT RULES]
 1. OUTPUT: ONLY a valid JSON object. No conversational text or markdown blocks.
 
