@@ -29,32 +29,50 @@ class QuizManager:
 
     def generate_and_store(self, bot=None, chat_id=None, user_id=None, message_id=None):
         try:
+            print(f"🚀 [START] Starting generation for user_id: {user_id}", flush=True)
+        
             distribution = get_question_distribution(user_id, total_questions=3)
             challenge_count = distribution["challenge_count"]
             new_count = distribution["new_count"]
         
+            print(f"📊 [INFO] Distribution: {new_count} new, {challenge_count} challenge.", flush=True)
+    
             if user_id is not None:
+                print(f"📡 [API] Requesting quizzes from AI...", flush=True)
                 quizzes = send_daily_challenge(bot, user_id, new_count, challenge_count)
+                print(f"✅ [API] Received {len(quizzes)} quizzes.", flush=True)
 
                 with self.lock:
+                    print(f"🔒 [LOCK] Updating state for chat_id: {chat_id}", flush=True)
                     state = self.sessions.get(chat_id)
                     if not state:
+                        print(f"⚠️ [WARN] State not found for chat_id: {chat_id}. Aborting.", flush=True)
                         return
-        
+    
+                    # إضافة الأسئلة الجديدة للقائمة الحالية
                     state["questions"].extend(quizzes)
                     state["is_extended"] = True
                     state["waiting_for_extension"] = False
+                
+                    # التحقق هل كان البوت متوقفاً عند آخر سؤال (يحتاج استئناف)
                     should_resume = state["index"] >= len(state["questions"]) - len(quizzes)
+                    print(f"📝 [STATE] Questions extended. Should resume: {should_resume}", flush=True)
 
             # خارج lock
             if should_resume:
+                print(f"▶️ [RESUME] Resuming quiz for chat_id: {chat_id}", flush=True)
                 if message_id:
                     bot.edit_message_text(chat_id, message_id=message_id, text="🔥 تم تجهيز أسئلة جديدة!")
+            
                 self.send_current_question(chat_id, bot)
                 state["questions_resumed"] = True
-        except Exception as e:
-            raise ValueError(f"generate_and_store_error: {str(e)}")
             
+            print(f"🏁 [FINISH] generate_and_store completed successfully.", flush=True)
+
+        except Exception as e:
+            print(f"❌ [ERROR] Error in generate_and_store: {str(e)}", flush=True)
+            raise ValueError(f"generate_and_store_error: {str(e)}")
+
         
 
     def start_quiz(self, chat_id, quiz_code, bot, is_shared_user=None):
