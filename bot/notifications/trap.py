@@ -53,8 +53,7 @@ def send_daily_challenge(user_id, review_count, new_count, challenge_count):
     if challenge_count > 0:
         pass
 
-    if extended_quizzes:
-        pass
+    
                 
 
 def get_all_user_ids():
