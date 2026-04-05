@@ -1,6 +1,6 @@
 from bot.bot_instance import mybot
 from services.user_trap import should_show_daily, update_progress
-from storage.sqlite_db import get_connection
+from storage.sqlite_db import get_connection، get_user_content
 from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
 from bot.keyboards.actions_keyboard import streak_keyboard
@@ -38,9 +38,9 @@ def send_daily_message():
 
 
 def send_daily_challenge(user_id, review_count, new_count, challenge_count):
-    content = get_user_contnet(user_id)
+    content = get_user_content(user_id)
 
-    threading.Thread(target=generate_quizzes_from_text, args=(user_id,)).start()
+    threading.Thread(target=generate_quizzes_from_text, args=(user_id, content)).start()
     
     if review_count > 0:
         mistakes = get_recent_mistakes(user_id, review_count)
