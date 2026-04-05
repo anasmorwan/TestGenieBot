@@ -5,10 +5,12 @@ import time
 import uuid
 from datetime import datetime, timedelta
 from storage.sqlite_db import get_connection
+from models.quiz import QuizQuestion
 from services.usage import is_paid_user_active
 import threading
 import time
 
+quiz_question() = QuizQuestion
 #----------------------------
 #  🔹 توليد و حفظ ال QC
 #----------------------------
@@ -32,7 +34,7 @@ def store_quiz(user_id, quizzes):
     VALUES (?, ?, ?, ?, ?)
     """, (
         user_id,
-        json.dumps(quizzes),
+        json_data = json.dumps([q.to_dict() for q in quizzes]),
         code,
         datetime.now().isoformat(),
         is_paid
