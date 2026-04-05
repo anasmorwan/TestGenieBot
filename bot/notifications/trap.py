@@ -50,11 +50,7 @@ def send_daily_challenge(bot, user_id, review_count, new_count, challenge_count)
             'num_questions': num_quizzes
         }).start()
         
-    if review_count > 0:
-        mistakes = get_recent_mistakes(user_id, review_count)
-                    
-        QuizManager.start_mistakes_review(chat_id, mistakes, bot)
-        
+    
     if extended_quizzes is not None and len(extended_quizzes) > 0:
         pass
     if challenge_count > 0:
