@@ -391,7 +391,7 @@ class QuizManager:
             try:
                 bot.send_message(
                     chat_id=chat_id,
-                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+                    text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
@@ -410,7 +410,7 @@ class QuizManager:
             try:
                 bot.send_message(
                     chat_id=chat_id,
-                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+                    text=get_message("TRAP_MSG", total=total, score=score, xp=xp, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
@@ -429,7 +429,7 @@ class QuizManager:
                     log_quiz_attempt(chat_id, quiz_code, score, total)
                 bot.send_message(
                     chat_id=chat_id,
-                    text=get_message("TRAP_MSG", total=total, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+                    text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
