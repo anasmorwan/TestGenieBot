@@ -28,7 +28,32 @@ messages = [
 
 
 
+def normalize_quizzes(raw_data):
+    """
+    تحول أي مدخل (Dict أو List) إلى قائمة موحدة من الكائنات
+    """
+    if not raw_data:
+        return []
+    
+    # 1. إذا كان المدخل قاموساً يحتوي على مفتاح questions
+    if isinstance(raw_data, dict):
+        questions_list = raw_data.get("questions", [])
+    # 2. إذا كان المدخل قائمة مباشرة
+    elif isinstance(raw_data, list):
+        questions_list = raw_data
+    else:
+        return []
 
+    # 3. تحويل كل عنصر في القائمة إلى كائن QuizQuestion (لضمان توحيد الحقول)
+    normalized = []
+    for q in questions_list:
+        # إذا كان العنصر أصلاً كائن، أضفه، وإذا كان dict حوله لكائن
+        obj = QuizQuestion.from_raw(q) if isinstance(q, dict) else q
+        if obj:
+            normalized.append(obj)
+            
+    return normalized
+ 
 def get_unique_random_message(user_id):
     global user_messages_remaining
     
@@ -91,8 +116,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             if not isinstance(quizzes, list):
                 return []
             
-            return quizzes
-
+            return normalize_quizzes(quizzes)
         else:
             pro_response = pro_quiz_generator(content, num_questions=num_quizzes)
         
@@ -100,11 +124,12 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
            # db.save_metadata(user_id, pro_response["metadata"])
         
             quizzes = pro_response.get("questions", [])
-            return quizzes[:num_quizzes]
             domain = pro_response["metadata"]["domain"]
             update_user_major(user_id, detected_domain)
             save_user_knowledge(user_id, content, domain)
 
+            return normalize_quizzes(quizzes)[:num_quizzes]
+            
     else:
         try:
             if msg_id:
@@ -146,7 +171,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         if not isinstance(quizzes, list):
             return []
             
-        return quizzes[:num_quizzes]
+        return normalize_quizzes(quizzes)[:num_quizzes]
 
 
 def generate_challenge_quiz(content, num_questions, is_pro):
@@ -163,7 +188,7 @@ def generate_challenge_quiz(content, num_questions, is_pro):
         quizzes = response_data.get("questions", [])
         print(f"✉️ quizzes extracted successfully", flush=True)
         
-        return quizzes
+        return normalize_quizzes(quizzes)[:num_quizzes]
         
     except Exception as e:
         print(f"ERROR: {str(e)}")
