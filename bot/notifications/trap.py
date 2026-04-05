@@ -41,8 +41,13 @@ def send_daily_challenge(user_id, review_count, new_count, challenge_count):
     content = get_user_content(user_id)
     if challenge_count and new_count > 0:
         num_quizzes = challenge_count + new_count
-        extended_quizzes = threading.Thread(target=generate_quizzes_from_text, args=(content, user_id, bot, num_quizzes=num_quizzes)).start()
-    
+        extended_quizzes = threading.Thread(target=generate_quizzes_from_text, kwargs={
+            'content': content,
+            'user_id': user_id,
+            'bot': bot,
+            'num_quizzes': num_quizzes
+        }).start()
+        
     if review_count > 0:
         mistakes = get_recent_mistakes(user_id, review_count)
                     
