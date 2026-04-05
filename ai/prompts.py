@@ -467,8 +467,11 @@ def build_adaptive_quiz_prompt(content: str, num_questions: int, is_pro: bool) -
     # القواعد الصارمة (Strict Rules) بالإنجليزية لضمان انضباط الـ AI
     strict_rules = """
 [STRICT OUTPUT RULES]
-1. OUTPUT: ONLY a valid JSON array. No conversational text.
-2. FORMAT: [{"question": "", "options": ["", "", "", ""], "correct_index": int, "explanation": ""}]
+1. OUTPUT: ONLY a valid JSON object. No conversational text or markdown blocks.
+
+2. FORMAT: 
+{QUIZ_FORMAT}
+
 3. LIMITS: Question < 250 chars. EACH option < 95 chars. Explanation < 200 chars.
 4. QUALITY: Avoid "All of the above". Focus on academic reasoning.
 5. LANGUAGE: Match the language of the 'Content' provided below."""
