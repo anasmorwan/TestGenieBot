@@ -13,6 +13,7 @@ from analytics.shared_quiz_analytics import get_hardest_question, get_success_ra
 from bot.keyboards.quiz_buttons import share_quiz_button
 from services.usage import is_paid_user_active
 from services.user_trap import update_progress, get_weakness_line, get_feedback_line, build_result_message
+from services.quiz_service import normalize_quizzes
 import random
 import time
 from bot.notifications.trap import send_daily_challenge
