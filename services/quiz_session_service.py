@@ -303,7 +303,8 @@ class QuizManager:
 
                     if state.get("questions_resumed"):
                         message_id = challenge_q_msg.message_id
-                        self.generate_and_store(message_id=message_id)
+                        
+                        self.generate_and_store(bot=bot, chat_id=chat_id, message_id=message_id)
                         
                         return
 
