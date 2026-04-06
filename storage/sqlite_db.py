@@ -331,8 +331,144 @@ def get_user_knowledge(user_id):
 #--------------------------
 #    🔹 دوال مساعدة
 #--------------------------
-            
+def update_user_difficulty(user_id, difficulty):
+    """
+    تغيير مستوى الصعوبة للمستخدم
     
+    Args:
+        user_id: معرف المستخدم
+        difficulty: مستوى الصعوبة ('early', 'mid', 'advanced')
+    
+    Returns:
+        bool: نجاح العملية أم لا
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    valid_difficulties = ['early', 'mid', 'advanced']
+    
+    if difficulty not in valid_difficulties:
+        print(f"Invalid difficulty: {difficulty}. Must be one of {valid_difficulties}")
+        return False
+    
+    try:
+        # التحقق إذا كان المستخدم موجود
+        cursor.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        
+        if result is None:
+            # مستخدم جديد: أدخل مع الصعوبة المحددة
+            cursor.execute("""
+                INSERT INTO users (user_id, difficulty) 
+                VALUES (?, ?)
+            """, (user_id, difficulty))
+        else:
+            # مستخدم موجود: حدث الصعوبة
+            cursor.execute("""
+                UPDATE users SET difficulty = ? WHERE user_id = ?
+            """, (difficulty, user_id))
+        
+        conn.commit()
+        return True
+        
+    except Exception as e:
+        print(f"Error updating difficulty for user {user_id}: {e}")
+        return False
+
+
+def init_user_quiz_count(user_id, default_count=5):
+    """
+    تهيئة عدد الاختبارات الافتراضي للمستخدم
+    
+    Args:
+        user_id: معرف المستخدم
+        default_count: العدد الافتراضي (مثلاً 3 اختبارات)
+    
+    Returns:
+        bool: نجاح العملية أم لا
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+       
+        # التحقق إذا كان المستخدم موجود أصلاً
+        cursor.execute("SELECT quiz_num FROM users WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        
+        if result is None:
+            # مستخدم جديد: أدخل مع العدد الافتراضي
+            cursor.execute("""
+                INSERT INTO users (user_id, quiz_num) 
+                VALUES (?, ?)
+            """, (user_id, default_count))
+        else:
+            # مستخدم موجود ولكن quiz_num قد يكون NULL
+            if result[0] is None:
+                cursor.execute("""
+                    UPDATE users SET quiz_num = ? WHERE user_id = ?
+                """, (default_count, user_id))
+        
+        conn.commit()
+        return True
+        
+    except Exception as e:
+        print(f"Error initializing quiz count for user {user_id}: {e}")
+        return False            
+
+
+def get_user_difficulty(user_id):
+    """
+    استرجاع مستوى الصعوبة للمستخدم
+    
+    Args:
+        user_id: معرف المستخدم
+    
+    Returns:
+        str: مستوى الصعوبة ('early', 'mid', 'advanced') أو 'early' كقيمة افتراضية
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT difficulty FROM users WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        
+        if result and result[0] is not None:
+            return result[0]
+        else:
+            return 'early'  # القيمة الافتراضية
+            
+    except Exception as e:
+        print(f"Error getting difficulty for user {user_id}: {e}")
+        return 'early'
+
+def get_user_question_count(user_id):
+    """
+    استرجاع عدد الأسئلة للمستخدم
+    
+    Args:
+        user_id: معرف المستخدم
+    
+    Returns:
+        int: عدد الأسئلة أو 10 كقيمة افتراضية
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("SELECT question_count FROM users WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        
+        if result and result[0] is not None:
+            return result[0]
+        else:
+            return 10  # القيمة الافتراضية
+            
+    except Exception as e:
+        print(f"Error getting question count for user {user_id}: {e}")
+        return 5
+
+
+#--------------------------
+#    🔹 دوال مساعدة user_major
+#--------------------------
 def update_user_major(user_id, detected_domain):
     conn = get_connection()
     cursor = conn.cursor()
@@ -595,9 +731,9 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE user_quizzes ADD COLUMN difficulty TEXT DEFAULT 'early'
         """)
-    if not column_exists("users", "num_quizzes"):
+    if not column_exists("users", "quiz_num"):
         c.execute("""
-        ALTER TABLE users ADD COLUMN num_quizzes TEXT 
+        ALTER TABLE users ADD COLUMN quiz_num INTEGER DEFAULT 5
         """)
         
 
