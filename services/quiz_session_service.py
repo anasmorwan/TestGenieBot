@@ -23,7 +23,7 @@ def send_questions_by_parts(bot, chat_id, questions, quiz_code=None):
     إرسال الأسئلة مقسمة إلى رسائل متعددة إذا كان النص طويلاً
     """
     # تنسيق الأسئلة
-    questions_text = '\n'.join([f'{i+1}. {q.text}' for i, q in enumerate(questions)])
+    questions_text = '\n'.join([f'{i+1}. {q}' for i, q in enumerate(questions)])
     
     # الحد الأقصى الآمن للرسالة
     MAX_LEN = 3800
