@@ -81,7 +81,9 @@ def register(bot):
                     chat_id,
                     message_id
                 )
-                # user_texts = content
+            else:
+                return
+                
                 try:
                     results = detect_quiz_pattern(content)
                     confidence = result.get("confidence", 0)
@@ -95,9 +97,8 @@ def register(bot):
                         pass
                 except:
                     pass
-
-
-                
+                    
+                   
                 if not content:
                     bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
                     return
