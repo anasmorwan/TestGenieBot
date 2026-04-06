@@ -8,30 +8,24 @@ import threading
 from services.quiz_service import generate_challenge_quiz
 from services.usage import is_paid_user_active
 
-def send_streak(user_id, streak, xp):
-    quiz_code = "quiz_sample"
-    keyboard = streak_keyboard()
-    text = f"🔥 <b>تحدي اليوم جاهز!</b>\n\n💡 هل يمكنك الحفاظ على سلسلة 🔥 <b>{streak}</b> أيام؟\n\nابدأ الآن واختبر نفسك 👇"
-    
-    # user_ids = get_all_user_ids(cursor)   
-    try:
-        mybot.send_message(chat_id=user_id, text=text, reply_markup=keyboard, parse_mode="HTML")
-                
-    except Exception as e:
-        print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
-        
 
 
 
-
-
-def send_daily_message():
+def send_daily_challenge_message():
     user_ids = [5048253124, 6948343253]
     for user_id in user_ids:
         
         if is_inactive(user_id):
             streak, xp = update_progress(user_id)
-            send_streak(user_id, streak, xp)
+            keyboard = streak_keyboard()
+            
+            text = f"🔥 <b>تحدي اليوم جاهز!</b>\n\n💡 هل يمكنك الحفاظ على سلسلة 🔥 <b>{streak}</b> أيام؟\n\nابدأ الآن واختبر نفسك 👇"
+            try:
+                mybot.send_message(chat_id=user_id, text=text, reply_markup=keyboard, parse_mode="HTML")
+                
+            except Exception as e:
+                print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
+        
         
         user_streak[user_id] = date.today()
 
