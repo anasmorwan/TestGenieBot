@@ -22,7 +22,7 @@ def init_db():
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
-    cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_id ON user_knowledge(user_id)")
+    # cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_id ON user_knowledge(user_id)")
     # أضف هذا السطر لتصحيح القاعدة (شغله مرة واحدة)
     cursor.execute("DROP INDEX IF EXISTS idx_user_id")
 
