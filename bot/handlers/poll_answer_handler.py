@@ -1,5 +1,5 @@
 from services.quiz_session_service import quiz_manager
-
+from services.user_trap import update_last_active
 
 def register(bot):
     
@@ -8,6 +8,7 @@ def register(bot):
         print("POLL ANSWER RECEIVED:", poll_answer)
         
         user_id = poll_answer.user.id
+        update_last_active(user_id)
         with quiz_manager.lock:
             chat_id = quiz_manager.poll_map.get(poll_answer.poll_id)
         print("RESOLVED CHAT ID:", chat_id)
