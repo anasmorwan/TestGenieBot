@@ -117,6 +117,7 @@ class QuizManager:
                     "questions": questions,
                     "index": 0,
                     "score": 0,
+                    "source": "generated_quiz",
                     "extended": False,
                     "quiz_code": quiz_code,
                     "wrong_count": 0,
@@ -325,7 +326,7 @@ class QuizManager:
         
             if is_correct:
                 state["score"] += 1
-                if state.get("source") == "mistakes_pool":
+                if state.get("source") == "dynamic_mix":
                     try:
                         self.increment_correct_count(chat_id, q.question)
                     except Exception as db_e:
