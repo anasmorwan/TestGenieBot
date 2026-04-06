@@ -1,10 +1,15 @@
+import random
+import time
 import sqlite3
-from storage.sqlite_db import get_connection, get_question_distribution
 import json
-from datetime import datetime
-from models.quiz import QuizQuestion
-# from services.poll_service import send_quiz_poll
 import threading
+from datetime import datetime
+
+from models.quiz import QuizQuestion
+from storage.sqlite_db import get_connection, get_question_distribution
+
+
+
 from services.usage import is_paid_user_active
 from storage.messages import get_message
 from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell, tracking_upsell_keyboard
@@ -12,12 +17,8 @@ from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_v
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
 from bot.keyboards.quiz_buttons import share_quiz_button
 from services.usage import is_paid_user_active
-from services.user_trap import update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
+from services.user_trap import send_daily_challenge, update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
 from services.quiz_service import normalize_quizzes
-import random
-import time
-from bot.notifications.trap import send_daily_challenge
-
 
 
 
