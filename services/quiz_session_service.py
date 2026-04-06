@@ -47,12 +47,7 @@ class QuizManager:
                 quizzes = normalize_quizzes(raw_quizzes) 
                 print(f"✅ [API] Received {len(quizzes)} quizzes.", flush=True)
                 
-                parsed_quizzes = []
-                for q in quizzes:
-                    obj = QuizQuestion.from_raw(q)
-                    if obj:
-                        parsed_quizzes.append(obj)
-                        
+                
                 
                 
                 with self.lock:
@@ -65,9 +60,10 @@ class QuizManager:
                     current_count = len(state["questions"])
     
                     # إضافة الأسئلة الجديدة للقائمة الحالية
-                    state["questions"].extend(parsed_quizzes)
+                    state["questions"].extend(quizzes)
                     state["is_extended"] = True
                     state["waiting_for_extension"] = False
+                    bot.send_message(chat_id=chat_id, text=f"محتويات quizzes:\n```\n{chr(10).join([f'{i+1}. {q}' for i, q in enumerate(state['questions'])])}\n```", parse_mode='Markdown')
                 
                     # التحقق هل كان البوت متوقفاً عند آخر سؤال (يحتاج استئناف)
                     should_resume = (current_count == 0) or (state["index"] >= current_count) or (state.get("waiting_for_extension") == True and state["index"] == 0)
@@ -109,6 +105,8 @@ class QuizManager:
                 print("PARSED:", obj, flush=True)
                 if obj:
                     questions.append(obj)
+
+            bot.send_message(chat_id, f"أسئلة الكويز (كود: {quiz_code}):\n```\n{chr(10).join([f'{i+1}. {q.text}' for i, q in enumerate(questions)])}\n```", parse_mode='Markdown')
 
         
             print("TOTAL QUESTIONS:", len(questions))
