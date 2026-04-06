@@ -122,7 +122,9 @@ MESSAGES = {
         "REFERRAL_LINK": (
             "<b>👥 اربح اختبارات مجانية!</b>\n\n"
             "🔗 رابطك:\n"
-            "<code>https://t.me/{username}?start=ref_{uid}</code>\n\n"
+            "<pre><code>\n"
+            "https://t.me/{username}?start=ref_{uid}\n"
+            "</code></pre>\n\n"
             "📌 شاركه مع أصدقائك واحصل على مكافآت 🎁"
         ),
         
