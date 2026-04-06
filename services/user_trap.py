@@ -3,9 +3,12 @@ from storage.sqlite_db import get_connection
 from datetime import timedelta, datetime, date
 from storage.session_store import user_streak
 from services.usage import is_paid_user_active
+from storage.session_store import last_active
 
+from datetime import datetime
 
-
+def update_last_active(user_id):
+    last_active[user_id] = datetime.now()
 
 
 def get_user_content(user_id):
