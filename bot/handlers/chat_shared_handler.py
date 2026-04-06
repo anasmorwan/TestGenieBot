@@ -5,7 +5,7 @@ from storage.messages import get_message
 from storage.session_store import user_states, get_state_safe, temp_texts
 from services.poll_service import generate_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
-
+from services.user_trap import update_last_active
 
 
 def publish_interactive_link(bot, target_chat_id, quiz_code, shared_by_name, watermark=True):
@@ -51,6 +51,7 @@ def register(bot):
         shared_by = message.from_user.first_name
         chat_id_to_publish = message.chat_shared.chat_id if message.chat_shared and message.chat_shared.chat_id else -1003806238292
         request_id = message.chat_shared.request_id  # 🔥 هذا المهم
+        update_last_active(user_id)
         
         
 
