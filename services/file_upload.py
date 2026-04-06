@@ -1,15 +1,21 @@
 import os
 from bot.bot_instance import mybot
 from datetime import datetime
+from services.usage import is_paid_user_active
 
+def get_max_file_size(user_id):
+    if not is_paid_user_active(user_id): 
+        Max_file_size = 5 * 1024 * 1024  # 5 MB
+    else:
+        max_file_size = 12 * 1024 * 1024
+    return max_file_size
 
-
-MAX_FILE_SIZE = 5 * 1024 * 1024  # 5 MB
-
-def is_file_size_allowed(mybot, file_id):
+def is_file_size_allowed(mybot, user_id, file_id):
     file_info = mybot.get_file(file_id)
-    return file_info.file_size <= MAX_FILE_SIZE
-
+    max_size = get_max_file_size(user_id)
+    
+    return file_info.file_size <= max_size
+    
 def get_file_extension(file_path):
     """استخراج امتداد الملف من المسار"""
     return os.path.splitext(file_path)[1] if file_path else ""
@@ -46,7 +52,7 @@ def handle_file_upload(msg):
         return None, None
     
     # ✅ التحقق من الحجم
-    if not is_file_size_allowed(mybot, file_id):
+    if not is_file_size_allowed(mybot, uid, file_id):
         
         return "large_file", None
     
