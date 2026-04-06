@@ -46,20 +46,10 @@ print("✅ قاعدة البيانات جاهزة ومحدثة", flush=True)
 # 4. بدء النسخ الاحتياطي التلقائي بعد استقرار الحالة
 # start_auto_backup()
 
-from services.backup_service import start_auto_backup, scheduler
+from services.backup_service import start_auto_backup, scheduler, start_daily_challenge
 
 
-def run_scheduler():
-    while True:
-        schedule.run_pending()
-        time.sleep(60)
-
-
-schedule.every(1).hours.do(send_daily_challenge_message)  # أو كل 10 دقائق
-
-# بدء المجدول في thread منفصل
-scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
-scheduler_thread.start()
+start_daily_challenge()
 
 # بعد init_db و restore
 start_auto_backup()
