@@ -2,6 +2,8 @@
 import os
 import schedule
 import time
+import threading
+
 
 from bot.bot_instance import mybot, set_webhook
 from bot.handlers import start, text_handler, file_handler, image_handler, group_messages_handler, callback_handler, pre_checkout_query_handler, payment_handler
@@ -46,6 +48,19 @@ print("✅ قاعدة البيانات جاهزة ومحدثة", flush=True)
 
 from services.backup_service import start_auto_backup, scheduler
 
+
+def run_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(60)
+
+
+schedule.every(1).hours.do(send_daily_challenge_message)  # أو كل 10 دقائق
+
+# بدء المجدول في thread منفصل
+scheduler_thread = threading.Thread(target=run_scheduler, daemon=True)
+scheduler_thread.start()
+
 # بعد init_db و restore
 start_auto_backup()
 scheduler.start()
@@ -73,11 +88,8 @@ migrate_users_to_trap()
 
 
 
-schedule.every(1).hours.do(send_daily_challenge_message)  # أو كل 10 دقائق
 
-while True:
-    schedule.run_pending()
-    time.sleep(60)
+
 
 
 
