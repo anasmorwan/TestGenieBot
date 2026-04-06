@@ -403,7 +403,7 @@ class QuizManager:
                 if not has_text:
                     bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                     return
-            else:
+            if source == "generated_quiz" or has_text:
             
                 keyboard = share_quiz_button(quiz_code)
                 try:
@@ -428,7 +428,7 @@ class QuizManager:
                     return
                 
             
-            else:
+            if source == "generated_quiz" or has_text:
                 keyboard = share_quiz_button(quiz_code)
             
                 try:
@@ -454,7 +454,7 @@ class QuizManager:
                     bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                     return
                 
-            else:
+            if source == "generated_quiz" or has_text:
                 try:
                     keyboard = share_quiz_button(quiz_code)
                     bot.send_message(
