@@ -182,9 +182,16 @@ def register(bot):
                     
                     
                     quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
+                    msgs = [
+                        get_message("CHALLENGE_STARTED"),
+                        get_message("CHALLENGE_STARTED1"),
+                        get_message("CHALLENGE_STARTED2")
+                    ]
+                    text = random.choice(msgs)
+                    
                     bot.edit_message_text(chat_id,
                     message_id=message_id,
-                    text=get_message(),
+                    text=text,
                     parse_mode="HTML"
                     )
                         
