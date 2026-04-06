@@ -71,7 +71,7 @@ def register(bot):
         content = None
 
         try:
-            if path:         
+            if path is not None:         
                 content = extract_text_from_file(
                     user_id,
                     bot,
@@ -80,7 +80,7 @@ def register(bot):
                     chat_id,
                     message_id
                 )
-                user_texts = content
+                # user_texts = content
                 try:
                     results = detect_quiz_pattern(content)
                     confidence = result.get("confidence", 0)
