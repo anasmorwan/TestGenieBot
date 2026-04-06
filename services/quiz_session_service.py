@@ -206,6 +206,7 @@ class QuizManager:
     
 
     def send_current_question(self, chat_id, bot, is_shared_user=None):
+        trap_msg = "⏱ لا تفكر كثيراً… أجب بسرعة"
         with self.lock:
             state = self.sessions.get(chat_id)
 
