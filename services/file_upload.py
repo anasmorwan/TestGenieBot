@@ -47,11 +47,7 @@ def handle_file_upload(msg):
     
     # ✅ التحقق من الحجم
     if not is_file_size_allowed(mybot, file_id):
-        mybot.send_message(chat_id,
-            "⚠️ الملف كبير جداً (الحد الأقصى 5MB)\n\n"
-            "💡 يمكنك تقليل حجمه أو تقسيمه لتجربته الآن.\n"
-            "🔓 الترقية تتيح لك التعامل مع ملفات أكبر دون قيود."
-        )
+        
         return None, None
     
     # ✅ تحميل الملف
