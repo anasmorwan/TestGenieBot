@@ -48,7 +48,7 @@ def handle_file_upload(msg):
     # ✅ التحقق من الحجم
     if not is_file_size_allowed(mybot, file_id):
         
-        return None, None
+        return "large_file", None
     
     # ✅ تحميل الملف
     try:
