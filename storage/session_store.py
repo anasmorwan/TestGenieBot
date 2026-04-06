@@ -9,6 +9,8 @@ temp_texts = {}
 
 user_selections = {}
 
+last_active = {}
+
 # services/quiz_service.py:
 user_messages_remaining = {}
 
