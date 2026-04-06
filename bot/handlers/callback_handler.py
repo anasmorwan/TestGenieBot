@@ -20,7 +20,7 @@ from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat,
 from bot.handlers.chat_shared_handler import publish_interactive_link
 from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
 from services.quiz_session_service import quiz_manager
-from bot.notifications.trap import send_daily_challenge
+from services.user_trap import send_daily_challenge
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
