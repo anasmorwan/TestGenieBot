@@ -46,7 +46,15 @@ class QuizManager:
                 raw_quizzes = send_daily_challenge(bot, user_id, new_count, challenge_count)
                 quizzes = normalize_quizzes(raw_quizzes) 
                 print(f"✅ [API] Received {len(quizzes)} quizzes.", flush=True)
-
+                
+                parsed_quizzes = []
+                for q in quizzes:
+                    obj = QuizQuestion.from_raw(q)
+                    if obj:
+                        parsed_quizzes.append(obj)
+                        
+                
+                
                 with self.lock:
                     print(f"🔒 [LOCK] Updating state for chat_id: {chat_id}", flush=True)
                     state = self.sessions.get(chat_id)
@@ -57,7 +65,7 @@ class QuizManager:
                     current_count = len(state["questions"])
     
                     # إضافة الأسئلة الجديدة للقائمة الحالية
-                    state["questions"].extend(quizzes)
+                    state["questions"].extend(parsed_quizzes)
                     state["is_extended"] = True
                     state["waiting_for_extension"] = False
                 
