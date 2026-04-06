@@ -589,10 +589,17 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE user_quizzes ADD COLUMN is_paid BOOLEAN DEFAULT 0
         """)
+        
+        
     if not column_exists("user_quizzes", "difficulty"):
         c.execute("""
         ALTER TABLE user_quizzes ADD COLUMN difficulty TEXT DEFAULT 'early'
         """)
+    if not column_exists("user_quizzes", "quiz_num"):
+        c.execute("""
+        ALTER TABLE user_quizzes ADD COLUMN quiz_num TEXT 
+        """)
+        
 
     if not column_exists("user_mistakes", "created_at"):
         c.execute("""
@@ -602,6 +609,7 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE users_trap ADD COLUMN last_quiz_time TEXT 
         """)
+    
 
     conn.commit()
     conn.close()
