@@ -2,7 +2,7 @@
 # تم النقل
 from storage.sqlite_db import is_user_exist, log_new_user
 from storage.messages import get_message
-
+from services.user_trap import update_last_active
 
 from bot.bot_instance import mybot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
