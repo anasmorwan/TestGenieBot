@@ -312,56 +312,56 @@ class QuizManager:
         
     
     
-        def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
-            try:
-                state = self.sessions.get(chat_id)
-                if not state:
-                    return
+    def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
+        try:
+            state = self.sessions.get(chat_id)
+            if not state:
+                return
 
-                shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
+            shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
         
-                q = state["questions"][state["index"]]
-                is_correct = (selected_option == q.correct_index)
+            q = state["questions"][state["index"]]
+            is_correct = (selected_option == q.correct_index)
         
-                if is_correct:
-                    state["score"] += 1
-                    if state.get("source") == "mistakes_pool":
-                        try:
-                            self.increment_correct_count(chat_id, q.question)
-                        except Exception as db_e:
-                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (increment): {db_e}")
+            if is_correct:
+                state["score"] += 1
+                if state.get("source") == "mistakes_pool":
+                    try:
+                        self.increment_correct_count(chat_id, q.question)
+                    except Exception as db_e:
+                        print(f"⚠️ تجاهل خطأ قاعدة البيانات (increment): {db_e}")
+            else:
+                state["wrong_count"] += 1
+                if state.get("source") != "mistakes_pool":
+                    try:
+                        self.save_mistake(chat_id, q)
+                    except Exception as db_e:
+                        print(f"⚠️ تجاهل خطأ قاعدة البيانات (save_mistake): {db_e}")
                 else:
-                    state["wrong_count"] += 1
-                    if state.get("source") != "mistakes_pool":
-                        try:
-                            self.save_mistake(chat_id, q)
-                        except Exception as db_e:
-                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (save_mistake): {db_e}")
-                    else:
-                        try:
-                            self.reset_correct_count(chat_id, q.question)
-                        except Exception as db_e:
-                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (reset): {db_e}")
+                    try:
+                        self.reset_correct_count(chat_id, q.question)
+                    except Exception as db_e:
+                        print(f"⚠️ تجاهل خطأ قاعدة البيانات (reset): {db_e}")
 
-                # 🚀 الانتقال للسؤال التالي بكل أمان
-                state["index"] += 1
+            # 🚀 الانتقال للسؤال التالي بكل أمان
+            state["index"] += 1
 
-                if state["index"] >= len(state["questions"]):
-                    if state.get("waiting_for_extension"):
-                        bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
-                        return
-                            
-                    self.finish_quiz(chat_id, bot, is_shared_user=shared)
+            if state["index"] >= len(state["questions"]):
+                if state.get("waiting_for_extension"):
+                    bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
                     return
+                            
+                self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                return
 
-                # إرسال السؤال التالي
-                self.send_current_question(chat_id, bot)
+            # إرسال السؤال التالي
+            self.send_current_question(chat_id, bot)
             
-            except Exception as e:
-                print(f"❌ CRITICAL ERROR in handle_answer: {e}")
-                # لتتبع الخطأ إذا حدث مستقبلاً
-                import traceback
-                traceback.print_exc()
+        except Exception as e:
+            print(f"❌ CRITICAL ERROR in handle_answer: {e}")
+            # لتتبع الخطأ إذا حدث مستقبلاً
+            import traceback
+            traceback.print_exc()
 
 
 
