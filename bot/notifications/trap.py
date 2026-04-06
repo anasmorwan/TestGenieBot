@@ -22,22 +22,27 @@ def send_daily_challenge_message():
             text = get_message("NEW_USER_STREAK")
             
             if status == "active":
-                text = get_message("ACTIVE_USER_STREAK")
+                text = random.choice([get_message("ACTIVE_USER_STREAK"), build_dynamic_message(user_id)])
+                if text is False:
+                    text = get_message("ACTIVE_USER_STREAK")
+                
                 
             elif status == "cooling":
                 text = build_dynamic_message(user_id)
                 if text is False:
-                    text = get_message("USER_STREAK")
+                    text = random.choice([get_message("COOLING_USER_STREAK"), get_message("COOLING_USER_STREAK1")])
             
 
             elif status == "inactive":
-                text = get_message("INACTIVE_USER_STREAK")
+                text = build_dynamic_message(user_id)
+                if text is False:
+                    text = get_message("INACTIVE_USER_STREAK")
                 
             elif status == "lost":
-                text = random.choice([get_message("INACTIVE_USER_STREAK"), build_dynamic_message(user_id)])
+                text = build_dynamic_message(user_id)
                 if text is False:
-                    text = get_message("USER_STREAK")
-            
+                    text = get_message("INACTIVE_USER_STREAK")
+                
                 
                 
             try:
