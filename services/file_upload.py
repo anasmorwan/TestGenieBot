@@ -41,23 +41,17 @@ def handle_file_upload(msg):
         file_name = f"photo_{uid}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jpg"
         file_type = "photo"
         
-    # elif msg.video:
-     #   file_id = msg.video.file_id
-    #    file_name = msg.video.file_name or f"video_{uid}.mp4"
-     #   file_type = "video"
-        
- #   elif msg.audio:
-    #    file_id = msg.audio.file_id
- #       file_name = msg.audio.file_name or f"audio_{uid}.mp3"
-#        file_type = "audio"
-        
     else:
         mybot.send_message(chat_id, "❌ نوع الملف غير مدعوم")
         return None, None
     
     # ✅ التحقق من الحجم
     if not is_file_size_allowed(mybot, file_id):
-        mybot.send_message(chat_id, f"⚠️ الملف كبير جداً (الحد الأقصى 5MB)")
+        mybot.send_message(chat_id,
+            "⚠️ الملف كبير جداً (الحد الأقصى 5MB)\n\n"
+            "💡 يمكنك تقليل حجمه أو تقسيمه لتجربته الآن.\n"
+            "🔓 الترقية تتيح لك التعامل مع ملفات أكبر دون قيود."
+        )
         return None, None
     
     # ✅ تحميل الملف
