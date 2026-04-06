@@ -219,6 +219,13 @@ def is_yesterday(date_str):
     last = datetime.strptime(date_str, "%Y-%m-%d").date()
     return last == date.today() - timedelta(days=1)
 
+from datetime import datetime, timedelta
+
+def is_inactive(user_id, hours=24):
+    last = last_active.get(user_id)
+    if not last:
+        return True
+    return datetime.now() - last > timedelta(hours=hours)
 
 def update_progress(user_id, correct=None, total=None):
     conn = get_connection()
