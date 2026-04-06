@@ -21,83 +21,36 @@ from bot.notifications.trap import send_daily_challenge
 import re
 import json
 
-def safe_text(obj):
-    """
-    تحويل أي كائن إلى نص آمن للتيليجرام:
-    - إزالة أي علامات HTML (أقواس زاوية)
-    - إزالة الأقواس المتعرجة والمربعة إذا تسببت بمشاكل
-    """
-    try:
-        # محاولة استخراج النص من الخصائص المعروفة
-        if hasattr(obj, 'question') and obj.question:
-            text = str(obj.question)
-        elif hasattr(obj, 'text') and obj.text:
-            text = str(obj.text)
-        elif hasattr(obj, 'title') and obj.title:
-            text = str(obj.title)
-        elif hasattr(obj, 'content') and obj.content:
-            text = str(obj.content)
-        elif hasattr(obj, '__dict__'):
-            # استخراج أول قيمة نصية من __dict__
-            for key, value in obj.__dict__.items():
-                if isinstance(value, str) and len(value) > 5:
-                    text = value
-                    break
-            else:
-                text = json.dumps(obj.__dict__, ensure_ascii=False)
-        else:
-            text = str(obj)
-    except:
-        text = "[خطأ في قراءة السؤال]"
-    
-    # إزالة أي شيء يشبه علامات HTML: <...>
-    text = re.sub(r'<[^>]+>', '', text)
-    # إزالة أي شيء يشبه الوسوم: [object ...] أو {...}
-    text = re.sub(r'\[object\s+[^\]]+\]', '', text)
-    # إزالة الأقواس المتعرجة الزائدة التي قد تظهر
-    text = text.replace('{', '').replace('}', '')
-    # تنظيف المسافات المتعددة
-    text = re.sub(r'\s+', ' ', text).strip()
-    
-    return text if text else "سؤال بدون نص"
 
 def send_questions_by_parts(bot, chat_id, questions, quiz_code=None):
-    """
-    إرسال الأسئلة بأمان تام - لا parse_mode، تنظيف تلقائي للنص
-    """
-    lines = []
+    # تحويل الأسئلة لنص عادي
+    text_parts = []
+    current_part = ""
+    header = f"محتويات quizzes:\n```\n" if not quiz_code else f"كويز {quiz_code}:\n```\n"
+    
     for i, q in enumerate(questions, 1):
-        question_text = safe_text(q)
-        lines.append(f"{i}. {question_text}")
-    
-    questions_text = "\n".join(lines)
-    header = f"أسئلة الكويز (كود: {quiz_code}):\n" if quiz_code else "الأسئلة:\n"
-    full_message = header + questions_text
-    
-    MAX_LEN = 4096
-    
-    if len(full_message) <= MAX_LEN:
-        # إرسال بدون أي parse_mode
-        bot.send_message(chat_id, full_message)
-    else:
-        # التقسيم مع الاحتفاظ بالترقيم
-        parts = []
-        current = header
-        for line in questions_text.split("\n"):
-            if len(current) + len(line) + 1 > MAX_LEN:
-                parts.append(current)
-                current = line
-            else:
-                current += "\n" + line
-        if current:
-            parts.append(current)
+        line = f"{i}. {q}\n"
         
-        for idx, part in enumerate(parts, 1):
-            if idx == 1:
-                msg = part
-            else:
-                msg = f"[تكملة {idx}/{len(parts)}]\n{part}"
-            bot.send_message(chat_id, msg)
+        # إذا تجاوزت الرسالة الحد مع السطر الجديد
+        if len(current_part) + len(line) + 10 > 4000:  # 4000 للامان
+            # حفظ الجزء الحالي
+            text_parts.append(current_part)
+            current_part = line
+        else:
+            current_part += line
+    
+    # إضافة آخر جزء
+    if current_part:
+        text_parts.append(current_part)
+    
+    # إرسال الأجزاء
+    for i, part in enumerate(text_parts):
+        if i == 0:
+            msg = header + part + "\n```"
+        else:
+            msg = "```\n" + part + "\n```"  # تكملة بدون عنوان
+        
+        bot.send_message(chat_id, msg, parse_mode='Markdown')
 admin_id = 5048253124
 
 class QuizManager:
