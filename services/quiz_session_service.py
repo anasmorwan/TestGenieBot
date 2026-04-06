@@ -64,22 +64,22 @@ class QuizManager:
     def generate_and_store(self, bot=None, chat_id=None, user_id=None, message_id=None):
         try:
             print(f"🚀 [START] Starting generation for user_id: {user_id}", flush=True)
-        
+
             distribution = get_question_distribution(user_id, total_questions=3)
             challenge_count = distribution["challenge_count"]
             new_count = distribution["new_count"]
-        
+
             print(f"📊 [INFO] Distribution: {new_count} new, {challenge_count} challenge.", flush=True)
-    
+
+            should_resume = False
+            state = None
+
             if user_id is not None:
                 print(f"📡 [API] Requesting quizzes from AI...", flush=True)
                 raw_quizzes = send_daily_challenge(bot, user_id, new_count, challenge_count)
-                quizzes = normalize_quizzes(raw_quizzes) 
+                quizzes = normalize_quizzes(raw_quizzes)
                 print(f"✅ [API] Received {len(quizzes)} quizzes.", flush=True)
-                
-                
-                
-                
+
                 with self.lock:
                     print(f"🔒 [LOCK] Updating state for chat_id: {chat_id}", flush=True)
                     state = self.sessions.get(chat_id)
@@ -88,34 +88,46 @@ class QuizManager:
                         return
 
                     current_count = len(state["questions"])
-    
-                    # إضافة الأسئلة الجديدة للقائمة الحالية
+
                     state["questions"].extend(quizzes)
                     state["is_extended"] = True
                     state["waiting_for_extension"] = False
-                    bot.send_message(chat_id=chat_id, text=f"محتويات quizzes:\n```\n{chr(10).join([f'{i+1}. {q}' for i, q in enumerate(state['questions'])])}\n```", parse_mode='Markdown')
-                
-                    # التحقق هل كان البوت متوقفاً عند آخر سؤال (يحتاج استئناف)
-                    should_resume = (current_count == 0) or (state["index"] >= current_count) or (state.get("waiting_for_extension") == True and state["index"] == 0)
-                    print(f"📝 [DEBUG] Index: {state['index']}, OldCount: {current_count}, NewTotal: {len(state['questions'])}, Resume: {should_resume}", flush=True)
+
+                    bot.send_message(
+                        chat_id=chat_id,
+                        text=f"محتويات quizzes:\n```\n{chr(10).join([f'{i+1}. {q}' for i, q in enumerate(state['questions'])])}\n```",
+                        parse_mode='Markdown'
+                    )
+
+                    should_resume = (
+                        (current_count == 0)
+                        or (state["index"] >= current_count)
+                        or (state.get("waiting_for_extension") == True and state["index"] == 0)
+                    )
+                    print(
+                        f"📝 [DEBUG] Index: {state['index']}, OldCount: {current_count}, "
+                        f"NewTotal: {len(state['questions'])}, Resume: {should_resume}",
+                        flush=True
+                    )
 
                     state["questions_resumed"] = True
 
-            # خارج lock
             if should_resume:
                 print(f"▶️{should_resume} [RESUME] Resuming quiz for chat_id: {chat_id}", flush=True)
                 if message_id:
                     bot.edit_message_text(chat_id, message_id=message_id, text="🔥 تم تجهيز أسئلة جديدة!")
-            
+
                 self.send_current_question(chat_id, bot)
-                state["questions_resumed"] = True
-            
+
+                with self.lock:
+                    if state:
+                        state["questions_resumed"] = True
+
             print(f"🏁 [FINISH] generate_and_store completed successfully.", flush=True)
 
         except Exception as e:
             print(f"❌ [ERROR] Error in generate_and_store: {str(e)}", flush=True)
             raise ValueError(f"generate_and_store_error: {str(e)}")
-
         
 
     def start_quiz(self, chat_id, quiz_code, bot, is_shared_user=None):
@@ -352,52 +364,55 @@ class QuizManager:
     
     def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
         try:
-            state = self.sessions.get(chat_id)
-            if not state:
-                return
+            with self.lock:
+                state = self.sessions.get(chat_id)
+                if not state:
+                    return
 
-            shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
-        
-            q = state["questions"][state["index"]]
-            is_correct = (selected_option == q.correct_index)
-        
-            if is_correct:
-                state["score"] += 1
-                if state.get("source") == "dynamic_mix":
-                    try:
-                        self.increment_correct_count(chat_id, q.question)
-                    except Exception as db_e:
-                        print(f"⚠️ تجاهل خطأ قاعدة البيانات (increment): {db_e}")
-            else:
-                state["wrong_count"] += 1
-                if state.get("source") != "mistakes_pool":
-                    try:
-                        self.save_mistake(chat_id, q)
-                    except Exception as db_e:
-                        print(f"⚠️ تجاهل خطأ قاعدة البيانات (save_mistake): {db_e}")
+                shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
+
+                q = state["questions"][state["index"]]
+                is_correct = (selected_option == q.correct_index)
+
+                if is_correct:
+                    state["score"] += 1
+                    if state.get("source") == "dynamic_mix":
+                        try:
+                            self.increment_correct_count(chat_id, q.question)
+                        except Exception as db_e:
+                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (increment): {db_e}")
                 else:
-                    try:
-                        self.reset_correct_count(chat_id, q.question)
-                    except Exception as db_e:
-                        print(f"⚠️ تجاهل خطأ قاعدة البيانات (reset): {db_e}")
+                    state["wrong_count"] += 1
+                    if state.get("source") != "mistakes_pool":
+                        try:
+                            self.save_mistake(chat_id, q)
+                        except Exception as db_e:
+                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (save_mistake): {db_e}")
+                    else:
+                        try:
+                            self.reset_correct_count(chat_id, q.question)
+                        except Exception as db_e:
+                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (reset): {db_e}")
 
-            # 🚀 الانتقال للسؤال التالي بكل أمان
-            state["index"] += 1
+                state["index"] += 1
+
+                if state["index"] >= len(state["questions"]):
+                    waiting_for_extension = state.get("waiting_for_extension")
+                else:
+                    waiting_for_extension = False
 
             if state["index"] >= len(state["questions"]):
-                if state.get("waiting_for_extension"):
+                if waiting_for_extension:
                     bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
                     return
-                            
+
                 self.finish_quiz(chat_id, bot, is_shared_user=shared)
                 return
 
-            # إرسال السؤال التالي
             self.send_current_question(chat_id, bot)
-            
+
         except Exception as e:
             print(f"❌ CRITICAL ERROR in handle_answer: {e}")
-            # لتتبع الخطأ إذا حدث مستقبلاً
             import traceback
             traceback.print_exc()
 
@@ -606,3 +621,36 @@ def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
 
 self.send_current_question(chat_id, bot)
 """
+
+
+def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
+    try:
+        with self.lock:
+            state = self.sessions.get(chat_id)
+            if not state:
+                return
+
+            shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
+            q = state["questions"][state["index"]]
+            is_correct = (selected_option == q.correct_index)
+
+            if is_correct:
+                state["score"] += 1
+            else:
+                state["wrong_count"] += 1
+
+            state["index"] += 1
+            waiting = state.get("waiting_for_extension", False)
+            finished = state["index"] >= len(state["questions"])
+
+        if finished:
+            if waiting:
+                bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
+                return
+            self.finish_quiz(chat_id, bot, is_shared_user=shared)
+            return
+
+        self.send_current_question(chat_id, bot)
+
+    except Exception as e:
+        print(f"❌ CRITICAL ERROR in handle_answer: {e}")
