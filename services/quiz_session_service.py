@@ -395,6 +395,7 @@ class QuizManager:
         prepared_text = build_result_message(chat_id, score, total, streak, xp)
         has_text = state.get("has_saved_texts")
         source = state.get("source")
+        self.poll_map.pop(chat_id, None)
 
         
         if not is_paid_user_active(chat_id) and not shared:
