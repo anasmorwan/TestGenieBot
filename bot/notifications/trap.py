@@ -7,7 +7,7 @@ from bot.keyboards.actions_keyboard import streak_keyboard
 import threading
 from services.quiz_service import generate_challenge_quiz
 from services.usage import is_paid_user_active
-
+from storage.messages import get_message
 
 
 
@@ -19,7 +19,7 @@ def send_daily_challenge_message():
             streak, xp = update_progress(user_id)
             keyboard = streak_keyboard()
             
-            text = f"🔥 <b>تحدي اليوم جاهز!</b>\n\n💡 هل يمكنك الحفاظ على سلسلة 🔥 <b>{streak}</b> أيام؟\n\nابدأ الآن واختبر نفسك 👇"
+            text = get_message("USER_STREAK")
             try:
                 mybot.send_message(chat_id=user_id, text=text, reply_markup=keyboard, parse_mode="HTML")
                 
