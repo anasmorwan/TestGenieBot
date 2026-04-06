@@ -26,6 +26,7 @@ from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
 from storage.session_store import user_selections
 from storage.sqlite_db import get_question_distribution, get_recent_mistakes
+from services.user_trap import update_last_active 
 import random
 import json
 import time
@@ -48,6 +49,8 @@ def register(bot):
 
         chat_id = call.message.chat.id
         data = call.data
+        user_id = call.from_user.id
+        update_last_active(user_id)
     
         # تهيئة بيانات المستخدم إذا لم تكن موجودة
         if chat_id not in user_selections:
@@ -120,6 +123,8 @@ def register(bot):
             quiz_code = parts[2]
             target_chat_id = int(parts[3]) # تحويل ID القناة إلى رقم صحيح
             chat_type = parts[4]
+            user_id = call.from_user.id
+            update_last_active(user_id)
             
 
             bot.answer_callback_query(call.id, "⌛ جاري النشر في القناة...")
@@ -153,6 +158,7 @@ def register(bot):
             user_id = call.from_user.id
             message_id = call.message.message_id
             print("callback:", data, flush=True)
+            update_last_active(user_id)
 
 
             if data == "how_it_works":
