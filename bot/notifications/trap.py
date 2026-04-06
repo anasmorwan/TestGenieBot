@@ -23,6 +23,10 @@ def send_streak(user_id, streak, xp):
 
 
 
+from datetime import datetime
+
+def update_last_active(user_id):
+    last_active[user_id] = datetime.now()
 
 
 def send_daily_message():
