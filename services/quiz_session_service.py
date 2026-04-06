@@ -19,30 +19,66 @@ import time
 from bot.notifications.trap import send_daily_challenge
 
 def send_questions_by_parts(bot, chat_id, questions, quiz_code=None):
+    """
+    إرسال الأسئلة كنص عادي، مقسم إلى رسائل متعددة إذا لزم الأمر.
+    لا يستخدم أي parse_mode لتجنب أخطاء Telegram.
+    """
+    # تحويل كل سؤال إلى نص عادي
+    lines = []
+    for i, q in enumerate(questions, 1):
+        # طباعة الكائن لمعرفة محتواه (للتشخيص)
+        print(f"Question {i}: {q}")
+        print(f"Type: {type(q)}")
+        print(f"Attributes: {dir(q)}")
+        print(f"Dict: {getattr(q, '__dict__', 'No __dict__')}")
+        print("-" * 40)
+        
+        # تحويل السؤال إلى نص عادي (قد يكون str(q) أو الوصول لخاصية)
+        # سنحاول استخراج النص بأمان
+        try:
+            if hasattr(q, 'text') and q.text:
+                text = str(q.text)
+            elif hasattr(q, 'question') and q.question:
+                text = str(q.question)
+            elif hasattr(q, 'title') and q.title:
+                text = str(q.title)
+            else:
+                text = str(q)  # نص افتراضي
+        except Exception as e:
+            text = f"[خطأ في قراءة السؤال: {e}]"
+        
+        lines.append(f"{i}. {text}")
     
-    # تعديل السطر ليعرض الكائن كاملاً كنص
-    questions_text = '\n'.join([f'{i+1}. {q}' for i, q in enumerate(questions)])
-    MAX_LEN = 4000
+    questions_text = "\n".join(lines)
     
-    header = f"📚 أسئلة الكويز (كود: {quiz_code}):\n<code>\n" if quiz_code else "📚 الأسئلة:\n<code>\n"
-    footer = "\n</code>"
+    # إضافة عنوان
+    header = f"أسئلة الكويز (كود: {quiz_code}):\n" if quiz_code else "الأسئلة:\n"
+    full_message = header + questions_text
     
-    if len(questions_text) + len(header) + len(footer) <= MAX_LEN:
-        bot.send_message(chat_id, f"{header}{questions_text}{footer}", parse_mode='HTML')
+    MAX_LEN = 4096  # الحد الأقصى لتيليجرام
+    
+    if len(full_message) <= MAX_LEN:
+        bot.send_message(chat_id, full_message)  # بدون parse_mode
     else:
+        # تقسيم إلى رسائل متعددة
         parts = []
-        current_part = ""
-        for line in questions_text.split('\n'):
+        current_part = header
+        for line in questions_text.split("\n"):
             if len(current_part) + len(line) + 1 > MAX_LEN:
                 parts.append(current_part)
                 current_part = line
             else:
-                current_part += ('\n' + line) if current_part else line
+                current_part += "\n" + line
         if current_part:
             parts.append(current_part)
         
         for i, part in enumerate(parts, 1):
-            bot.send_message(chat_id, f"📚 الأسئلة ({i}/{len(parts)}):\n<code>\n{part}\n</code>", parse_mode='HTML')
+            if i == 1:
+                msg = part
+            else:
+                msg = f"تكملة الأسئلة ({i}/{len(parts)}):\n{part}"
+            bot.send_message(chat_id, msg)  # بدون parse_mode
+
 
 admin_id = 5048253124
 
