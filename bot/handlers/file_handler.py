@@ -72,7 +72,7 @@ def register(bot):
         content = None
 
         try:
-            if path is not None:         
+            if path is not None and path == "large_file":
                 content = extract_text_from_file(
                     user_id,
                     bot,
@@ -101,15 +101,15 @@ def register(bot):
                 if not content:
                     bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
                     return
-            else:
+           elif path == "large_file":
                 bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=waiting_msg.message_id,
                 text=get_message("SIZE_LIMIT"),
                 parse_mode="HTML")
-                print("Error during file upload", flush=True)
-                
                 return
+            else:
+                print("Error during file upload", flush=True)
     
                 
             if not content:
