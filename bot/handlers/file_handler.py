@@ -82,6 +82,10 @@ def register(bot):
                     message_id
                 )
             else:
+                bot.send_message(
+                chat_id=chat_id,
+                text=get_message("SIZE_LIMIT"),
+                parse_mode="HTML")
                 return
                 
                 try:
