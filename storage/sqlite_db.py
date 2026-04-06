@@ -595,9 +595,9 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE user_quizzes ADD COLUMN difficulty TEXT DEFAULT 'early'
         """)
-    if not column_exists("user_quizzes", "quiz_num"):
+    if not column_exists("users", "num_quizzes"):
         c.execute("""
-        ALTER TABLE user_quizzes ADD COLUMN quiz_num TEXT 
+        ALTER TABLE users ADD COLUMN num_quizzes TEXT 
         """)
         
 
