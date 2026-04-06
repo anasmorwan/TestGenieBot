@@ -18,39 +18,10 @@ import random
 import time
 from bot.notifications.trap import send_daily_challenge
 
-import re
-import json
 
 
-def send_questions_by_parts(bot, chat_id, questions, quiz_code=None):
-    # تحويل الأسئلة لنص عادي
-    text_parts = []
-    current_part = ""
-    header = f"محتويات quizzes:\n```\n" if not quiz_code else f"كويز {quiz_code}:\n```\n"
-    
-    for i, q in enumerate(questions, 1):
-        line = f"{i}. {q}\n"
-        
-        # إذا تجاوزت الرسالة الحد مع السطر الجديد
-        if len(current_part) + len(line) + 10 > 4000:  # 4000 للامان
-            # حفظ الجزء الحالي
-            text_parts.append(current_part)
-            current_part = line
-        else:
-            current_part += line
-    
-    # إضافة آخر جزء
-    if current_part:
-        text_parts.append(current_part)
-    
-    # إرسال الأجزاء
-    for i, part in enumerate(text_parts):
-        if i == 0:
-            msg = header + part + "\n```"
-        else:
-            msg = "```\n" + part + "\n```"  # تكملة بدون عنوان
-        
-        bot.send_message(chat_id, msg, parse_mode='Markdown')
+
+
 admin_id = 5048253124
 
 class QuizManager:
@@ -148,9 +119,7 @@ class QuizManager:
                 if obj:
                     questions.append(obj)
 
-            # بعد بناء قائمة questions
-            send_questions_by_parts(bot, chat_id, questions, quiz_code)
-        
+            
             print("TOTAL QUESTIONS:", len(questions))
 
             if not questions:
