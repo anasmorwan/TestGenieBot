@@ -189,7 +189,8 @@ def register(bot):
                     ]
                     text = random.choice(msgs)
                     
-                    bot.edit_message_text(chat_id,
+                    bot.edit_message_text(
+                    chat_id=chat_id,
                     message_id=message_id,
                     text=text,
                     parse_mode="HTML"
