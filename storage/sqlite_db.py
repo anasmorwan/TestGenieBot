@@ -2,6 +2,7 @@
 
 import sqlite3
 import json
+quiz_history
 from datetime import datetime, timedelta
 DB_PATH = "quiz_users.db"
 
