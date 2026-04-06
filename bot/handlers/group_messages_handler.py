@@ -1,6 +1,6 @@
 
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
-
+from services.user_trap import update_last_active
 
 def register(bot):
     @bot.message_handler(func=lambda msg: msg.chat.type in ['group', 'supergroup'], content_types=["text"])
@@ -9,6 +9,8 @@ def register(bot):
         
         chat_id = message.chat.id
         user_name = message.from_user.first_name
+        user_id = message.from_user.id
+        update_last_active(user_id)
             
         
         text = message.text or message.caption
