@@ -226,12 +226,21 @@ def get_top_interest(cursor, user_id):
 
 def get_last_learning(cursor, user_id):
     cursor.execute("""
-        SELECT last_text, specialty, updated_at
+        SELECT specialty, updated_at
         FROM user_knowledge
         WHERE user_id = ?
     """, (user_id,))
     
-    return cursor.fetchone()
+    row = cursor.fetchone()
+    
+    if not row:
+        return None
+    
+    specialty, updated_at = row
+    return {
+        "specialty": specialty,
+        "updated_at": updated_at
+    }
 
 def get_user_profile(cursor, user_id):
     cursor.execute("""
@@ -252,39 +261,36 @@ def build_dynamic_message(user_id):
     learning = get_last_learning(cursor, user_id)
 
     xp, streak, level, last_topic = profile if profile else (0, 0, "beginner", None)
-
-    # --- بناء الرسالة ---
+    
     if profile is not None and mistake is not None and interest is not None and learning is not None:
         parts = []
 
-        # 1) Hook (جذب)
+        # 1) Hook
         if streak > 5:
             parts.append(f"🔥 سلسلة قوية: {streak} أيام!")
         else:
             parts.append("🔥 جاهز لتحدي جديد؟")
 
-        # 2) ربط بالاهتمام
+        # 2) الاهتمامات
         if interest:
             domain, points = interest
             parts.append(f"📚 واضح أنك مهتم بـ {domain}")
 
-        # 3) استدعاء آخر تعلم
-        if learning:
-            last_text, specialty, _ = learning
-            parts.append(f"🧠 آخر مرة كنت تراجع: {specialty}")
+        # 3) آخر تعلم (المهم)
+        if learning and learning.get("specialty"):
+            parts.append(f"🧠 آخر مراجعة كانت عن {learning['specialty']}")
 
-        # 4) استهداف نقطة ضعف
+        # 4) الأخطاء
         if mistake:
             q_text, fails, corrects = mistake
-            parts.append(f"⚠️ عندك سؤال متكرر الخطأ ({fails} مرات)... جاهز تتجاوزه؟")
+            parts.append(f"⚠️ عندك نقطة تتكرر ({fails} مرات)... جاهز تحلها؟")
 
-        # 5) CTA
+        # 5) CTA دائمًا موجود
         parts.append("👇 ابدأ الآن واختبر نفسك")
 
         return "\n\n".join(parts)
     else:
-        return False
-
+        return False   
 #--------------------------
 #    🔹 دوال الادمن المساعدة
 #--------------------------
