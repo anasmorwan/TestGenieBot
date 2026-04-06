@@ -598,6 +598,10 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE user_mistakes ADD COLUMN created_at TEXT DEFAULT CURRENT_TIMESTAMP 
         """)
+    if not column_exists("users_trap", "last_quiz_time"):
+        c.execute("""
+        ALTER TABLE users_trap ADD COLUMN last_quiz_time TEXT 
+        """)
 
     conn.commit()
     conn.close()
