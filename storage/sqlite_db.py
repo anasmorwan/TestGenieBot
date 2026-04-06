@@ -187,7 +187,103 @@ def init_db():
     
     conn.commit()
     conn.close()
+    
+#--------------------------
+#    🔹 دوال data-driven messages 
+#--------------------------
+def get_top_mistake(cursor, user_id):
+    cursor.execute("""
+        SELECT question_text, fail_count, correct_count
+        FROM user_mistakes
+        WHERE user_id = ?
+        ORDER BY fail_count DESC
+        LIMIT 1
+    """, (user_id,))
+    
+    return cursor.fetchone()
 
+def get_top_interest(cursor, user_id):
+    cursor.execute("""
+        SELECT domain_name, points
+        FROM user_interests
+        WHERE user_id = ?
+        ORDER BY points DESC
+        LIMIT 1
+    """, (user_id,))
+    
+    return cursor.fetchone()
+
+def get_top_interest(cursor, user_id):
+    cursor.execute("""
+        SELECT domain_name, points
+        FROM user_interests
+        WHERE user_id = ?
+        ORDER BY points DESC
+        LIMIT 1
+    """, (user_id,))
+    
+    return cursor.fetchone()
+
+def get_last_learning(cursor, user_id):
+    cursor.execute("""
+        SELECT last_text, specialty, updated_at
+        FROM user_knowledge
+        WHERE user_id = ?
+    """, (user_id,))
+    
+    return cursor.fetchone()
+
+def get_user_profile(cursor, user_id):
+    cursor.execute("""
+        SELECT xp, streak, level, last_topic
+        FROM users_trap
+        WHERE user_id = ?
+    """, (user_id,))
+    
+    return cursor.fetchone()
+
+def build_dynamic_message(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    profile = get_user_profile(cursor, user_id)
+    mistake = get_top_mistake(cursor, user_id)
+    interest = get_top_interest(cursor, user_id)
+    learning = get_last_learning(cursor, user_id)
+
+    xp, streak, level, last_topic = profile if profile else (0, 0, "beginner", None)
+
+    # --- بناء الرسالة ---
+    if profile and mistake and interest and learning:
+        parts = []
+
+        # 1) Hook (جذب)
+        if streak > 5:
+            parts.append(f"🔥 سلسلة قوية: {streak} أيام!")
+        else:
+            parts.append("🔥 جاهز لتحدي جديد؟")
+
+        # 2) ربط بالاهتمام
+        if interest:
+            domain, points = interest
+            parts.append(f"📚 واضح أنك مهتم بـ {domain}")
+
+        # 3) استدعاء آخر تعلم
+        if learning:
+            last_text, specialty, _ = learning
+            parts.append(f"🧠 آخر مرة كنت تراجع: {specialty}")
+
+        # 4) استهداف نقطة ضعف
+        if mistake:
+            q_text, fails, corrects = mistake
+            parts.append(f"⚠️ عندك سؤال متكرر الخطأ ({fails} مرات)... جاهز تتجاوزه؟")
+
+        # 5) CTA
+        parts.append("👇 ابدأ الآن واختبر نفسك")
+
+        return "\n\n".join(parts)
+    else:
+        return False
 
 #--------------------------
 #    🔹 دوال الادمن المساعدة
