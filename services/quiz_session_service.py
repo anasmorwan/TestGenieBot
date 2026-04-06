@@ -399,8 +399,10 @@ class QuizManager:
 
         
         if not is_paid_user_active(chat_id) and not shared:
-            if source != "mistakes_pool" and not has_text:
-                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+            if source != "generated_quiz":
+                if not has_text:
+                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                    return
             else:
             
                 keyboard = share_quiz_button(quiz_code)
@@ -420,8 +422,11 @@ class QuizManager:
         
         elif is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
-            if source != "mistakes_pool" and not has_text:
-                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+            if source != "generated_quiz":
+                if not has_text:
+                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                    return
+                
             
             else:
                 keyboard = share_quiz_button(quiz_code)
@@ -444,8 +449,10 @@ class QuizManager:
                 creator_id = get_quiz_creator(quiz_code)
                 log_quiz_attempt(chat_id, quiz_code, score, total)
                 
-            if source != "mistakes_pool" and not has_text:
-                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+            if source != "generated_quiz":
+                if not has_text:
+                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                    return
                 
             else:
                 try:
