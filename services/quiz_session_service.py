@@ -18,7 +18,42 @@ import random
 import time
 from bot.notifications.trap import send_daily_challenge
 
-
+def send_questions_by_parts(bot, chat_id, questions, quiz_code=None):
+    """
+    إرسال الأسئلة مقسمة إلى رسائل متعددة إذا كان النص طويلاً
+    """
+    # تنسيق الأسئلة
+    questions_text = '\n'.join([f'{i+1}. {q.text}' for i, q in enumerate(questions)])
+    
+    # الحد الأقصى الآمن للرسالة
+    MAX_LEN = 3800
+    
+    # إضافة عنوان الكويز إن وجد
+    header = f"📚 أسئلة الكويز (كود: {quiz_code}):\n```\n" if quiz_code else "📚 الأسئلة:\n```\n"
+    footer = "\n```"
+    
+    if len(questions_text) + len(header) + len(footer) <= MAX_LEN:
+        # رسالة واحدة تكفي
+        bot.send_message(chat_id, f"{header}{questions_text}{footer}", parse_mode='Markdown')
+    else:
+        # تقسيم إلى عدة رسائل
+        parts = []
+        current_part = ""
+        
+        for line in questions_text.split('\n'):
+            if len(current_part) + len(line) + 1 > MAX_LEN:
+                parts.append(current_part)
+                current_part = line
+            else:
+                current_part += ('\n' + line) if current_part else line
+        
+        if current_part:
+            parts.append(current_part)
+        
+        # إرسال الأجزاء
+        for i, part in enumerate(parts, 1):
+            msg = f"📚 الأسئلة ({i}/{len(parts)}):\n```\n{part}\n```"
+            bot.send_message(chat_id, msg, parse_mode='Markdown')
 
 
 admin_id = 5048253124
@@ -106,8 +141,8 @@ class QuizManager:
                 if obj:
                     questions.append(obj)
 
-            bot.send_message(chat_id, f"أسئلة الكويز (كود: {quiz_code}):\n```\n{chr(10).join([f'{i+1}. {q.text}' for i, q in enumerate(questions)])}\n```", parse_mode='Markdown')
-
+            # بعد بناء قائمة questions
+            send_questions_by_parts(bot, chat_id, questions, quiz_code)
         
             print("TOTAL QUESTIONS:", len(questions))
 
@@ -136,7 +171,7 @@ class QuizManager:
 
             return True
         except Exception as e:
-            raise ValueError("start_quizError: {str(e)}")
+            raise ValueError(f"start_quizError: {str(e)}")
             
 
     def start_mistakes_review(self, chat_id, mistakes_list, bot):
