@@ -102,8 +102,9 @@ def register(bot):
                     bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
                     return
             else:
-                bot.send_message(
+                bot.edit_message_text(
                 chat_id=chat_id,
+                message_id=waiting_msg.message_id,
                 text=get_message("SIZE_LIMIT"),
                 parse_mode="HTML")
                 print("Error during file upload", flush=True)
