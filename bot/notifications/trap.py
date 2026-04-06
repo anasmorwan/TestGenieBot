@@ -1,5 +1,5 @@
 from bot.bot_instance import mybot
-from services.user_trap import should_show_daily, update_progress, get_user_content
+from services.user_trap import should_show_daily, update_progress, get_user_content, is_inactive
 from storage.sqlite_db import get_connection
 from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
@@ -29,7 +29,7 @@ def send_daily_message():
     user_ids = [5048253124, 6948343253]
     for user_id in user_ids:
         
-        if should_show_daily(user_id):
+        if is_inactive(user_id):
             streak, xp = update_progress(user_id)
             send_streak(user_id, streak, xp)
         
