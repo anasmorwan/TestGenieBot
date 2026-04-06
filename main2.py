@@ -1,5 +1,8 @@
 # main.py (مهم: وضع طباعات للتتبع)
 import os
+import schedule
+import time
+
 from bot.bot_instance import mybot, set_webhook
 from bot.handlers import start, text_handler, file_handler, image_handler, group_messages_handler, callback_handler, pre_checkout_query_handler, payment_handler
 from storage.sqlite_db import init_db, migrate_users_to_trap
@@ -10,7 +13,7 @@ from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import safe_add_column, safe_add_table
 from bot.handlers import chat_shared_handler 
 from bot.handlers import admin_commands, bot_commands
-from bot.notifications.trap import send_daily_message
+from bot.notifications.trap import send_daily_challenge_message
 print("main starting...", flush=True)
 
 
@@ -67,7 +70,14 @@ poll_answer_handler.register(mybot)
 chat_shared_handler.register(mybot)
 
 migrate_users_to_trap()
-send_daily_message()
+
+
+
+schedule.every(1).hours.do(send_daily_challenge_message)  # أو كل 10 دقائق
+
+while True:
+    schedule.run_pending()
+    time.sleep(60)
 
 
 
