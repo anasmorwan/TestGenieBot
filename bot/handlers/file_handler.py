@@ -14,7 +14,7 @@ from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
-
+from services.user_trap import update_last_active
 import threading
     
 
@@ -39,6 +39,7 @@ def register(bot):
         user_id = msg.from_user.id
         chat_id = msg.chat.id
         message_id = msg.message_id
+        update_last_active(user_id)
 
         try:
             plan = check_subscription_valid(user_id)
