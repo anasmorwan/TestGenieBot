@@ -21,6 +21,9 @@ def send_daily_challenge_message():
             status = get_inactivity_level(user_id)
             text = get_message("NEW_USER_STREAK")
             
+            if status = "new":
+                text = random.choice([get_message("NEW_USER_STREAK"), get_message("USER_STREAK")])
+            
             if status == "active":
                 text = random.choice([get_message("ACTIVE_USER_STREAK"), build_dynamic_message(user_id)])
                 if text is False:
