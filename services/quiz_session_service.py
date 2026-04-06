@@ -18,68 +18,86 @@ import random
 import time
 from bot.notifications.trap import send_daily_challenge
 
+import re
+import json
+
+def safe_text(obj):
+    """
+    تحويل أي كائن إلى نص آمن للتيليجرام:
+    - إزالة أي علامات HTML (أقواس زاوية)
+    - إزالة الأقواس المتعرجة والمربعة إذا تسببت بمشاكل
+    """
+    try:
+        # محاولة استخراج النص من الخصائص المعروفة
+        if hasattr(obj, 'question') and obj.question:
+            text = str(obj.question)
+        elif hasattr(obj, 'text') and obj.text:
+            text = str(obj.text)
+        elif hasattr(obj, 'title') and obj.title:
+            text = str(obj.title)
+        elif hasattr(obj, 'content') and obj.content:
+            text = str(obj.content)
+        elif hasattr(obj, '__dict__'):
+            # استخراج أول قيمة نصية من __dict__
+            for key, value in obj.__dict__.items():
+                if isinstance(value, str) and len(value) > 5:
+                    text = value
+                    break
+            else:
+                text = json.dumps(obj.__dict__, ensure_ascii=False)
+        else:
+            text = str(obj)
+    except:
+        text = "[خطأ في قراءة السؤال]"
+    
+    # إزالة أي شيء يشبه علامات HTML: <...>
+    text = re.sub(r'<[^>]+>', '', text)
+    # إزالة أي شيء يشبه الوسوم: [object ...] أو {...}
+    text = re.sub(r'\[object\s+[^\]]+\]', '', text)
+    # إزالة الأقواس المتعرجة الزائدة التي قد تظهر
+    text = text.replace('{', '').replace('}', '')
+    # تنظيف المسافات المتعددة
+    text = re.sub(r'\s+', ' ', text).strip()
+    
+    return text if text else "سؤال بدون نص"
+
 def send_questions_by_parts(bot, chat_id, questions, quiz_code=None):
     """
-    إرسال الأسئلة كنص عادي، مقسم إلى رسائل متعددة إذا لزم الأمر.
-    لا يستخدم أي parse_mode لتجنب أخطاء Telegram.
+    إرسال الأسئلة بأمان تام - لا parse_mode، تنظيف تلقائي للنص
     """
-    # تحويل كل سؤال إلى نص عادي
     lines = []
     for i, q in enumerate(questions, 1):
-        # طباعة الكائن لمعرفة محتواه (للتشخيص)
-        print(f"Question {i}: {q}")
-        print(f"Type: {type(q)}")
-        print(f"Attributes: {dir(q)}")
-        print(f"Dict: {getattr(q, '__dict__', 'No __dict__')}")
-        print("-" * 40)
-        
-        # تحويل السؤال إلى نص عادي (قد يكون str(q) أو الوصول لخاصية)
-        # سنحاول استخراج النص بأمان
-        try:
-            if hasattr(q, 'text') and q.text:
-                text = str(q.text)
-            elif hasattr(q, 'question') and q.question:
-                text = str(q.question)
-            elif hasattr(q, 'title') and q.title:
-                text = str(q.title)
-            else:
-                text = str(q)  # نص افتراضي
-        except Exception as e:
-            text = f"[خطأ في قراءة السؤال: {e}]"
-        
-        lines.append(f"{i}. {text}")
+        question_text = safe_text(q)
+        lines.append(f"{i}. {question_text}")
     
     questions_text = "\n".join(lines)
-    
-    # إضافة عنوان
     header = f"أسئلة الكويز (كود: {quiz_code}):\n" if quiz_code else "الأسئلة:\n"
     full_message = header + questions_text
     
-    MAX_LEN = 4096  # الحد الأقصى لتيليجرام
+    MAX_LEN = 4096
     
     if len(full_message) <= MAX_LEN:
-        bot.send_message(chat_id, full_message)  # بدون parse_mode
+        # إرسال بدون أي parse_mode
+        bot.send_message(chat_id, full_message)
     else:
-        # تقسيم إلى رسائل متعددة
+        # التقسيم مع الاحتفاظ بالترقيم
         parts = []
-        current_part = header
+        current = header
         for line in questions_text.split("\n"):
-            if len(current_part) + len(line) + 1 > MAX_LEN:
-                parts.append(current_part)
-                current_part = line
+            if len(current) + len(line) + 1 > MAX_LEN:
+                parts.append(current)
+                current = line
             else:
-                current_part += "\n" + line
-        if current_part:
-            parts.append(current_part)
+                current += "\n" + line
+        if current:
+            parts.append(current)
         
-        for i, part in enumerate(parts, 1):
-            if i == 1:
+        for idx, part in enumerate(parts, 1):
+            if idx == 1:
                 msg = part
             else:
-                msg = f"تكملة الأسئلة ({i}/{len(parts)}):\n{part}"
-            bot.send_message(chat_id, msg)  # بدون parse_mode
-
-
+                msg = f"[تكملة {idx}/{len(parts)}]\n{part}"
+            bot.send_message(chat_id, msg)
 admin_id = 5048253124
 
 class QuizManager:
