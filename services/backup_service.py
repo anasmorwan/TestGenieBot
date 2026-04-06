@@ -356,3 +356,13 @@ def start_auto_backup():
         id='auto_backup',
         replace_existing=True
         )
+
+def start_daily_challenge():
+    from bot.notifications.trap import send_daily_challenge_message  # استيراد محلي
+    scheduler.add_job(
+        send_daily_challenge_message,
+        'interval',
+        hours=1,
+        id='daily_challenge',
+        replace_existing=True
+    )
