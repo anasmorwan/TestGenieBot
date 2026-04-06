@@ -19,42 +19,30 @@ import time
 from bot.notifications.trap import send_daily_challenge
 
 def send_questions_by_parts(bot, chat_id, questions, quiz_code=None):
-    """
-    إرسال الأسئلة مقسمة إلى رسائل متعددة إذا كان النص طويلاً
-    """
-    # تنسيق الأسئلة
+    
+    # تعديل السطر ليعرض الكائن كاملاً كنص
     questions_text = '\n'.join([f'{i+1}. {q}' for i, q in enumerate(questions)])
+    MAX_LEN = 4000
     
-    # الحد الأقصى الآمن للرسالة
-    MAX_LEN = 3800
-    
-    # إضافة عنوان الكويز إن وجد
-    header = f"📚 أسئلة الكويز (كود: {quiz_code}):\n```\n" if quiz_code else "📚 الأسئلة:\n```\n"
-    footer = "\n```"
+    header = f"📚 أسئلة الكويز (كود: {quiz_code}):\n<code>\n" if quiz_code else "📚 الأسئلة:\n<code>\n"
+    footer = "\n</code>"
     
     if len(questions_text) + len(header) + len(footer) <= MAX_LEN:
-        # رسالة واحدة تكفي
-        bot.send_message(chat_id, f"{header}{questions_text}{footer}", parse_mode='Markdown')
+        bot.send_message(chat_id, f"{header}{questions_text}{footer}", parse_mode='HTML')
     else:
-        # تقسيم إلى عدة رسائل
         parts = []
         current_part = ""
-        
         for line in questions_text.split('\n'):
             if len(current_part) + len(line) + 1 > MAX_LEN:
                 parts.append(current_part)
                 current_part = line
             else:
                 current_part += ('\n' + line) if current_part else line
-        
         if current_part:
             parts.append(current_part)
         
-        # إرسال الأجزاء
         for i, part in enumerate(parts, 1):
-            msg = f"📚 الأسئلة ({i}/{len(parts)}):\n```\n{part}\n```"
-            bot.send_message(chat_id, msg, parse_mode='Markdown')
-
+            bot.send_message(chat_id, f"📚 الأسئلة ({i}/{len(parts)}):\n<code>\n{part}\n</code>", parse_mode='HTML')
 
 admin_id = 5048253124
 
