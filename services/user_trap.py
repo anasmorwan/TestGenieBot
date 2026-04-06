@@ -27,6 +27,47 @@ def update_last_active(user_id):
     last_active[user_id] = datetime.now()
 
 
+
+def get_inactivity_level(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT last_quiz_date FROM users_trap
+        WHERE user_id = ?
+    """, (user_id,))
+    
+    row = cursor.fetchone()
+    
+    if not row or not row[0]:
+        return "new"
+
+    last_time = datetime.strptime(row[0], "%Y-%m-%d %H:%M:%S")
+    diff = datetime.now() - last_time
+
+    if diff < timedelta(hours=24):
+        return "active"
+    elif diff < timedelta(days=3):
+        return "cooling"
+    elif diff < timedelta(days=7):
+        return "inactive"
+    else:
+        return "lost"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def get_user_content(user_id):
     """
     استرجاع محتوى المستخدم من قاعدة البيانات
