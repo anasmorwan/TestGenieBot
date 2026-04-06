@@ -28,23 +28,7 @@ def send_daily_challenge_message():
         
         
         user_streak[user_id] = date.today()
-
-
-def send_daily_challenge(bot, user_id, new_count, challenge_count):
-    content = get_user_content(user_id)
-    
-    if challenge_count and new_count > 0:
-        is_pro = is_paid_user_active(user_id)
-        
-        num_quizzes = challenge_count + new_count
-        extended_quizzes = generate_challenge_quiz(content, num_quizzes, is_pro)
-        
-        return extended_quizzes  # ✅ ترجع القائمة، وليس العدد
-    
-    return []  # ✅ إرجاع قائمة فارغة إذا لم تكن الشروط مستوفاة
-    
-    
-                
+               
 
 def get_all_user_ids():
     conn = get_connection
