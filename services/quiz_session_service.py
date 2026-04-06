@@ -22,6 +22,7 @@ from bot.notifications.trap import send_daily_challenge
 
 
 
+
 admin_id = 5048253124
 
 class QuizManager:
@@ -52,34 +53,20 @@ class QuizManager:
                 print(f"✅ [API] Received {len(quizzes)} quizzes.", flush=True)
 
                 with self.lock:
-                    print(f"🔒 [LOCK] Updating state for chat_id: {chat_id}", flush=True)
                     state = self.sessions.get(chat_id)
                     if not state:
-                        print(f"⚠️ [WARN] State not found for chat_id: {chat_id}. Aborting.", flush=True)
                         return
 
                     current_count = len(state["questions"])
+                    was_waiting = state.get("waiting_for_extension", False)
+                    current_index = state["index"]
 
                     state["questions"].extend(quizzes)
                     state["is_extended"] = True
                     state["waiting_for_extension"] = False
 
-                    bot.send_message(
-                        chat_id=chat_id,
-                        text=f"محتويات quizzes:\n```\n{chr(10).join([f'{i+1}. {q}' for i, q in enumerate(state['questions'])])}\n```",
-                        parse_mode='Markdown'
-                    )
+                    should_resume = was_waiting and current_index >= current_count
 
-                    should_resume = (
-                        (current_count == 0)
-                        or (state["index"] >= current_count)
-                        or (state.get("waiting_for_extension") == True and state["index"] == 0)
-                    )
-                    print(
-                        f"📝 [DEBUG] Index: {state['index']}, OldCount: {current_count}, "
-                        f"NewTotal: {len(state['questions'])}, Resume: {should_resume}",
-                        flush=True
-                    )
 
                     state["questions_resumed"] = True
 
