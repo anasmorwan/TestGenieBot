@@ -103,7 +103,7 @@ class QuizManager:
 
             # خارج lock
             if should_resume:
-                print(f"▶️ [RESUME] Resuming quiz for chat_id: {chat_id}", flush=True)
+                print(f"▶️{should_resume} [RESUME] Resuming quiz for chat_id: {chat_id}", flush=True)
                 if message_id:
                     bot.edit_message_text(chat_id, message_id=message_id, text="🔥 تم تجهيز أسئلة جديدة!")
             
