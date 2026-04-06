@@ -12,6 +12,7 @@ from storage.session_store import user_states, get_state_safe, get_chat_title, t
 from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
 from services.poll_service import generate_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
+from services.user_trap import update_last_active
 
 import time
 
@@ -35,6 +36,7 @@ def register(bot):
         user_id = msg.from_user.id
         chat_id = msg.chat.id
         text = msg.text
+        update_last_active(user_id)
 
         try:
             plan = check_subscription_valid(user_id)
