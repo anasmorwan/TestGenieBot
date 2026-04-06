@@ -1,6 +1,6 @@
 from bot.bot_instance import mybot
 from services.user_trap import should_show_daily, update_progress, get_user_content, is_inactive
-from storage.sqlite_db import get_connection
+from storage.sqlite_db import get_connection, build_dynamic_message
 from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
 from bot.keyboards.actions_keyboard import streak_keyboard
@@ -18,8 +18,11 @@ def send_daily_challenge_message():
         if is_inactive(user_id):
             streak, xp = update_progress(user_id)
             keyboard = streak_keyboard()
+            text = build_dynamic_message(user_id)
             
-            text = get_message("USER_STREAK")
+            if text is False:
+                text = get_message("USER_STREAK")
+            
             try:
                 mybot.send_message(chat_id=user_id, text=text, reply_markup=keyboard, parse_mode="HTML")
                 
