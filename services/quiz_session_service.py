@@ -132,62 +132,50 @@ class QuizManager:
             raise ValueError("start_quizError: {str(e)}")
             
 
-    def start_mistakes_review(self, chat_id, mistakes_list, bot):
-        try:
-            # 1. تحويل الأخطاء لكائنات (حتى لو القائمة فارغة لن ينهار الكود)
-            questions = []
-            if mistakes_list:
-                for mistake in mistakes_list:
-                    # التأكد من أن الخطأ يحتوي على بيانات سؤال
-                    q_data = mistake.get("questions") if isinstance(mistake, dict) else None
-                    if q_data:
-                        obj = QuizQuestion.from_raw(q_data)
-                        if obj:
-                            questions.append(obj)
-    
-            # 2. إنشاء الجلسة في كل الأحوال
-            with self.lock:
-                self.sessions[chat_id] = {
-                    "questions": questions, # قد تكون قائمة فارغة []
-                    "index": 0,
-                    "score": 0,
-                    "wrong_count": 0,
-                    "source": "dynamic_mix",
-                    "quiz_code": "CHALLENGE_MODE",
-                    "has_saved_texts": True,
-                    "is_extended": False,
-                    "waiting_for_extension": True,
-                    "questions_resumed": False
-                }
-
-            # 3. التحقق من وجود "مادة علمية" (Knowledge) قبل بدء التوليد
-            user_content = get_user_content(chat_id) # chat_id هو نفسه user_id هنا عادة
-            state = self.sessions.get(chat_id)
-
-            if questions:
-                # إذا كان لديه أخطاء، نبدأ بها فوراً
-                self.send_current_question(chat_id, bot)
+        def start_mistakes_review(self, chat_id, mistakes_list, bot):
+            try:
+                questions = []
+                if mistakes_list:
+                    for mistake in mistakes_list:
+                        q_data = mistake.get("questions") if isinstance(mistake, dict) else None
+                        if q_data:
+                            obj = QuizQuestion.from_raw(q_data)
+                            if obj: questions.append(obj)
             
-                # إذا كان لديه مادة علمية، نشغل التوليد في الخلفية لزيادة الأسئلة
-                if user_content is not None:
-                    threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
-                else:
-                    state["has_saved_texts"] = False        
-            else:
-                # ليس لديه أخطاء سابقة
-                if user_content:
-                    bot.send_message(chat_id, "🔍 جاري توليد أسئلة تحدي جديدة بناءً على تخصصك...")
-                    threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
-                else:
-                    # ليس لديه أخطاء وليس لديه مادة علمية!
-                    bot.send_message(chat_id, "⚠️ لا توجد أخطاء سابقة، ولم تقم بإضافة نصوص أو ملفات لتوليد أسئلة جديدة. يرجى إرسال نص أولاً!")
-                    # نحذف الجلسة لأنها لن تعمل
-                    with self.lock:
-                        self.sessions.pop(chat_id, None)
+                # التحقق من وجود مادة علمية هنا أولاً
+                user_content = get_user_content(chat_id)
+                has_content = user_content is not None
 
-        except Exception as e:
-            print(f"❌ Error in start_mistakes_review: {str(e)}")
-        
+                with self.lock:
+                    self.sessions[chat_id] = {
+                        "questions": questions,
+                        "index": 0,
+                        "score": 0,
+                        "wrong_count": 0,
+                        "source": "dynamic_mix",
+                        "quiz_code": "CHALLENGE_MODE",
+                        "has_saved_texts": has_content, # 👈 ستكون True أو False بدقة
+                        "is_extended": False,
+                        "waiting_for_extension": True,
+                        "questions_resumed": False
+                    }
+
+                if questions:
+                    self.send_current_question(chat_id, bot)
+                    if has_content:
+                        threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
+                else:
+                    if has_content:
+                        bot.send_message(chat_id, "🔍 جاري توليد أسئلة تحدي جديدة بناءً على تخصصك...")
+                        threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
+                    else:
+                        bot.send_message(chat_id, "⚠️ لا توجد أخطاء سابقة، ولم تقم بإضافة نصوص أو ملفات لتوليد أسئلة جديدة. يرجى إرسال نص أولاً!")
+                        with self.lock:
+                            self.sessions.pop(chat_id, None)
+
+            except Exception as e:
+                print(f"❌ Error in start_mistakes_review: {str(e)}")
+
 
     def load_quiz(self, quiz_code):
         with self.lock:
@@ -324,53 +312,56 @@ class QuizManager:
         
     
     
-    def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
-        state = self.sessions.get(chat_id)
-        if not state:
-            return
+        def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
+            try:
+                state = self.sessions.get(chat_id)
+                if not state:
+                    return
 
-        shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
-    
-        # 1. الحصول على السؤال الحالي وحساب النتيجة
-        q = state["questions"][state["index"]]
-        is_correct = (selected_option == q.correct_index)
-    
-        if is_correct:
-            state["score"] += 1
-            # إذا كان من مجمع الأخطاء، نزيد عداد الإتقان
-            if state.get("source") == "mistakes_pool":
-                self.increment_correct_count(chat_id, q.question)
-        else:
-            state["wrong_count"] += 1
-            # حفظ الخطأ إذا لم يكن مراجعة أخطاء أصلاً
-            if state.get("source") != "mistakes_pool":
-                self.save_mistake(chat_id, q)
-            else:
-                self.reset_correct_count(chat_id, q.question)
-
-        # 2. الانتقال للسؤال التالي
-        state["index"] += 1
-
-        # 3. التحقق: هل وصلنا لنهاية القائمة الحالية؟
-        if state["index"] >= len(state["questions"]):
+                shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
         
-            # حالة أ: ننتظر أسئلة إضافية من الذكاء الاصطناعي
-            if state.get("waiting_for_extension"):
-                bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
-                # هنا ننتظر Thread الـ generate_and_store ليقوم بعمله
-                # (سيقوم هو باستدعاء send_current_question عندما ينتهي)
-                return
+                q = state["questions"][state["index"]]
+                is_correct = (selected_option == q.correct_index)
+        
+                if is_correct:
+                    state["score"] += 1
+                    if state.get("source") == "mistakes_pool":
+                        try:
+                            self.increment_correct_count(chat_id, q.question)
+                        except Exception as db_e:
+                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (increment): {db_e}")
+                else:
+                    state["wrong_count"] += 1
+                    if state.get("source") != "mistakes_pool":
+                        try:
+                            self.save_mistake(chat_id, q)
+                        except Exception as db_e:
+                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (save_mistake): {db_e}")
+                    else:
+                        try:
+                            self.reset_correct_count(chat_id, q.question)
+                        except Exception as db_e:
+                            print(f"⚠️ تجاهل خطأ قاعدة البيانات (reset): {db_e}")
+
+                # 🚀 الانتقال للسؤال التالي بكل أمان
+                state["index"] += 1
+
+                if state["index"] >= len(state["questions"]):
+                    if state.get("waiting_for_extension"):
+                        bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
+                        return
+                            
+                    self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                    return
+
+                # إرسال السؤال التالي
+                self.send_current_question(chat_id, bot)
             
-                    
-                
-                    
-            # حالة ب: انتهت كل الأسئلة ولا يوجد تمديد
-            self.finish_quiz(chat_id, bot, is_shared_user=shared)
-            return
-
-        # 4. إذا لم ينتهِ الاختبار، أرسل السؤال التالي فوراً
-        self.send_current_question(chat_id, bot)
-        
+            except Exception as e:
+                print(f"❌ CRITICAL ERROR in handle_answer: {e}")
+                # لتتبع الخطأ إذا حدث مستقبلاً
+                import traceback
+                traceback.print_exc()
 
 
 
@@ -397,7 +388,7 @@ class QuizManager:
 
         
         if not is_paid_user_active(chat_id) and not shared:
-            if source == "mistakes_pool" and not has_text:
+            if source != "mistakes_pool" and not has_text:
                 bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
             else:
             
@@ -418,7 +409,7 @@ class QuizManager:
         
         elif is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
-            if source == "mistakes_pool" and not has_text:
+            if source != "mistakes_pool" and not has_text:
                 bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
             
             else:
@@ -442,7 +433,7 @@ class QuizManager:
                 creator_id = get_quiz_creator(quiz_code)
                 log_quiz_attempt(chat_id, quiz_code, score, total)
                 
-            if source == "mistakes_pool" and not has_text:
+            if source != "mistakes_pool" and not has_text:
                 bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                 
             else:
