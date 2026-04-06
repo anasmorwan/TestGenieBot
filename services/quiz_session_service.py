@@ -490,8 +490,10 @@ class QuizManager:
                 explanation=safe_explanation,
                 is_anonymous=False
             )
+            
 
-            self.poll_map[poll.poll.id] = chat_id
+            with self.lock:
+                self.poll_map[poll.poll.id] = chat_id
             return poll.message_id
 
         except Exception as e:
@@ -579,34 +581,3 @@ self.send_current_question(chat_id, bot)
 """
 
 
-def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
-    try:
-        with self.lock:
-            state = self.sessions.get(chat_id)
-            if not state:
-                return
-
-            shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
-            q = state["questions"][state["index"]]
-            is_correct = (selected_option == q.correct_index)
-
-            if is_correct:
-                state["score"] += 1
-            else:
-                state["wrong_count"] += 1
-
-            state["index"] += 1
-            waiting = state.get("waiting_for_extension", False)
-            finished = state["index"] >= len(state["questions"])
-
-        if finished:
-            if waiting:
-                bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
-                return
-            self.finish_quiz(chat_id, bot, is_shared_user=shared)
-            return
-
-        self.send_current_question(chat_id, bot)
-
-    except Exception as e:
-        print(f"❌ CRITICAL ERROR in handle_answer: {e}")
