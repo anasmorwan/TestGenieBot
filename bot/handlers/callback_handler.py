@@ -182,6 +182,11 @@ def register(bot):
                     
                     
                     quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
+                    bot.edit_message_text(chat_id,
+                    message_id=message_id,
+                    text=get_message(),
+                    parse_mode="HTML"
+                    )
                         
                 except Exception as e:
                     bot.send_message(chat_id, f"CALLBACK ERROR: {str(e)}")
