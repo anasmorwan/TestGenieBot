@@ -81,12 +81,7 @@ def register(bot):
                     chat_id,
                     message_id
                 )
-            else:
-                bot.send_message(
-                chat_id=chat_id,
-                text=get_message("SIZE_LIMIT"),
-                parse_mode="HTML")
-                return
+            
                 
                 try:
                     results = detect_quiz_pattern(content)
@@ -107,8 +102,15 @@ def register(bot):
                     bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
                     return
             else:
+                bot.send_message(
+                chat_id=chat_id,
+                text=get_message("SIZE_LIMIT"),
+                parse_mode="HTML")
                 print("Error during file upload", flush=True)
-
+                
+                return
+    
+                
             if not content:
                 bot.send_message(chat_id, "لم أستطع قراءة الملف.")
                 return
