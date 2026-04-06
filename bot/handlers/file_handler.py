@@ -15,6 +15,7 @@ from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 from services.user_trap import update_last_active
+from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 import threading
     
 
@@ -101,11 +102,13 @@ def register(bot):
                 if not content:
                     bot.send_message(chat_id, "❌ لم يتمكن النظام من قراءة الملف (OCR فشل).")
                     return
-           elif path == "large_file":
+            elif path == "large_file":
+                keyboard = saved_quiz_upsell()
                 bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=waiting_msg.message_id,
                 text=get_message("SIZE_LIMIT"),
+                reply_markup=keyboard,
                 parse_mode="HTML")
                 return
             else:
