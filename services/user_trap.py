@@ -5,7 +5,7 @@ from storage.session_store import user_streak
 from services.usage import is_paid_user_active
 from storage.session_store import last_active
 
-from datetime import datetime
+from datetime import datetime, date
 
 
 def send_daily_challenge(bot, user_id, new_count, challenge_count):
@@ -32,7 +32,7 @@ def get_inactivity_level(user_id):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT last_quiz_date FROM users_trap
+        SELECT last_quiz_time FROM users_trap
         WHERE user_id = ?
     """, (user_id,))
     
@@ -284,6 +284,8 @@ def is_inactive(user_id, hours=24):
         return True
     return datetime.now() - last > timedelta(hours=hours)
 
+
+
 def update_progress(user_id, correct=None, total=None):
     conn = get_connection()
     cursor = conn.cursor()
@@ -295,6 +297,8 @@ def update_progress(user_id, correct=None, total=None):
     
     streak, last_date, xp = result
     today = str(date.today())
+    now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     
     # تحديث الـ streak فقط إذا أردت (يعني عند أداء اختبار)
     if correct is not None:
@@ -310,11 +314,13 @@ def update_progress(user_id, correct=None, total=None):
         gained_xp = correct * 10
         xp += gained_xp
         
+        
+        
         cursor.execute("""
             UPDATE users_trap
-            SET streak=?, last_quiz_date=?, xp=?
+            SET streak=?, last_quiz_date=?, last_quiz_time=?, xp=?
             WHERE user_id=?
-        """, (streak, today, xp, user_id))
+        """, (streak, today, now, xp, user_id))
         
         conn.commit()
         return streak, gained_xp
