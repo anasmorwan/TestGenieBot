@@ -9,7 +9,7 @@ from storage.session_store import user_states
 from services.referral import save_referral
 from storage.sqlite_db import get_connection
 from analytics.shared_quiz_analytics import log_quiz_start
-
+from services.user_trap import update_last_active
 
 
 def register(bot):
@@ -27,6 +27,7 @@ def register(bot):
         chat_id = message.chat.id
         args = message.text.split(maxsplit=1)
         uid = message.from_user.id
+        update_last_active(uid)
 
 
 
