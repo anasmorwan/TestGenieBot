@@ -60,8 +60,20 @@ def register(bot):
         if data.startswith("level_"):
             selected_level = data.split("_")[1]
             # شرط: المستوى يجب أن يكون واحداً من ['متقدم', 'متوسط', 'مبتدئ']
+            # قاموس الترجمة من التسمية الظاهرة إلى القيمة المخزنة
+            LEVEL_MAPPING = {
+                'مبتدئ': 'early',
+                'متوسط': 'mid', 
+                'متقدم': 'advanced'
+            }
+
+            # عند معالجة اختيار المستخدم
             if selected_level in ['متقدم', 'متوسط', 'مبتدئ']:
-                user_selections[chat_id]['level'] = selected_level
+            user_selections[chat_id]['level'] = selected_level
+    
+            # ترجمة التسمية إلى القيمة المناسبة للدالة
+            difficulty = LEVEL_MAPPING.get(selected_level, 'early')
+            if update_user_difficulty(user_id, difficulty):
                 # تحديث لوحة المفاتيح
                 new_markup = get_testgenie_keyboard(
                     selected_level=selected_level,
@@ -78,12 +90,14 @@ def register(bot):
             if count_value.isdigit() and int(count_value) in [5, 10, 15]:
                 selected_count = int(count_value)
                 user_selections[chat_id]['count'] = selected_count
-                new_markup = get_testgenie_keyboard(
-                    selected_level=user_selections[chat_id]['level'],
-                    selected_count=selected_count
-                )
-                bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
-                bot.answer_callback_query(call.id, f"تم اختيار {selected_count} سؤال")
+                if init_user_quiz_count(user_id, selected_count):
+                
+                    new_markup = get_testgenie_keyboard(
+                        selected_level=user_selections[chat_id]['level'],
+                        selected_count=selected_count
+                    )
+                    bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+                    bot.answer_callback_query(call.id, f"تم اختيار {selected_count} سؤال")
         
             # شرط: زر مخصص (Custom)
             elif count_value == "custom":
@@ -92,7 +106,12 @@ def register(bot):
         
             # شرط: زر Pro (20 سؤال)
             elif count_value == "pro":
-                bot.answer_callback_query(call.id, "🔓 هذه الميزة للمشتركين المميزين فقط - قم بالترقية الآن!", show_alert=True)
+                if not is_paid_user_active(user_id):
+                    bot.answer_callback_query(call.id, "🔓 هذه الميزة للمشتركين المميزين فقط - قم بالترقية الآن!", show_alert=True)
+                selected_count = 20
+                if init_user_quiz_count(user_id, 20):
+                    bot.answer_callback_query(call.id, f"✅ تمت إختيار {selected_count} سؤال")
+                    
     
         # معالجة زر بدء الاختبار
         elif data == "start_test":
@@ -101,7 +120,7 @@ def register(bot):
         
             # شرط: التأكد من وجود مستوى وعدد صالحين قبل البدء
             if level and count:
-                bot.answer_callback_query(call.id, f"🚀 جاري توليد اختبار بـ {count} سؤال (مستوى {level})...")
+                bot.answer_callback_query(call.id, f"✅ تم تحديث الإعدادات بنجاح: {count} سؤال | (مستوى {level})")
                 # هنا قم باستدعاء دالة توليد الاختبار الفعلية
                 # generate_test(chat_id, level, count)
             else:
