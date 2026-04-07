@@ -447,13 +447,15 @@ def get_user_question_count(user_id):
         result = cursor.fetchone()
         
         if result and result[0] is not None:
-            return result[0]
+            return int(result[0])  # تأكد من إرجاع int
         else:
             return 10  # القيمة الافتراضية
             
     except Exception as e:
         print(f"Error getting question count for user {user_id}: {e}")
-        return False
+        return 10  # ✅ في حالة الخطأ، أرجع القيمة الافتراضية أيضاً
+    finally:
+        conn.close()
 
 
 #--------------------------
