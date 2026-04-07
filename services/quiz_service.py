@@ -129,7 +129,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             update_user_major(user_id, detected_domain)
             save_user_knowledge(user_id, content, domain)
 
-            return normalize_quizzes(quizzes)[:num_quizzes]
+            return normalize_quizzes(quizzes)[:question_count]
             
     else:
         try:
@@ -172,7 +172,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         # if not isinstance(quizzes, list):
             #return []
             
-        return normalize_quizzes(quizzes)[:num_quizzes]
+        return normalize_quizzes(quizzes)[:question_count]
 
 
 def generate_challenge_quiz(content, num_questions, is_pro):
