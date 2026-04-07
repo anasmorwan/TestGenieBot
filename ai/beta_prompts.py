@@ -4,12 +4,11 @@ import json
 from ai.llm_client import generate_smart_response
 from utils.json_utils import parse_llm_json
 from bot.bot_instance import mybot
-from storage.sqlite_db import update_user_major
+from storage.sqlite_db import update_user_major, get_user_question_count, get_user_difficulty
+
 from services.user_trap import save_user_knowledge
 
 admin_id = 5048253124
-
-
 
 def normalize_text_content(text_content):
     if isinstance(text_content, tuple):
@@ -254,7 +253,8 @@ def build_exact_question_plan(stage_weights, num_questions):
 
     return counts, plan
 
-def normalize_stage_smart(metadata, config):
+def normalize_stage_smart(user_id, metadata, config):
+    user_level = get_user_difficulty(user_id)
     # مصفوفة الرتب لتسهيل المقارنة الرياضية
     rank = {"early": 1, "mid": 2, "advanced": 3}
     
@@ -354,7 +354,7 @@ def generate_smart_batch_prompt(user_id, text_content, num_questions):
         
     
     # 2. التطبيع الاحترافي للمستوى
-    user_stage = normalize_stage_smart(metadata, config)
+    user_stage = normalize_stage_smart(user_id, metadata, config)
 
     available_subjects = config.get("subjects", [])
     
