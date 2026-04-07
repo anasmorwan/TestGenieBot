@@ -124,7 +124,7 @@ Return ONLY a JSON object in this structure:
       "options": ["...", "...", "...", "..."],
       "correct_index": 0,
       "explanation": "...",
-      "Branch": "e.g: anatomy",
+      "branch": "e.g: anatomy",
       "complexity": "Analysis"
     }}
   ]
@@ -387,7 +387,7 @@ QUIZ_FORMAT = """
       "question": "...",
       "options": ["A", "B", "C", "D"],
       "correct_index": 0,
-      "Branch": "e.g: anatomy"
+      "branch": "e.g: anatomy"
     }
   ]
 }
