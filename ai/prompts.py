@@ -367,19 +367,19 @@ def pro_quiz_generator(content: Any, num_questions: int) -> Dict[str, Any]:
 #  Free quiz prompt
 # ============================================================
 
-SYSTEM_ROLE = """
+system_role = """
 You are a precise AI quiz generator.
 Your task is to create quiz questions strictly from the provided content.
 """.strip()
 
-QUIZ_RULES = """
+quiz_rules = """
 Rules:
 - Use ONLY information in the content.
 - Do NOT invent or assume information.
 - Questions must test recall or understanding.
 """.strip()
 
-QUIZ_FORMAT = """
+quiz_format = """
 {
   "domain": "Medicine",
   "questions": [
@@ -424,9 +424,9 @@ def build_quiz_prompt(content: Any, num_questions: int, user_instruction: str = 
         """.strip()
 
     prompt = f"""
-{SYSTEM_ROLE}
+{system_role}
 
-{QUIZ_RULES}
+{quiz_rules}
 
 {language_rule}
 
@@ -436,7 +436,7 @@ Generate {num_questions} quiz questions.
 
 {user_part}
 
-{QUIZ_FORMAT}
+{quiz_format}
 
 CONTENT:
 {content}
