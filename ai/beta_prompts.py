@@ -428,7 +428,7 @@ SOURCE TEXT:
 {text_content}
 
 OUTPUT FORMAT: Return ONLY a JSON array of objects with: 
-(question, options, correct_index, explanation, type, difficulty)
+(question, options, correct_index, explanation, type, difficulty, Branch: "e.g: anatomy")
 """
     return final_prompt
             
