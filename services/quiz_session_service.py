@@ -476,6 +476,7 @@ class QuizManager:
             # 1. الوصول للبيانات عبر الكائن (Object Attributes) وليس القاموس
             # نستخدم getattr كإجراء أمان إضافي أو الوصول المباشر
             state = self.sessions.get(chat_id)
+            questions = state.get("questions")
             
             q_text = getattr(q, 'question', 'سؤال بدون عنوان')
             options = getattr(q, 'options', [])
@@ -483,7 +484,7 @@ class QuizManager:
             explanation_text = getattr(q, 'explanation', '')
             branch = getattr(q, 'branch', '')
             current_index = state.get("index")
-            total = len(q)
+            total = len(questions)
 
             header = f"{current_index + 1}/{total} • {branch}\n\n"
 
