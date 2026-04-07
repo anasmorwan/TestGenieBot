@@ -475,14 +475,17 @@ class QuizManager:
             
             # 1. الوصول للبيانات عبر الكائن (Object Attributes) وليس القاموس
             # نستخدم getattr كإجراء أمان إضافي أو الوصول المباشر
+            state = self.sessions.get(chat_id)
+            
             q_text = getattr(q, 'question', 'سؤال بدون عنوان')
             options = getattr(q, 'options', [])
             correct_idx = getattr(q, 'correct_index', 0)
             explanation_text = getattr(q, 'explanation', '')
             branch = getattr(q, 'branch', '')
+            current_index = state.get("index")
             total = len(q_text)
 
-            header = f"{current_index}/{total} • {branch}\n\n"
+            header = f"{current_index + 1}/{total} • {branch}\n\n"
 
             # 2. الحماية: قص النصوص لتطابق قيود تيليجرام (300 للسؤال، 100 للخيار، 200 للشرح)
             if not is_paid_user_active(chat_id):
