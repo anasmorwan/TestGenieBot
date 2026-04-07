@@ -376,6 +376,9 @@ def update_user_difficulty(user_id, difficulty):
 
 
 def init_user_quiz_count(user_id, default_count):
+    """
+    تهيئة أو تحديث عدد الاختبارات للمستخدم
+    """
     conn = get_connection()
     cursor = conn.cursor()
     try:
@@ -384,18 +387,26 @@ def init_user_quiz_count(user_id, default_count):
         result = cursor.fetchone()
         
         if result is None:
-            # مستخدم جديد: أدخل
+            # مستخدم جديد
             cursor.execute("""
                 INSERT INTO users (user_id, quiz_num) 
                 VALUES (?, ?)
             """, (user_id, default_count))
+            print(f"✅ New user {user_id}: quiz_num set to {default_count}")
         else:
             # مستخدم موجود: حدث القيمة دائماً
             cursor.execute("""
                 UPDATE users SET quiz_num = ? WHERE user_id = ?
             """, (default_count, user_id))
+            print(f"✅ Updated user {user_id}: quiz_num = {default_count}")
         
         conn.commit()
+        
+        # تحقق من أن القيمة حفظت
+        cursor.execute("SELECT quiz_num FROM users WHERE user_id = ?", (user_id,))
+        saved = cursor.fetchone()
+        print(f"Verification: quiz_num = {saved[0] if saved else 'None'}")
+        
         return True
         
     except Exception as e:
