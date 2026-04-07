@@ -375,7 +375,7 @@ def update_user_difficulty(user_id, difficulty):
         return False
 
 
-def init_user_quiz_count(user_id, default_count=5):
+def init_user_quiz_count(user_id, default_count):
     """
     تهيئة عدد الاختبارات الافتراضي للمستخدم
     
