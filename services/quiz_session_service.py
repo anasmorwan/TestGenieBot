@@ -491,7 +491,7 @@ class QuizManager:
 
             # 2. الحماية: قص النصوص لتطابق قيود تيليجرام (300 للسؤال، 100 للخيار، 200 للشرح)
             safe_question = header + str(q_text)[:285]
-            safe_options = str(options)[:100]
+            safe_options = [str(opt)[:100] for opt in options if opt is not None]
                  
             # الشرح بحد أقصى 200 حرف
             safe_explanation = str(explanation_text)[:200]
