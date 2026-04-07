@@ -75,8 +75,8 @@ poll_answer_handler.register(mybot)
 chat_shared_handler.register(mybot)
 
 migrate_users_to_trap()
-
-
+send_daily_challenge_message()
+print("send_daily_challenge_message sended", flush=True)
 
 
 
