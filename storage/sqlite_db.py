@@ -444,30 +444,33 @@ def get_user_difficulty(user_id):
 def get_user_question_count(user_id):
     """
     استرجاع عدد الأسئلة للمستخدم
-    
-    Args:
-        user_id: معرف المستخدم
-    
-    Returns:
-        int: عدد الأسئلة أو 10 كقيمة افتراضية
     """
     conn = get_connection()
     cursor = conn.cursor()
     try:
+        # طباعة اسم الجدول والأعمدة الموجودة
+        cursor.execute("PRAGMA table_info(users)")
+        columns = cursor.fetchall()
+        print(f"Columns in users table: {[col[1] for col in columns]}")
+        
+        # استعلام القيمة
         cursor.execute("SELECT quiz_num FROM users WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
+        print(f"Raw result from DB: {result}")
         
         if result and result[0] is not None:
-            return int(result[0])  # تأكد من إرجاع int
+            value = int(result[0])
+            print(f"Returning: {value}")
+            return value
         else:
-            return 10  # القيمة الافتراضية
+            print("No value found, returning 10")
+            return 10
             
     except Exception as e:
-        print(f"Error getting question count for user {user_id}: {e}")
-        return 10  # ✅ في حالة الخطأ، أرجع القيمة الافتراضية أيضاً
+        print(f"Error: {e}")
+        return 10
     finally:
         conn.close()
-
 
 #--------------------------
 #    🔹 دوال مساعدة user_major
