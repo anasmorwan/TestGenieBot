@@ -46,7 +46,7 @@ def send_daily_challenge_message():
             elif status == "lost":
                 text = build_dynamic_message(user_id)
                 if text is False:
-                    text = inactive_user_streak
+                    text = get_message("INACTIVE_USER_STREAK", streak=streak)
                 
                 
                 
