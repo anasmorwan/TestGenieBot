@@ -27,6 +27,7 @@ from services.backup_service import safe_backup, backup_all
 from storage.session_store import user_selections
 from storage.sqlite_db import get_question_distribution, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
 from services.user_trap import update_last_active 
+from storage.session_store user_states
 import random
 import json
 import time
@@ -103,11 +104,11 @@ def register(bot):
             elif count_value == "custom":
                 if not is_paid_user_active(user_id):
                     bot.answer_callback_query(call.id, "✨ أرسل عدد أسئلة من [1 — 15]")
-                    user_selections[chat_id]['count'] = count_value
+                    user_states[user_id] = count_value
                     # يمكنك هنا إرسال رسالة تطلب من المستخدم إدخال رقم
                 else:
                     bot.answer_callback_query(call.id, "✨ أرسل عدد أسئلة من [1 — 20]")
-                    user_selections[chat_id]['count'] = count_value
+                    user_states[user_id] = count_value
         
             # شرط: زر Pro (20 سؤال)
             elif count_value == "pro":
@@ -129,7 +130,8 @@ def register(bot):
                 # هنا قم باستدعاء دالة توليد الاختبار الفعلية
                 # generate_test(chat_id, level, count)
             else:
-                bot.answer_callback_query(call.id, "❌ الرجاء اختيار المستوى وعدد الأسئلة أولاً", show_alert=True)
+                if user_states.get(user_id) == "set_configs":
+                    bot.answer_callback_query(call.id, "❌ الرجاء اختيار المستوى وعدد الأسئلة أولاً", show_alert=True)
 
         # معالجة أي بيانات غير متوقعة
         else:
