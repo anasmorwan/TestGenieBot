@@ -16,6 +16,8 @@ from services.backup_service import smart_restore, is_db_valid
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 from services.user_trap import update_last_active
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
+
+
 import threading
     
 
