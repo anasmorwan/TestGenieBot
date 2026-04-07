@@ -333,7 +333,7 @@ class QuizManager:
 
                 if is_correct:
                     state["score"] += 1
-                    update_progress(user_id, correct=1, total=None)
+                    update_progress(chat_id, correct=1, total=None)
                     if state.get("source") == "dynamic_mix":
                         try:
                             self.increment_correct_count(chat_id, q.question)
