@@ -69,10 +69,10 @@ def generate_smart_response(prompt: str) -> str:
             logging.info("Attempting request with: 1. Google Gemini...")
 
             response = gemini_model.models.generate_content(
-            model="gemini-2.5-flash", 
+            model="gemini-1.5-flash", 
             contents=prompt,
             config={
-                'temperature': 0.8,
+                'temperature': 0.7,
                 'top_p': 0.95,
             }
             )
