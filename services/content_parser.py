@@ -80,7 +80,7 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
         if ocr_func:
             content = ocr_func(path, api_key=OCR_API_KEY, language=language)
 
-    return content, coverage
+    return content
 
 # -------------------------------------------------------------------
 #                     Text Extraction & OCR
