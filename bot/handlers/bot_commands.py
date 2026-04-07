@@ -6,6 +6,7 @@ from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
 from bot.helping_functions import truncate_text
 from storage.sqlite_db import get_user_knowledge
 from services.user_trap import update_last_active
+from storage.session_store import user_selections
 # قائمة معرفات الأدمن
 admin_ids = [6948343253, 5048253124]  # استبدل بالأرقام الحقيقية
 
@@ -80,13 +81,15 @@ def register(bot):
         try:
             user_id = msg.from_user.id
             chat_id = msg.chat.id
-            
+
+            level = user_selections.get(user_id, {}).get('level', 'early')    
+            count = user_selections.get(user_id, {}).get('count', '10')
                 
             
             
             quiz_message = get_message("POLL_INST")
 
-            keyboard = get_testgenie_keyboard(user_id=user_id, selected_level='متوسط', selected_count=10)
+            keyboard = get_testgenie_keyboard(user_id=user_id, selected_level=level, selected_count=count)
             
             bot.send_message(chat_id,
             text=quiz_message,
