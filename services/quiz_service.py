@@ -84,7 +84,7 @@ def delayed_message(bot, user_id, delay, selected_text):
 
 def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
     number = get_user_question_count(user_id)
-    question_count = number if number is not None else 10
+    question_count = number if number is not None else 5
     
     if is_paid_user_active(user_id):
         if user_id == 5048253124:
