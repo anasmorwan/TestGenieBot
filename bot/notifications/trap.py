@@ -8,7 +8,7 @@ import threading
 from services.quiz_service import generate_challenge_quiz
 from services.usage import is_paid_user_active
 from storage.messages import get_message
-
+import random
 
 
 def send_daily_challenge_message():
