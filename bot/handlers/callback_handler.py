@@ -77,6 +77,7 @@ def register(bot):
             if update_user_difficulty(user_id, difficulty):
                 # تحديث لوحة المفاتيح
                 new_markup = get_testgenie_keyboard(
+                    user_id=user_id,
                     selected_level=selected_level,
                     selected_count=user_selections[chat_id]['count']
                 )
@@ -94,6 +95,7 @@ def register(bot):
                 if init_user_quiz_count(user_id, selected_count):
                 
                     new_markup = get_testgenie_keyboard(
+                        user_id=user_id,
                         selected_level=user_selections[chat_id]['level'],
                         selected_count=selected_count
                     )
