@@ -16,21 +16,25 @@ class QuizQuestion:
             "branch": self.branch
         }
 
+    
     @classmethod
     def from_raw(cls, q):
-
         if isinstance(q, dict):
             return cls(
-                q.get("question"),
-                q.get("options"),
-                q.get("correct_index"),
-                q.get("explanation", ""),
-                q.get("branch", "")
+                question=q.get("question"),
+                options=q.get("options"),
+                correct_index=q.get("correct_index"),
+                branch=q.get("branch", ""),
+                explanation=q.get("explanation", "")
             )
 
         if isinstance(q, (list, tuple)):
-            return cls(q[0], q[1], q[2], q[3] if len(q) > 3 else "")
+            return cls(
+                question=q[0],
+                options=q[1],
+                correct_index=q[2],
+                branch=q[3] if len(q) > 3 else "",
+                explanation=q[4] if len(q) > 4 else ""
+            )
 
         return None
-
-
