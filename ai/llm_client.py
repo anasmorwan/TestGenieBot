@@ -57,6 +57,10 @@ if COHERE_API_KEY:
         logging.warning(f"⚠️ Could not configure Cohere: {e}")
 
 
+
+
+
+    
 def generate_smart_response(prompt: str) -> str:
     """
     Tries to generate a response by attempting a chain of services silently.
