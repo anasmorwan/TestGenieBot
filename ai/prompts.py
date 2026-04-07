@@ -135,7 +135,7 @@ Return ONLY a JSON object in this structure:
 - Each question must have exactly 4 options.
 - correct_index must be between 0 and 3.
 - Keep questions concise and academically strong.
-- Do not include _thinking.
+- {surface_level_rule}
 - Do not include markdown.
 - Do not wrap the JSON in code fences.
 
@@ -394,9 +394,10 @@ QUIZ_FORMAT = """
 Return ONLY valid JSON. No markdown.
 """.strip()
 
+surface_level_rule = "Avoid shallow, text-bound, surface-level retrieval, and definition-reliant questions. Do not generate questions that simply extract phrases from the text, ask for formulaic ratios, rephrase introductory sentences, or mimic definition patterns. Instead, generate inference-based, analytical, and applied questions that test real understanding of the CONTENT, not memorization or copying."
 
 
-    
+
 def build_quiz_prompt(content: Any, num_questions: int, user_instruction: str = None) -> str:
     # --- إضافة الحماية ---
     if isinstance(content, tuple):
@@ -429,13 +430,15 @@ def build_quiz_prompt(content: Any, num_questions: int, user_instruction: str = 
 
 {language_rule}
 
+{surface_level_rule}
+
 Generate {num_questions} quiz questions.
 
 {user_part}
 
 {QUIZ_FORMAT}
 
-Content:
+CONTENT:
 {content}
 
 [STRICT LIMITS]:
