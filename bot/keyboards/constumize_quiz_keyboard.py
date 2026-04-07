@@ -1,6 +1,9 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from storage.session_store import user_states
 
-def get_testgenie_keyboard(selected_level='متوسط', selected_count=10):
+
+
+def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=10):
     """
     Returns InlineKeyboardMarkup for TestGenie test creation
     selected_level: 'متقدم', 'متوسط', 'مبتدئ'
@@ -31,8 +34,13 @@ def get_testgenie_keyboard(selected_level='متوسط', selected_count=10):
     )
 
     # Row 4: Start generation
-    markup.row(
-        InlineKeyboardButton(text="🚀 ابدأ توليد الاختبار الآن", callback_data="start_test")
-    )
-
+    if user_states.get(user_id) == "set_configs":
+        markup.row(
+            InlineKeyboardButton(text="🚀 ابدأ توليد الاختبار الآن", callback_data="start_test")
+        )
+    else:
+        markup.row(
+            InlineKeyboardButton(text="🚀 حفظ الإعدادات", callback_data="start_test")
+        )
+        
     return markup
