@@ -463,7 +463,7 @@ def get_user_question_count(user_id):
             
     except Exception as e:
         print(f"Error getting question count for user {user_id}: {e}")
-        return 5
+        return False
 
 
 #--------------------------
