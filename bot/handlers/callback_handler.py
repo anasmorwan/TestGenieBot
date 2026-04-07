@@ -69,7 +69,7 @@ def register(bot):
 
             # عند معالجة اختيار المستخدم
             if selected_level in ['متقدم', 'متوسط', 'مبتدئ']:
-            user_selections[chat_id]['level'] = selected_level
+                user_selections[chat_id]['level'] = selected_level
     
             # ترجمة التسمية إلى القيمة المناسبة للدالة
             difficulty = LEVEL_MAPPING.get(selected_level, 'early')
@@ -101,8 +101,13 @@ def register(bot):
         
             # شرط: زر مخصص (Custom)
             elif count_value == "custom":
-                bot.answer_callback_query(call.id, "✨ سيتم فتح نافذة لإدخال عدد مخصص (قريباً)", show_alert=True)
-                # يمكنك هنا إرسال رسالة تطلب من المستخدم إدخال رقم
+                if not is_paid_user_active(user_id):
+                    bot.answer_callback_query(call.id, "✨ أرسل عدد أسئلة من [1 — 15]")
+                    user_selections[chat_id]['count'] = count_value
+                    # يمكنك هنا إرسال رسالة تطلب من المستخدم إدخال رقم
+                else:
+                    bot.answer_callback_query(call.id, "✨ أرسل عدد أسئلة من [1 — 20]")
+                    user_selections[chat_id]['count'] = count_value
         
             # شرط: زر Pro (20 سؤال)
             elif count_value == "pro":
