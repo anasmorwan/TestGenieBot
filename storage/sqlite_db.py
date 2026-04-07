@@ -358,13 +358,13 @@ def update_user_difficulty(user_id, difficulty):
         if result is None:
             # مستخدم جديد: أدخل مع الصعوبة المحددة
             cursor.execute("""
-                INSERT INTO users (user_id, difficulty) 
+                INSERT INTO user_quizzes (user_id, difficulty) 
                 VALUES (?, ?)
             """, (user_id, difficulty))
         else:
             # مستخدم موجود: حدث الصعوبة
             cursor.execute("""
-                UPDATE users SET difficulty = ? WHERE user_id = ?
+                UPDATE user_quizzes SET difficulty = ? WHERE user_id = ?
             """, (difficulty, user_id))
         
         conn.commit()
@@ -428,7 +428,7 @@ def get_user_difficulty(user_id):
     conn = get_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT difficulty FROM users WHERE user_id = ?", (user_id,))
+        cursor.execute("SELECT difficulty FROM user_quizzes WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
         
         if result and result[0] is not None:
