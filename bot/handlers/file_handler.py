@@ -94,6 +94,15 @@ def register(bot):
                     chat_id,
                     message_id
                 )
+                if content == "ocr_needed":
+                    keyboard = saved_quiz_upsell()
+                    bot.send_message(
+                        chat_id=chat_id,
+                        text=get_message("OCR_NEEDED"),
+                        reply_markup=keyboard,
+                        parse_mode="HTML"
+                    )
+                    return
             
                 
                 try:
