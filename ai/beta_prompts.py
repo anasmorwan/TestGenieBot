@@ -143,17 +143,17 @@ def detect_source_language(text_content):
 
 explanation_style_guidelines = """
 EXPLANATION STYLE:
-- Use the SAME language as the SOURCE TEXT.
-- If source is English, write question, options, and explanation in English.
-- If source is Arabic, write them in Arabic, while keeping standard medical terms in English when useful.
-- Keep explanation very short: max 3 short lines, max 45 words.
-- Do NOT repeat the stem.
-- Do NOT make the explanation long or split it into many bullets.
+
+- Use the SAME language as the source.
+- Keep it very short: 1–2 lines, max 30 words.
+- Focus on the key idea only (no repetition, no details).
+- Avoid listing all wrong options.
 
 Format:
-🎯 Answer:
-🔍 Why:
-❌ Why not others:
+
+✅ Correct: [answer]
+💡 Key idea: [one clear reason]
+⚠️ Note (optional): [common mistake or contrast]
 """
 
 def analyze_text_metadata(text_content, config):
