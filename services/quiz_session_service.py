@@ -341,7 +341,7 @@ class QuizManager:
                             print(f"⚠️ تجاهل خطأ قاعدة البيانات (increment): {db_e}")
                 else:
                     state["wrong_count"] += 1
-                    if state.get("source") != "mistakes_pool":
+                    if state.get("source") != "dynamic_mix":
                         try:
                             self.save_mistake(chat_id, q)
                         except Exception as db_e:
