@@ -451,23 +451,23 @@ def get_user_question_count(user_id):
         # طباعة اسم الجدول والأعمدة الموجودة
         cursor.execute("PRAGMA table_info(users)")
         columns = cursor.fetchall()
-        print(f"Columns in users table: {[col[1] for col in columns]}")
+        print(f"Columns in users table: {[col[1] for col in columns]}", flush=True)
         
         # استعلام القيمة
         cursor.execute("SELECT quiz_num FROM users WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
-        print(f"Raw result from DB: {result}")
+        print(f"Raw result from DB: {result}", flush=True)
         
         if result and result[0] is not None:
             value = int(result[0])
-            print(f"Returning: {value}")
+            print(f"Returning: {value}", flush=True)
             return value
         else:
-            print("No value found, returning 10")
+            print("No value found, returning 10", flush=True)
             return 10
             
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error: {e}", flush=True)
         return 10
     finally:
         conn.close()
