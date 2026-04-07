@@ -376,43 +376,33 @@ def update_user_difficulty(user_id, difficulty):
 
 
 def init_user_quiz_count(user_id, default_count):
-    """
-    تهيئة عدد الاختبارات الافتراضي للمستخدم
-    
-    Args:
-        user_id: معرف المستخدم
-        default_count: العدد الافتراضي (مثلاً 3 اختبارات)
-    
-    Returns:
-        bool: نجاح العملية أم لا
-    """
     conn = get_connection()
     cursor = conn.cursor()
     try:
-       
-        # التحقق إذا كان المستخدم موجود أصلاً
-        cursor.execute("SELECT quiz_num FROM users WHERE user_id = ?", (user_id,))
+        # التحقق إذا كان المستخدم موجود
+        cursor.execute("SELECT user_id FROM users WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
         
         if result is None:
-            # مستخدم جديد: أدخل مع العدد الافتراضي
+            # مستخدم جديد: أدخل
             cursor.execute("""
                 INSERT INTO users (user_id, quiz_num) 
                 VALUES (?, ?)
             """, (user_id, default_count))
         else:
-            # مستخدم موجود ولكن quiz_num قد يكون NULL
-            if result[0] is None:
-                cursor.execute("""
-                    UPDATE users SET quiz_num = ? WHERE user_id = ?
-                """, (default_count, user_id))
+            # مستخدم موجود: حدث القيمة دائماً
+            cursor.execute("""
+                UPDATE users SET quiz_num = ? WHERE user_id = ?
+            """, (default_count, user_id))
         
         conn.commit()
         return True
         
     except Exception as e:
-        print(f"Error initializing quiz count for user {user_id}: {e}")
-        return False            
+        print(f"Error: {e}")
+        return False
+    finally:
+        conn.close()
 
 
 def get_user_difficulty(user_id):
