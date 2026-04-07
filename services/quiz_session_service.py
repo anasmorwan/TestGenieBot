@@ -483,7 +483,7 @@ class QuizManager:
             explanation_text = getattr(q, 'explanation', '')
             branch = getattr(q, 'branch', '')
             current_index = state.get("index")
-            total = len(q_text)
+            total = len(q)
 
             header = f"{current_index + 1}/{total} • {branch}\n\n"
 
