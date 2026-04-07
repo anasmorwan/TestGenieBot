@@ -5,7 +5,7 @@ from services.usage import is_paid_user_active
 
 def get_max_file_size(user_id):
     if not is_paid_user_active(user_id): 
-        Max_file_size = 5 * 1024 * 1024  # 5 MB
+        max_file_size = 5 * 1024 * 1024  # 5 MB
     else:
         max_file_size = 12 * 1024 * 1024
     return max_file_size
