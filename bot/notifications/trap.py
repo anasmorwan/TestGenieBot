@@ -20,7 +20,7 @@ def send_daily_challenge_message():
             keyboard = streak_keyboard()
             status = get_inactivity_level(user_id)
             text = get_message("NEW_USER_STREAK")
-            user_streak = get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+            user_streak = get_message("TRAP_MSG", streak=streak),
             
             
             if status == "new":
