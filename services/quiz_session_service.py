@@ -489,14 +489,9 @@ class QuizManager:
             header = f"{current_index + 1}/{total} • {branch}\n\n"
 
             # 2. الحماية: قص النصوص لتطابق قيود تيليجرام (300 للسؤال، 100 للخيار، 200 للشرح)
-            if not is_paid_user_active(chat_id):
-                safe_question = header + str(q_text)[:285]
-            else:
-                safe_question = str(q_text)[:300]
-        
-            # التأكد من أن كل خيار لا يتجاوز 100 حرف (حل خطأ 400 السابق)
-            safe_options = [str(opt)[:100] for opt in options if opt]
-        
+            safe_question = header + str(q_text)[:285]
+            
+                 
             # الشرح بحد أقصى 200 حرف
             safe_explanation = str(explanation_text)[:200]
 
