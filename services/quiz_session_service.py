@@ -479,9 +479,16 @@ class QuizManager:
             options = getattr(q, 'options', [])
             correct_idx = getattr(q, 'correct_index', 0)
             explanation_text = getattr(q, 'explanation', '')
+            branch = getattr(q, 'branch', '')
+            total = len(q_text)
+
+            header = f"{current_index}/{total} • {branch}\n\n"
 
             # 2. الحماية: قص النصوص لتطابق قيود تيليجرام (300 للسؤال، 100 للخيار، 200 للشرح)
-            safe_question = str(q_text)[:300]
+            if not is_paid_user_active(chat_id):
+                safe_question = header + str(q_text)[:285]
+            else:
+                safe_question = str(q_text)[:300]
         
             # التأكد من أن كل خيار لا يتجاوز 100 حرف (حل خطأ 400 السابق)
             safe_options = [str(opt)[:100] for opt in options if opt]
@@ -514,79 +521,4 @@ class QuizManager:
 
 
 quiz_manager = QuizManager()
-
-
-"""
-def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
-        state = self.sessions.get(chat_id)
-        if not state:
-            return
-
-        # إذا لم يُمرر is_shared_user كمعامل، نقرأه من الجلسة
-        shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
-
-        
-
-        q = state["questions"][state["index"]]
-        is_correct = (selected_option == q.correct_index) 
-        if not is_correct:
-            state["wrong_count"] += 1   # 👈 احسب الأخطاء هنا
-
-        if state.get("source") == "mistakes_pool":   
-            if is_correct:
-                # إذا أجاب صح على سؤال كان خطأ سابقاً، نزيد عداد الإتقان
-                self.increment_correct_count(chat_id, q.question)
-            else:
-                # إذا أخطأ فيه مجدداً، نعيد تصفير العداد لضمان بقائه في التدريب
-                self.reset_correct_count(chat_id, q.question)
-        else:
-            # إذا كان اختباراً عادياً (ليس مراجعة) وأخطأ المستخدم
-            if not is_correct:
-                # تحتاج تعديل لضمان عدم حفظ الخطأ مرتين ❗
-                self.save_mistake(chat_id, q)
-            
-
-        if selected_option == q.correct_index:
-            state["score"] += 1
-            state["index"] += 1
-        else:
-            state["wrong_count"] += 1
-            state["index"] += 1
-
-        
-        
-
-        if state["index"] >= len(state["questions"]):
-            
-            if state.get("source") == "mistakes_pool":
-                self.send_current_question(chat_id, bot)
-                if not state.get("has_saved_texts"):
-                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
-                    
-                
-
-                if state.get("waiting_for_extension") and not state.get("is_extended"):
-                    challenge_q_msg = bot.send_message(chat_id, "⚡ يتم تجهيز أسئلة إضافية...")
-
-                    if state.get("questions_resumed"):
-                        message_id = challenge_q_msg.message_id
-                        
-                        self.generate_and_store(bot=bot, chat_id=chat_id, message_id=message_id)
-                        
-                        return
-
-
-
-    
-
-                else:
-                    self.finish_quiz(chat_id, bot, is_shared_user=shared)
-                    return
-            else:
-                self.finish_quiz(chat_id, bot, is_shared_user=shared)
-                return
-
-self.send_current_question(chat_id, bot)
-"""
-
 
