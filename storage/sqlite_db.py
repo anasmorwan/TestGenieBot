@@ -453,7 +453,7 @@ def get_user_question_count(user_id):
     conn = get_connection()
     cursor = conn.cursor()
     try:
-        cursor.execute("SELECT question_count FROM users WHERE user_id = ?", (user_id,))
+        cursor.execute("SELECT quiz_num FROM users WHERE user_id = ?", (user_id,))
         result = cursor.fetchone()
         
         if result and result[0] is not None:
