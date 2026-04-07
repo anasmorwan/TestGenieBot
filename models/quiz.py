@@ -12,7 +12,8 @@ class QuizQuestion:
             "question": self.question,
             "options": self.options,
             "correct_index": self.correct_index,
-            "explanation": self.explanation
+            "explanation": self.explanation,
+            "branch": self.branch
         }
 
     @classmethod
@@ -23,7 +24,8 @@ class QuizQuestion:
                 q.get("question"),
                 q.get("options"),
                 q.get("correct_index"),
-                q.get("explanation", "")
+                q.get("explanation", ""),
+                q.get("branch", "")
             )
 
         if isinstance(q, (list, tuple)):
