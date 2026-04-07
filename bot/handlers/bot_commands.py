@@ -86,7 +86,7 @@ def register(bot):
             
             quiz_message = get_message("POLL_INST")
 
-            keyboard = get_testgenie_keyboard(selected_level='متوسط', selected_count=10)
+            keyboard = get_testgenie_keyboard(user_id=user_id, selected_level='متوسط', selected_count=10)
             
             bot.send_message(chat_id,
             text=quiz_message,
