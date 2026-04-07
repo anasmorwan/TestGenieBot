@@ -26,13 +26,14 @@ def send_daily_challenge_message():
             cooling_user_streak = get_message("COOLING_USER_STREAK", streak=streak)
             cooling_user_streak1 = get_message("COOLING_USER_STREAK1", streak=streak)
             inactive_user_streak = get_message("INACTIVE_USER_STREAK", streak=streak)
+            returning_user_streak = get_message("RETURNING_USER_STREAK")
 
             
             if status == "new":
                 text = random.choice([new_user_streak, user_streak])
             
             if status == "active":
-                text = random.choice([active_user_streak, build_dynamic_message(user_id)])
+                text = random.choice([active_user_streak, build_dynamic_message(user_id), returning_user_streak])
                 if text is False:
                     text = active_user_streak
                 
