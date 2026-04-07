@@ -292,7 +292,7 @@ def trim_questions(data: Dict[str, Any], num_questions: int) -> Dict[str, Any]:
 #  Main generator
 # ============================================================
 
-def pro_quiz_generator(content: Any, num_questions: int = 5) -> Dict[str, Any]:
+def pro_quiz_generator(content: Any, num_questions: int) -> Dict[str, Any]:
     # --- إضافة الحماية هنا أيضاً ---
     if isinstance(content, tuple):
         content = content[0]
