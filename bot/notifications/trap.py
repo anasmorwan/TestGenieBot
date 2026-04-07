@@ -21,32 +21,37 @@ def send_daily_challenge_message():
             status = get_inactivity_level(user_id)
             text = get_message("NEW_USER_STREAK")
             user_streak = get_message("TRAP_MSG", streak=streak)
-            
+            new_user_streak = get_message("NEW_USER_STREAK", streak=streak)
+            active_user_streak = get_message("ACTIVE_USER_STREAK", streak=streak)
+            cooling_user_streak = get_message("COOLING_USER_STREAK", streak=streak)
+            cooling_user_streak1 = get_message("COOLING_USER_STREAK1", streak=streak)
+            inactive_user_streak = get_message("INACTIVE_USER_STREAK", streak=streak)
+
             
             if status == "new":
-                text = random.choice([get_message("NEW_USER_STREAK"), user_streak])
+                text = random.choice([new_user_streak, user_streak])
             
             if status == "active":
-                text = random.choice([get_message("ACTIVE_USER_STREAK"), build_dynamic_message(user_id)])
+                text = random.choice([active_user_streak, build_dynamic_message(user_id)])
                 if text is False:
-                    text = get_message("ACTIVE_USER_STREAK")
+                    text = active_user_streak
                 
                 
             elif status == "cooling":
                 text = build_dynamic_message(user_id)
                 if text is False:
-                    text = random.choice([get_message("COOLING_USER_STREAK"), get_message("COOLING_USER_STREAK1")])
+                    text = random.choice([cooling_user_streak, cooling_user_streak1])
             
 
             elif status == "inactive":
                 text = build_dynamic_message(user_id)
                 if text is False:
-                    text = get_message("INACTIVE_USER_STREAK")
+                    text = inactive_user_streak
                 
             elif status == "lost":
                 text = build_dynamic_message(user_id)
                 if text is False:
-                    text = get_message("INACTIVE_USER_STREAK")
+                    text = inactive_user_streak
                 
                 
                 
