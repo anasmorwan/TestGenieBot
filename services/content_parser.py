@@ -45,13 +45,7 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
 
     if ext in ("jpg", "png"):
         if not is_paid_user_active(uid):
-            keyboard = saved_quiz_upsell()
-            return bot.send_message(
-                chat_id=uid, 
-            text="📸 هذه الميزة متاحة فقط للمشتركين Pro.\n\n"
-            "💎 اشترك الآن لتحويل الصور إلى اختبارات تلقائيًا بلا حدود!",
-                reply_markup=keyboard
-            )
+            return
 
         
         bot.edit_message_text("⏳ جاري تحليل الصورة...", chat_id=chat_id, message_id=message_id)
@@ -77,14 +71,9 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
 
     # إذا النص فارغ، استخدم OCR
     if is_text_empty(content):
-        if not is_paid_user_active(uid):
-            keyboard = saved_quiz_upsell()
-            return bot.send_message(
-                chat_id=chat_id,
-                text="📝 لا يمكن قراءة هذا الملف تلقائيًا.\n"
-                "💎 مع الاشتراك Pro، يمكنك استخدام OCR وتحويل أي ملف نصيًا أو صورة إلى اختبار بسهولة!",
-                reply_markup=keyboard
-            )
+        if not is_paid_user_active(uid):         
+            return "ocr_needed"
+            
         bot.edit_message_text("⏳ يتم تجهيز الملف... الرجاء الانتظار لحظات.", chat_id=chat_id, message_id=message_id)
         language = detect_language_from_filename(msg.document.file_name)
         ocr_func = ocr_map.get(ext)
