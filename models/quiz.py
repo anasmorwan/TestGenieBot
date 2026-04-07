@@ -1,11 +1,11 @@
 class QuizQuestion:
 
-    def __init__(self, question, options, correct_index, explanation=""):
+    def __init__(self, question, options, correct_index, branch="", explanation=""):
         self.question = question
         self.options = options
         self.correct_index = correct_index
         self.explanation = explanation
-
+        self.branch = branch
     # دالة التحويل لقاموس (للحفظ في القاعدة)
     def to_dict(self):
         return {
