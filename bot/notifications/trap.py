@@ -20,9 +20,11 @@ def send_daily_challenge_message():
             keyboard = streak_keyboard()
             status = get_inactivity_level(user_id)
             text = get_message("NEW_USER_STREAK")
+            user_streak = get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
+            
             
             if status == "new":
-                text = random.choice([get_message("NEW_USER_STREAK"), get_message("USER_STREAK")])
+                text = random.choice([get_message("NEW_USER_STREAK"), user_streak])
             
             if status == "active":
                 text = random.choice([get_message("ACTIVE_USER_STREAK"), build_dynamic_message(user_id)])
