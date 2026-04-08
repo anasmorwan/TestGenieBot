@@ -138,7 +138,7 @@ class QuizManager:
             raise ValueError(f"start_quizError: {str(e)}")
             
 
-    def start_mistakes_review(self, chat_id, mistakes_list, bot, only_mistakes):
+    def start_challege(self, chat_id, mistakes_list, bot):
         try:
             questions = []
             if mistakes_list:
@@ -181,6 +181,46 @@ class QuizManager:
 
         except Exception as e:
             print(f"❌ Error in start_mistakes_review: {str(e)}")
+
+    def start_mistakes_review(self, chat_id, mistakes_list, bot, only_mistakes):
+        try:
+            questions = []
+            if mistakes_list:
+                for mistake in mistakes_list:
+                    q_data = mistake.get("questions") if isinstance(mistake, dict) else None
+                    if q_data:
+                        obj = QuizQuestion.from_raw(q_data)
+                        if obj: questions.append(obj)
+            
+            # التحقق من وجود مادة علمية هنا أولاً
+            user_content = get_user_content(chat_id)
+            has_content = user_content is not None
+
+            with self.lock:
+                self.sessions[chat_id] = {
+                    "questions": questions,
+                    "index": 0,
+                    "score": 0,
+                    "wrong_count": 0,
+                    "source": "dynamic_mix",
+                    "quiz_code": "CHALLENGE_MODE",
+                    "has_saved_texts": has_content, # 👈 ستكون True أو False بدقة
+                    "is_extended": False,
+                    "waiting_for_extension": True,
+                    "questions_resumed": False
+                }
+
+            if questions:
+                self.send_current_question(chat_id, bot)
+                
+            else:
+                bot.send_message(chat_id, "⚠️ لا توجد أخطاء سابقة .يرجى إرسال نص أولاً!")
+                with self.lock:
+                    self.sessions.pop(chat_id, None)
+
+        except Exception as e:
+            print(f"❌ Error in start_mistakes_review: {str(e)}")
+                                     
 
 
     def load_quiz(self, quiz_code):
