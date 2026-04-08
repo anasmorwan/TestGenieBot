@@ -156,6 +156,20 @@ Format:
 ⚠️ Note (optional): [common mistake or contrast]
 """
 
+output_format = """
+{
+  "domain": "e.g: Medicine",
+  "questions": [
+    {
+      "question": "...",
+      "options": ["...", "...", "...", "..."],
+      "correct_index": 0,
+      "explanation": "...",
+      "branch": "e.g: anatomy"
+    }
+  ]
+}
+"""
 def analyze_text_metadata(text_content, config):
     
     valid_subjects = config.get("subjects", [])
@@ -408,6 +422,7 @@ CONSTRAINTS:
 - Exactly {num_questions} questions.
 - Exactly 4 options per question.
 - No facts outside the provided source.
+- Return ONLY a JSON object like OUTPUT FORMAT
 
 QUESTION TYPES TO GENERATE:
 {chr(10).join([f"- {item['slot']}. {item['type']}" for item in question_plan])}
@@ -427,8 +442,8 @@ EXPLANATION GUIDELINES:
 SOURCE TEXT:
 {text_content}
 
-OUTPUT FORMAT: Return ONLY a JSON array of objects with: 
-(question, options, correct_index, explanation, type, difficulty, branch: "e.g: anatomy")
+OUTPUT FORMAT: 
+{output_format}
 """
     return final_prompt
             
