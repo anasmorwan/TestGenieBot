@@ -7,7 +7,7 @@ from ai.beta_prompts import generate_smart_batch_prompt
 from storage.messages import get_message
 from storage.session_store import user_messages_remaining
 from storage.sqlite_db import update_user_major, get_user_question_count
-from services.user_trap import save_user_knowledge
+
 import random
 import threading
 import time
@@ -83,6 +83,7 @@ def delayed_message(bot, user_id, delay, selected_text):
 
 
 def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
+    from services.user_trap import save_user_knowledge
     number = get_user_question_count(user_id)
     question_count = number if number is not None else 5
     
