@@ -218,7 +218,7 @@ def register(bot):
                         mistakes = get_recent_mistakes(user_id, review_count)
                     
                     
-                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=False)
+                        quiz_manager.start_challege(chat_id, mistakes, bot)
                         msgs = [
                             get_message("CHALLENGE_STARTED"),
                             get_message("CHALLENGE_STARTED1"),
