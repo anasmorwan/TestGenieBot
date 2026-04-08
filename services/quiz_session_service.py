@@ -409,7 +409,7 @@ class QuizManager:
             if state["index"] >= len(state["questions"]):
                 if waiting_for_extension:
 
-                    distribution = get_question_distribution(user_id, total_questions=3)
+                    distribution = get_question_distribution(chat_id, total_questions=3)
                     challenge_count = distribution["challenge_count"]
                     new_count = distribution["new_count"]
                     
