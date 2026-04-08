@@ -741,6 +741,11 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE users ADD COLUMN quiz_num INTEGER DEFAULT 5
         """)
+
+    if not column_exists("users", "pro_quota"):
+        c.execute("""
+        ALTER TABLE users ADD COLUMN quiz_num INTEGER DEFAULT 5
+        """)
         
 
     if not column_exists("user_mistakes", "created_at"):
