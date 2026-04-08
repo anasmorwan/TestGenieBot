@@ -15,7 +15,7 @@ from storage.messages import get_message
 from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell, tracking_upsell_keyboard
 from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_viral_message, get_quiz_creator, format_usernames, get_quiz_user_ids
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
-from bot.keyboards.quiz_buttons import share_quiz_button, too_mistakes_keyboard, few_mistakes_keyboard
+from bot.keyboards.quiz_buttons import share_quiz_button, too_mistakes_keyboard, few_mistakes_keyboard, pro_quota_keyboard
 from services.usage import is_paid_user_active
 from services.user_trap import send_daily_challenge, update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
 from services.quiz_service import normalize_quizzes
@@ -471,9 +471,10 @@ class QuizManager:
 
             elif is_allowed and remaining == 2 and remaining_pro != 0: 
                 keyboard = pro_quota_keyboard()
+                text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)]
                 bot.send_message(
                     chat_id,
-                    text=get_message("QUOTA_OFFER", quota=quota),
+                    text=text,
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
