@@ -3,8 +3,8 @@ import json
 from typing import Any, Dict, List, Union
 
 from utils.json_utils import parse_llm_json
-from ai.llm_client import generate_smart_response
-
+from ai.llm_client import generate_smart_response, generate_free_response
+from services.usage import is_paid_user_active
 
 # ============================================================
 #  Language detection
@@ -187,11 +187,17 @@ RAW OUTPUT:
 # ============================================================
 #  Validation helpers
 # ============================================================
-def safe_generate(prompt: str) -> str:
+def safe_generate(user_id, prompt: str) -> str:
     """
     دالة وسيطة لضمان استخراج النص فقط في حال كانت 
     generate_smart_response تُرجع Tuple
-    """
+    """  
+    if is_paid_user_active(user_id):    
+        response = generate_smart_response(prompt)
+        if isinstance(response, tuple):
+            return response[0]
+        return response
+    
     response = generate_smart_response(prompt)
     if isinstance(response, tuple):
         return response[0]
