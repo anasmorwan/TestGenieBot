@@ -200,7 +200,7 @@ def register(bot):
             if ":" in data:
                 quiz_code = data.split(":")[1]
 
-            if data startswith("start_challenge"):
+            if data.startswith("start_challenge"):
                 try:
                     parts = data.split(":")
                     challenge_type = parts[1] if len(parts) > 1 else None
