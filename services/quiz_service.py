@@ -126,7 +126,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         
             quizzes = pro_response.get("questions", [])
             domain = pro_response["metadata"]["domain"]
-            update_user_major(user_id, detected_domain)
+            update_user_major(user_id, domain)
             save_user_knowledge(user_id, content, domain)
 
             return normalize_quizzes(quizzes)[:question_count]
