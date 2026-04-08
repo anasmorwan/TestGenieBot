@@ -449,7 +449,7 @@ class QuizManager:
                 # keyboard = share_quiz_button(quiz_code)
                 keyboard = None
                 try:
-                    if wrongs_ratio =< 0.4:
+                    if wrongs_ratio <= 0.4:
                         keyboard = too_mistakes_keyboard(wrong)
                     else:
                         keyboard = few_mistakes_keyboard(wrong)
@@ -477,7 +477,7 @@ class QuizManager:
             
             if source == "generated_quiz" or has_text:
                 keyboard = share_quiz_button(quiz_code)
-                if wrongs_ratio =< 0.4:
+                if wrongs_ratio <= 0.4:
                     keyboard = too_mistakes_keyboard(wrong)
                 else:
                     keyboard = few_mistakes_keyboard(wrong)
@@ -509,7 +509,7 @@ class QuizManager:
             if source == "generated_quiz" or has_text:
                 try:
                     keyboard = share_quiz_button(quiz_code)
-                    if wrongs_ratio =< 0.4:
+                    if wrongs_ratio <= 0.4:
                         keyboard = too_mistakes_keyboard(wrong)
                     else:
                         keyboard = few_mistakes_keyboard(wrong)
