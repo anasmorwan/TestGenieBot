@@ -50,3 +50,13 @@ def few_mistakes_keyboard(wrong_count):
     
     return keyboard
     
+def pro_quota_keyboard():
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    
+    buttons = [ 
+    InlineKeyboardButton("🔥 جرب الآن", callback_data="pro_quota")
+        ]
+    keyboard.add(*buttons)
+    
+    return keyboard
+    
