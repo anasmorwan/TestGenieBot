@@ -69,7 +69,7 @@ def generate_smart_response(prompt: str) -> str:
     timeout_seconds = 45
 
     
-    # 2️⃣ Google Gemini
+    # 1️⃣ Google Gemini
     if gemini_model:
         try:
             logging.info("Attempting request with: 1. Google Gemini...")
@@ -92,34 +92,10 @@ def generate_smart_response(prompt: str) -> str:
 
         except Exception as e:
             logging.warning(f"❌ Gemini failed: {e}")
-            
-
-
-    # 1️⃣ Cohere
-    if cohere_client:
-        try:
-            logging.info("Attempting request with: 4. Cohere...")
-
-            response = cohere_client.chat(
-                model="command-a-03-2025",
-                message=prompt,
-                temperature=0.8
-            )
-
-            if response and response.text:
-                logging.info("✅ Success with Cohere.")
-                print("✅ Success with Cohere", flush=True)
-                return response.text.strip()
-
-            logging.warning("❌ Cohere returned empty response. Trying fallback...")
-
-        except Exception as e:
-            logging.warning(f"❌ Cohere failed: {e}")
 
 
     
-
-    # 3️⃣ Groq (LLaMA 3.3)
+    # 2️⃣ Groq (LLaMA 3.3)
     if groq_client:
         try:
             logging.info("Attempting request with: 2. Groq (LLaMA 3.3)...")
@@ -141,6 +117,28 @@ def generate_smart_response(prompt: str) -> str:
 
         except Exception as e:
             logging.warning(f"❌ Groq failed: {e}")
+            
+
+    # 3️⃣ Cohere
+    if cohere_client:
+        try:
+            logging.info("Attempting request with: 4. Cohere...")
+
+            response = cohere_client.chat(
+                model="command-a-03-2025",
+                message=prompt,
+                temperature=0.8
+            )
+
+            if response and response.text:
+                logging.info("✅ Success with Cohere.")
+                print("✅ Success with Cohere", flush=True)
+                return response.text.strip()
+
+            logging.warning("❌ Cohere returned empty response. Trying fallback...")
+
+        except Exception as e:
+            logging.warning(f"❌ Cohere failed: {e}")
 
 
     # 4️⃣ OpenRouter
@@ -187,3 +185,133 @@ def generate_smart_response(prompt: str) -> str:
     # 🚫 All models failed
     raise Exception("All AI providers failed")
     return ""
+
+
+
+
+
+def generate_free_response(prompt: str) -> str:
+    """
+    Tries to generate a response by attempting a chain of services silently.
+    It logs errors for the developer but does not send progress messages to the user.
+    """
+    timeout_seconds = 45
+    
+    # 1️⃣ Groq (LLaMA 3.3)
+    if groq_client:
+        try:
+            logging.info("Attempting request with: 2. Groq (LLaMA 3.3)...")
+
+            chat_completion = groq_client.chat.completions.create(
+                messages=[{"role": "user", "content": prompt}],
+                model="llama-3.3-70b-versatile",
+                temperature=0.8,
+            )
+
+            result = chat_completion.choices[0].message.content
+
+            if result:
+                logging.info("✅ Success with Groq.")
+                print("✅ Success with Groq", flush=True)
+                return result.strip()
+
+            logging.warning("❌ Groq returned empty response. Trying fallback...")
+
+        except Exception as e:
+            logging.warning(f"❌ Groq failed: {e}")
+
+    
+    # 2️⃣ Google Gemini
+    if gemini_model:
+        try:
+            logging.info("Attempting request with: 1. Google Gemini...")
+
+            response = gemini_model.models.generate_content(
+            model="gemini-2.0-flash-lite-001", 
+            contents=prompt,
+            config={
+                'temperature': 0.7,
+                'top_p': 0.95,
+            }
+            )
+
+            if response and response.text:
+                logging.info("✅ Success with Gemini.")
+                print("✅ Success with Gemini", flush=True)
+                return response.text.strip()
+
+            logging.warning("❌ Gemini returned empty response. Trying fallback...")
+
+        except Exception as e:
+            logging.warning(f"❌ Gemini failed: {e}")
+
+    
+            
+
+    # 3️⃣ Cohere
+    if cohere_client:
+        try:
+            logging.info("Attempting request with: 4. Cohere...")
+
+            response = cohere_client.chat(
+                model="command-a-03-2025",
+                message=prompt,
+                temperature=0.8
+            )
+
+            if response and response.text:
+                logging.info("✅ Success with Cohere.")
+                print("✅ Success with Cohere", flush=True)
+                return response.text.strip()
+
+            logging.warning("❌ Cohere returned empty response. Trying fallback...")
+
+        except Exception as e:
+            logging.warning(f"❌ Cohere failed: {e}")
+
+
+    # 4️⃣ OpenRouter
+    if OPENROUTER_API_KEY:
+        try:
+            logging.info("Attempting request with: 3. OpenRouter...")
+    
+            headers = {
+                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://t.me/Oiuhelper_bot",
+                "X-Title": "AI Quiz Bot"
+            }
+
+            response = requests.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers=headers,
+                json={
+                    "model": "google/gemma-2-9b-it",
+                    "messages": [
+                    {"role": "user", "content": prompt}
+                    ]
+                },
+                timeout=timeout_seconds
+            )
+
+            response.raise_for_status()
+
+            data = response.json()
+
+            result_text = data["choices"][0]["message"]["content"]
+
+            if result_text:
+                logging.info("✅ Success with OpenRouter.")
+                print("✅ Success with OpenRouter", flush=True)
+                return result_text.strip()
+
+            logging.warning("❌ OpenRouter returned empty response.")
+
+        except Exception as e:
+            logging.warning(f"❌ OpenRouter failed: {e}")
+
+
+    # 🚫 All models failed
+    raise Exception("All AI providers failed")
+    return ""
+            
