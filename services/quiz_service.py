@@ -109,9 +109,13 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 
 
             raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+            
         
         
-            quizzes = parse_llm_json(raw_response)
+            response = parse_llm_json(raw_response)
+            quizzes = response.get("questions")
+            detected_domain = response.get("domain")
+            update_user_major(user_id, detected_domain)
         
         
             # if not isinstance(quizzes, list):
