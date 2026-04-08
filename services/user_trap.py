@@ -4,7 +4,7 @@ from datetime import timedelta, datetime, date
 from storage.session_store import user_streak
 from services.usage import is_paid_user_active
 from storage.session_store import last_active
-
+from services.quiz_service import generate_challenge_quiz
 from datetime import datetime, date
 
 
