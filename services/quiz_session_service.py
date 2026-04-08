@@ -206,7 +206,7 @@ class QuizManager:
                     "quiz_code": "CHALLENGE_MODE",
                     "has_saved_texts": has_content, # 👈 ستكون True أو False بدقة
                     "is_extended": False,
-                    "waiting_for_extension": True,
+                    "waiting_for_extension": False,
                     "questions_resumed": False
                 }
 
@@ -359,7 +359,7 @@ class QuizManager:
         
     
     
-    def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None):
+    def handle_answer(self, chat_id, selected_option, bot, is_shared_user=None, only_mistakes=False):
         try:
             with self.lock:
                 state = self.sessions.get(chat_id)
@@ -396,15 +396,15 @@ class QuizManager:
 
                 if state["index"] >= len(state["questions"]):
                     waiting_for_extension = state.get("waiting_for_extension")
-                else:
-                    waiting_for_extension = False
+               # else:
+                #    state["waiting_for_extension"]
 
             if state["index"] >= len(state["questions"]):
                 if waiting_for_extension:
                     bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
                     return
 
-                self.finish_quiz(chat_id, bot, is_shared_user=shared)
+                self.finish_quiz(chat_id, bot, shared, only_mistakes)
                 return
 
             self.send_current_question(chat_id, bot)
@@ -418,7 +418,7 @@ class QuizManager:
 
         
     
-    def finish_quiz(self, chat_id, bot, is_shared_user=None):
+    def finish_quiz(self, chat_id, bot, is_shared_user=None, only_mistakes=False):
     
         state = self.sessions.pop(chat_id, None)
         if not state:
