@@ -24,3 +24,16 @@ def share_quiz_button(quiz_code):
     keyboard.add(*buttons)
     
     return keyboard
+
+
+
+def too_mistakes_keyboard(quiz_code):
+    keyboard = InlineKeyboardMarkup(row_width=1)
+    
+    buttons = [ 
+    InlineKeyboardButton("🎯 تدريب على أخطائي", callback_data=f"challenge_quiz:{quiz_code}")
+        ]
+    keyboard.add(*buttons)
+    
+    return keyboard
+    
