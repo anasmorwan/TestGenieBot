@@ -108,7 +108,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             ).start()
 
 
-            raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+            raw_response = safe_generate(user_id, prompt) # استخدم هذه الدالة دائماً!
             
         
         
@@ -153,7 +153,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             ).start()
             print(f"✉️ second message sent 📤", flush=True)
         
-            raw_response = safe_generate(prompt) # استخدم هذه الدالة دائماً!
+            raw_response = safe_generate(user_id, prompt) # استخدم هذه الدالة دائماً!
             print(f"✉️ raw response message obtained", flush=True)        
 
         
