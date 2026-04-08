@@ -17,7 +17,7 @@ from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_v
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
 from bot.keyboards.quiz_buttons import share_quiz_button, too_mistakes_keyboard, few_mistakes_keyboard, pro_quota_keyboard
 from services.usage import is_paid_user_active
-from services.user_trap import send_daily_challenge, update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
+from services.user_trap import generate_challenge, update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
 from services.quiz_service import normalize_quizzes
 
 
