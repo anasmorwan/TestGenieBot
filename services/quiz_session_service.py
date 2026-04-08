@@ -407,10 +407,16 @@ class QuizManager:
 
             if state["index"] >= len(state["questions"]):
                 if waiting_for_extension:
+
+                    distribution = get_question_distribution(user_id, total_questions=3)
+                    challenge_count = distribution["challenge_count"]
+                    new_count = distribution["new_count"]
+                    
+                    text = random.choice([get_message("WAITING_CHAL_QUIZ_1", new_count=new_count, challenge_count=challenge_count), get_message("WAITING_CHAL_QUIZ")])
                     waiting_msg = bot.edit_message_text(
                         chat_id,
                         message_id=message_id,
-                        text=get_message("WAITING_CHAL_QUIZ"),
+                        text=text,
                         parse_mode="HTML"
                     )
                     with self.lock:
