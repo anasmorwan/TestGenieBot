@@ -201,7 +201,7 @@ class QuizManager:
                     "index": 0,
                     "score": 0,
                     "wrong_count": 0,
-                    "source": "dynamic_mix",
+                    "source": "mistakes",
                     "quiz_code": "CHALLENGE_MODE",
                     "has_saved_texts": has_content, # 👈 ستكون True أو False بدقة
                     "is_extended": False,
@@ -372,7 +372,8 @@ class QuizManager:
 
                 if is_correct:
                     state["score"] += 1
-                    update_progress(chat_id, correct=1, total=None)
+                    if source != "mistakes":
+                        update_progress(chat_id, correct=1, total=None)
                     if state.get("source") == "dynamic_mix":
                         try:
                             self.increment_correct_count(chat_id, q.question)
@@ -380,7 +381,7 @@ class QuizManager:
                             print(f"⚠️ تجاهل خطأ قاعدة البيانات (increment): {db_e}")
                 else:
                     state["wrong_count"] += 1
-                    if state.get("source") != "dynamic_mix":
+                    if state.get("source") is not "dynamic_mix" and not "mistakes":
                         try:
                             self.save_mistake(chat_id, q)
                         except Exception as db_e:
@@ -444,11 +445,11 @@ class QuizManager:
             remaining_pro = get_current_pro_quota(chat_id)
             remaining = info.get("remaining")
             
-            if source != "generated_quiz":
-                if not has_text:
-                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
-                    return
-            if source == "generated_quiz" or has_text:
+            if source == "dynamic_mix" and not has_text:
+                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                return
+                
+            elif source == "generated_quiz" or has_text:
             
                 # keyboard = share_quiz_button(quiz_code)
                 keyboard = None
@@ -487,7 +488,7 @@ class QuizManager:
         
         elif is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
-            if source != "generated_quiz":
+            if source == "dynamic_mix":
                 if not has_text:
                     bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                     return
@@ -519,7 +520,7 @@ class QuizManager:
                 creator_id = get_quiz_creator(quiz_code)
                 log_quiz_attempt(chat_id, quiz_code, score, total)
                 
-            if source != "generated_quiz":
+            if source == "dynamic_mix":
                 if not has_text:
                     bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                     return
