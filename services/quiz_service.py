@@ -183,7 +183,7 @@ def generate_challenge_quiz(content, num_questions, is_pro):
     try:
         
         prompt = build_adaptive_quiz_prompt(content, num_questions, is_pro)
-        raw_response = safe_generate(prompt)
+        raw_response = generate_smart_response(prompt)
         
         # 🧪 اطبع الرد الخام فوراً قبل أي معالجة
         print(f"DEBUG: Raw AI Response: {raw_response[:200]}...", flush=True)
