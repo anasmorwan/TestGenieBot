@@ -15,7 +15,7 @@ from storage.messages import get_message
 from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell, tracking_upsell_keyboard
 from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_viral_message, get_quiz_creator, format_usernames, get_quiz_user_ids
 from analytics.shared_quiz_analytics import get_hardest_question, get_success_rate, build_advanced_stats_message
-from bot.keyboards.quiz_buttons import share_quiz_button
+from bot.keyboards.quiz_buttons import share_quiz_button, too_mistakes_keyboard, few_mistakes_keyboard
 from services.usage import is_paid_user_active
 from services.user_trap import send_daily_challenge, update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
 from services.quiz_service import normalize_quizzes
@@ -138,7 +138,7 @@ class QuizManager:
             raise ValueError(f"start_quizError: {str(e)}")
             
 
-    def start_mistakes_review(self, chat_id, mistakes_list, bot):
+    def start_mistakes_review(self, chat_id, mistakes_list, bot, only_mistakes):
         try:
             questions = []
             if mistakes_list:
@@ -397,6 +397,7 @@ class QuizManager:
         has_text = state.get("has_saved_texts")
         source = state.get("source")
         self.poll_map.pop(chat_id, None)
+        wrongs_ratio = wrong / total
 
         
         if not is_paid_user_active(chat_id) and not shared:
@@ -406,8 +407,14 @@ class QuizManager:
                     return
             if source == "generated_quiz" or has_text:
             
-                keyboard = share_quiz_button(quiz_code)
+                # keyboard = share_quiz_button(quiz_code)
+                keyboard = None
                 try:
+                    if wrongs_ratio =< 0.4:
+                        keyboard = too_mistakes_keyboard(wrong)
+                    else:
+                        keyboard = few_mistakes_keyboard(wrong)
+                    
                     bot.send_message(
                         chat_id=chat_id,
                         text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
@@ -431,6 +438,11 @@ class QuizManager:
             
             if source == "generated_quiz" or has_text:
                 keyboard = share_quiz_button(quiz_code)
+                if wrongs_ratio =< 0.4:
+                    keyboard = too_mistakes_keyboard(wrong)
+                else:
+                    keyboard = few_mistakes_keyboard(wrong)
+                    
             
                 try:
                     bot.send_message(
@@ -458,6 +470,11 @@ class QuizManager:
             if source == "generated_quiz" or has_text:
                 try:
                     keyboard = share_quiz_button(quiz_code)
+                    if wrongs_ratio =< 0.4:
+                        keyboard = too_mistakes_keyboard(wrong)
+                    else:
+                        keyboard = few_mistakes_keyboard(wrong)
+                    
                     bot.send_message(
                         chat_id=chat_id,
                         text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
