@@ -31,7 +31,7 @@ def too_mistakes_keyboard(quiz_code):
     keyboard = InlineKeyboardMarkup(row_width=1)
     
     buttons = [ 
-    InlineKeyboardButton("🎯 تدريب على أخطائي", callback_data=f"challenge_quiz:many:{quiz_code}")
+    InlineKeyboardButton("🎯 تدريب على أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
         ]
     keyboard.add(*buttons)
     
@@ -44,7 +44,7 @@ def few_mistakes_keyboard(quiz_code):
     
     buttons = [ 
     InlineKeyboardButton("🔥 تحدي جديد", callback_data="go_generate"),
-    InlineKeyboardButton("🧠 راجع أخطائي", callback_data=f"challenge_quiz:few:{quiz_code}")
+    InlineKeyboardButton("🧠 راجع أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
         ]
     keyboard.add(*buttons)
     
