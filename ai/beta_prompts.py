@@ -6,7 +6,7 @@ from utils.json_utils import parse_llm_json
 from bot.bot_instance import mybot
 from storage.sqlite_db import update_user_major, get_user_question_count, get_user_difficulty
 
-from services.user_trap import save_user_knowledge
+
 
 admin_id = 5048253124
 
@@ -350,6 +350,7 @@ def sanitize_generated_questions(items, num_questions):
 
 
 def generate_smart_batch_prompt(user_id, text_content, num_questions):
+    from services.user_trap import save_user_knowledge
     text_content = normalize_text_content(text_content)
     
     # تحميل الإعدادات أولاً (نفترض الطب كافتراضي حالياً)
