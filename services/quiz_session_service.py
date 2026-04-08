@@ -213,7 +213,7 @@ class QuizManager:
                 self.send_current_question(chat_id, bot, only_mistakes)
                 
             else:
-                bot.send_message(chat_id, "⚠️ لا توجد أخطاء سابقة .يرجى إرسال نص أولاً!")
+                bot.send_message(chat_id, text=get_message("NO_MISTAKES"), parse_mode="HTML")
                 with self.lock:
                     self.sessions.pop(chat_id, None)
 
