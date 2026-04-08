@@ -298,7 +298,7 @@ def trim_questions(data: Dict[str, Any], num_questions: int) -> Dict[str, Any]:
 #  Main generator
 # ============================================================
 
-def pro_quiz_generator(content: Any, num_questions: int) -> Dict[str, Any]:
+def pro_quiz_generator(user_id, content: Any, num_questions: int) -> Dict[str, Any]:
     # --- إضافة الحماية هنا أيضاً ---
     if isinstance(content, tuple):
         content = content[0]
@@ -308,7 +308,7 @@ def pro_quiz_generator(content: Any, num_questions: int) -> Dict[str, Any]:
 
         # المحاولة الأولى
         prompt = build_pro_quiz_prompt(content, num_questions, target_lang)
-        raw_response = safe_generate(prompt) # استخدام الدالة الآمنة
+        raw_response = safe_generate(user_id, prompt) # استخدام الدالة الآمنة
         
         full_data = normalize_llm_output(parse_llm_json(raw_response))
 
