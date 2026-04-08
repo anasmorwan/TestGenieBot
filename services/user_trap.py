@@ -8,7 +8,7 @@ from services.quiz_service import generate_challenge_quiz
 from datetime import datetime, date
 
 
-def send_daily_challenge(bot, user_id, new_count, challenge_count):
+def generate_challenge(bot, user_id, new_count, challenge_count):
     content = get_user_content(user_id)
     
     if challenge_count and new_count > 0:
