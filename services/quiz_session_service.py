@@ -73,7 +73,7 @@ class QuizManager:
 
             if should_resume:
                 print(f"▶️{should_resume} [RESUME] Resuming quiz for chat_id: {chat_id}", flush=True)
-                bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
+                
 
                 self.send_current_question(chat_id, bot)
 
@@ -401,7 +401,7 @@ class QuizManager:
 
             if state["index"] >= len(state["questions"]):
                 if waiting_for_extension:
-                    # bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
+                    bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
                     return
 
                 self.finish_quiz(chat_id, bot, shared, only_mistakes)
