@@ -200,29 +200,39 @@ def register(bot):
             if ":" in data:
                 quiz_code = data.split(":")[1]
 
-            if data == "start_challenge":
+            if data startswith("start_challenge"):
                 try:
-                    distribution = get_question_distribution(user_id, total_questions=3)
-                    review_count = distribution["review_count"]
+                    parts = data.split(":")
+                    challenge_type = parts[1] if len(parts) > 1 else None
+                    quiz_code = parts[3] if len(parts) > 1 else None
+                    total_mistakes = parts[2] if len(parts) > 1 else None
+
+                    if challenge_type == "mistakes_review":
+                        mistakes = get_recent_mistakes(user_id, total_mistakes)
+                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
+            
+                    else:
+                        distribution = get_question_distribution(user_id, total_questions=3)
+                        review_count = distribution["review_count"]
                 
                     
-                    mistakes = get_recent_mistakes(user_id, review_count)
+                        mistakes = get_recent_mistakes(user_id, review_count)
                     
                     
-                    quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
-                    msgs = [
-                        get_message("CHALLENGE_STARTED"),
-                        get_message("CHALLENGE_STARTED1"),
-                        get_message("CHALLENGE_STARTED2")
-                    ]
-                    text = random.choice(msgs)
+                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
+                        msgs = [
+                            get_message("CHALLENGE_STARTED"),
+                            get_message("CHALLENGE_STARTED1"),
+                            get_message("CHALLENGE_STARTED2")
+                        ]
+                        text = random.choice(msgs)
                     
-                    bot.edit_message_text(
-                    chat_id=chat_id,
-                    message_id=message_id,
-                    text=text,
-                    parse_mode="HTML"
-                    )
+                        bot.edit_message_text(
+                        chat_id=chat_id,
+                        message_id=message_id,
+                        text=text,
+                        parse_mode="HTML"
+                        )
                         
                 except Exception as e:
                     bot.send_message(chat_id, f"CALLBACK ERROR: {str(e)}")
