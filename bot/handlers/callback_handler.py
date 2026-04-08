@@ -204,12 +204,11 @@ def register(bot):
                 try:
                     parts = data.split(":")
                     challenge_type = parts[1] if len(parts) > 1 else None
-                    quiz_code = parts[3] if len(parts) > 1 else None
                     total_mistakes = parts[2] if len(parts) > 1 else None
 
-                    if challenge_type == "mistakes_review":
+                    if challenge_type == "mistakes":
                         mistakes = get_recent_mistakes(user_id, total_mistakes)
-                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
+                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=True)
             
                     else:
                         distribution = get_question_distribution(user_id, total_questions=3)
@@ -219,7 +218,7 @@ def register(bot):
                         mistakes = get_recent_mistakes(user_id, review_count)
                     
                     
-                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot)
+                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=False)
                         msgs = [
                             get_message("CHALLENGE_STARTED"),
                             get_message("CHALLENGE_STARTED1"),
