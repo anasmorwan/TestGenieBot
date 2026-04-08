@@ -182,7 +182,7 @@ class QuizManager:
         except Exception as e:
             print(f"❌ Error in start_mistakes_review: {str(e)}")
 
-    def start_mistakes_review(self, chat_id, mistakes_list, bot, only_mistakes):
+    def start_mistakes_review(self, chat_id, mistakes_list, bot, only_mistakes=False):
         try:
             questions = []
             if mistakes_list:
@@ -211,7 +211,7 @@ class QuizManager:
                 }
 
             if questions:
-                self.send_current_question(chat_id, bot)
+                self.send_current_question(chat_id, bot, only_mistakes)
                 
             else:
                 bot.send_message(chat_id, "⚠️ لا توجد أخطاء سابقة .يرجى إرسال نص أولاً!")
@@ -242,7 +242,7 @@ class QuizManager:
             return json.loads(row[0])
     
 
-    def send_current_question(self, chat_id, bot, is_shared_user=None):
+    def send_current_question(self, chat_id, bot, is_shared_user=None, only_mistakes=False):
         trap_msg = "⏱ لا تفكر كثيراً… أجب بسرعة"
         with self.lock:
             state = self.sessions.get(chat_id)
@@ -259,7 +259,7 @@ class QuizManager:
         q = state["questions"][state["index"]]
         print(f"Sending question {state['index']+1} to chat {chat_id}")
 
-        self.send_quiz_poll(bot, chat_id, q)
+        self.send_quiz_poll(bot, chat_id, q, only_mistakes)
 
         
     def save_mistake(self, user_id, q_obj):
@@ -528,7 +528,7 @@ class QuizManager:
 
             
 
-    def send_quiz_poll(self, bot, chat_id, q):
+    def send_quiz_poll(self, bot, chat_id, q, only_mistakes=False):
         try:
             
             # 1. الوصول للبيانات عبر الكائن (Object Attributes) وليس القاموس
