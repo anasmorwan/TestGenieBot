@@ -372,6 +372,7 @@ class QuizManager:
                     return
 
                 shared = state.get("is_shared_user") if is_shared_user is None else is_shared_user
+                source = state.get("source")
 
                 q = state["questions"][state["index"]]
                 is_correct = (selected_option == q.correct_index)
@@ -388,7 +389,8 @@ class QuizManager:
                             print(f"⚠️ تجاهل خطأ قاعدة البيانات (increment): {db_e}")
                 else:
                     state["wrong_count"] += 1
-                    if state.get("source") is not "dynamic_mix" and not "mistakes":
+                    
+                    if source not in ("dynamic_mix", "mistakes"):
                         try:
                             self.save_mistake(chat_id, q)
                         except Exception as db_e:
