@@ -3,7 +3,36 @@ from datetime import datetime, timedelta
 
 
 
-    
+def get_current_pro_quota(user_id):
+    """
+    استرجاع عدد الأسئلة للمستخدم
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        # طباعة اسم الجدول والأعمدة الموجودة
+        cursor.execute("PRAGMA table_info(users)")
+        columns = cursor.fetchall()
+        print(f"Columns in users table: {[col[1] for col in columns]}", flush=True)
+        
+        # استعلام القيمة
+        cursor.execute("SELECT pro_quota FROM users WHERE user_id = ?", (user_id,))
+        result = cursor.fetchone()
+        print(f"Raw result from DB: {result}", flush=True)
+        
+        if result and result[0] is not None:
+            value = int(result[0])
+            print(f"Returning: {value}", flush=True)
+            return value
+        else:
+            print("No value found, returning 10", flush=True)
+            return 3
+            
+    except Exception as e:
+        print(f"Error: {e}", flush=True)
+        return 3
+    finally:
+        conn.close()    
 
 def get_subscription(user_id):
     conn = get_connection()
