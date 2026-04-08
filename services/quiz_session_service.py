@@ -567,6 +567,7 @@ class QuizManager:
 
             with self.lock:
                 self.poll_map[poll.poll.id] = chat_id
+                self.poll_map["only_mistakes"] = only_mistakes
             return poll.message_id
 
         except Exception as e:
