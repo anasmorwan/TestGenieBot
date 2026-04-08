@@ -10,7 +10,7 @@ from storage.sqlite_db import get_connection, get_question_distribution
 
 
 
-from services.usage import is_paid_user_active
+from services.usage import is_paid_user_active, can_generate, get_current_pro_quota
 from storage.messages import get_message
 from bot.keyboards.upsell_keyboard import quiz_number_limit_upsell, tracking_upsell_keyboard
 from storage.quiz_attempts import log_quiz_attempt, get_quiz_stats, build_quiz_viral_message, get_quiz_creator, format_usernames, get_quiz_user_ids
@@ -440,6 +440,10 @@ class QuizManager:
 
         
         if not is_paid_user_active(chat_id) and not shared:
+            is_allowed, info = can_generate(chat_id)
+            remaining_pro = get_current_pro_quota(chat_id)
+            remaining = info.get("remaining")
+            
             if source != "generated_quiz":
                 if not has_text:
                     bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
@@ -464,6 +468,19 @@ class QuizManager:
                 except Exception as e:
                     print(f"❌ فشل إرسال النتيجة: {e}")
                     bot.send_message(chat_id, f"خطأ: {str(e)}")
+
+            elif is_allowed and remaining == 2 and remaining_pro != 0: 
+                keyboard = pro_quota_keyboard()
+                bot.send_message(
+                    chat_id,
+                    text=get_message("QUOTA_OFFER", quota=quota),
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
+                return
+                                     
+                    
+                
 
 
         
