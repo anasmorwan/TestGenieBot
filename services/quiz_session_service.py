@@ -494,7 +494,7 @@ class QuizManager:
 
             elif is_allowed and remaining == 2 and remaining_pro != 0: 
                 keyboard = pro_quota_keyboard()
-                text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)]
+                text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)])
                 bot.send_message(
                     chat_id,
                     text=text,
