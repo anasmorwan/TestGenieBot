@@ -123,7 +123,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             
             return normalize_quizzes(quizzes)
         else:
-            pro_response = pro_quiz_generator(content, num_questions=question_count)
+            pro_response = pro_quiz_generator(user_id, content, num_questions=question_count)
         
            #  يمكنك لاحقاً استخدام pro_response["metadata"] لحفظها في قاعدة البيانات للتتبع (Tracking)
            # db.save_metadata(user_id, pro_response["metadata"])
