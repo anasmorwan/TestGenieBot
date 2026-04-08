@@ -72,6 +72,11 @@ class QuizManager:
                     state["questions_resumed"] = True
 
             if should_resume:
+                if message_id:
+                    bot.delete_message(chat_id, message_id=message_id)
+                    time.sleep(1)
+                    
+                                          
                 print(f"▶️{should_resume} [RESUME] Resuming quiz for chat_id: {chat_id}", flush=True)
                 
 
@@ -369,6 +374,7 @@ class QuizManager:
 
                 q = state["questions"][state["index"]]
                 is_correct = (selected_option == q.correct_index)
+                
 
                 if is_correct:
                     state["score"] += 1
@@ -401,7 +407,16 @@ class QuizManager:
 
             if state["index"] >= len(state["questions"]):
                 if waiting_for_extension:
-                    bot.send_message(chat_id, "⚡ جاري تحضير تحدي إضافي لك...")
+                    waiting_msg = bot.edit_message_text(
+                        chat_id,
+                        message_id=message_id,
+                        text=get_message("WAITING_CHAL_QUIZ"),
+                        parse_mode="HTML"
+                    )
+                    with self.lock:
+                        state.get("questions_resumed")
+                    if questions_resumed:
+                        generate_and_store(message_id=waiting_msg.message_id)
                     return
 
                 self.finish_quiz(chat_id, bot, shared, only_mistakes)
