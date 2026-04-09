@@ -46,6 +46,7 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
     if ext in ("jpg", "png"):
         if not is_paid_user_active(uid):
             return
+            
 
         
         bot.edit_message_text("⏳ جاري تحليل الصورة...", chat_id=chat_id, message_id=message_id)
@@ -74,7 +75,7 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
         if not is_paid_user_active(uid):         
             return "ocr_needed"
             
-        bot.edit_message_text("⏳ يتم تجهيز الملف... الرجاء الانتظار لحظات.", chat_id=chat_id, message_id=message_id)
+        
         language = detect_language_from_filename(msg.document.file_name)
         ocr_func = ocr_map.get(ext)
         if ocr_func:
