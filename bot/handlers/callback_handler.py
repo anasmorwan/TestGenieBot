@@ -24,7 +24,7 @@ from services.user_trap import generate_challenge
 from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
-from storage.session_store import user_selections
+from storage.session_store import user_selections, user_states
 from storage.sqlite_db import get_question_distribution, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
 from services.user_trap import update_last_active 
 from storage.session_store import user_states
@@ -146,8 +146,17 @@ def register(bot):
             # شرط: التأكد من وجود مستوى وعدد صالحين قبل البدء
             if level and count:
                 bot.answer_callback_query(call.id, f"✅ تم تحديث الإعدادات بنجاح: {count} سؤال | (مستوى {level})")
-                # هنا قم باستدعاء دالة توليد الاختبار الفعلية
-                # generate_test(chat_id, level, count)
+                if user_states.get(user_id) == "set_configs":
+                    pass
+                else:
+                    new_markup = get_testgenie_keyboard(
+                        user_id=user_id,
+                        selected_level=level,
+                        selected_count=count,
+                        is_set=True
+                    )
+                    bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+                
             else:
                 if user_states.get(user_id) == "set_configs":
                     bot.answer_callback_query(call.id, "❌ الرجاء اختيار المستوى وعدد الأسئلة أولاً", show_alert=True)
