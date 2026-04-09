@@ -28,7 +28,7 @@ def normalize_poll(poll):
 
 def generate_and_store_question(user_id, prompt):
     print(f"DEBUG: [User: {user_id}] Sending prompt to LLM...", flush=True)
-    raw_poll = generate_smart_response(prompt)
+    raw_poll = safe_generate(user_id, prompt)
     print("RAW LLM RESPONSE:", raw_poll, flush=True)
     
     
