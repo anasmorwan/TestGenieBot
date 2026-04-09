@@ -50,7 +50,7 @@ def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=
     else:
         if is_set:
             markup.row(
-                InlineKeyboardButton(text="👇 إبدأ الآن", callback_data="start_test")
+                InlineKeyboardButton(text="👇 إبدأ الآن بإرسال ملفك", callback_data="start_test")
             )
         else:
             markup.row(
