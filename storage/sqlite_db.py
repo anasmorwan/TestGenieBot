@@ -300,10 +300,11 @@ def build_dynamic_message(user_id):
 
         # 3) آخر تعلم (المهم)
         if branches:
-            first_branch = branches[0][0]
-            if len(branches) > 1:
-                second_branch = branches[1][0]
-            parts.append(f"🧠 آخر مراجعة كانت عن الـ{first_branch}")
+            if branches is not None:
+                first_branch = branches[0][0]
+                if len(branches) > 1:
+                    second_branch = branches[1][0]
+                parts.append(f"🧠 آخر مراجعة كانت عن الـ{first_branch}")
 
         # 4) الأخطاء
         if mistake:
