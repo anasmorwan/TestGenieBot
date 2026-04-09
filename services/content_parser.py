@@ -56,7 +56,7 @@ def extract_text_from_file(uid, bot, msg, path, chat_id=None, message_id=None):
     # الحصول على دالة الاستخراج
     extract_func = extractor_map.get(ext)
     if not extract_func:
-        return bot.send_message(uid, f"❌ نوع الملف '{ext}' غير مدعوم.")
+        return f"not_supported {ext}"
 
     content_full = extract_func(path)
     full_length = len(content_full)
