@@ -6,7 +6,7 @@ from services.usage import is_paid_user_active
 from ai.beta_prompts import generate_smart_batch_prompt
 from storage.messages import get_message
 from storage.session_store import user_messages_remaining
-from storage.sqlite_db import update_user_major, get_user_question_count
+from storage.sqlite_db import update_user_major, get_user_question_count, user_has_quizzes
 
 import random
 import threading
@@ -146,7 +146,11 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
                 text=selected_text,
                 parse_mode="HTML"
                 )
-                print(f"✉️ first message sent 📤", flush=True)
+                
+            
+            if user_has_quizzes(user_id):
+                pass
+                
             prompt = build_quiz_prompt(user_id, content, question_count, user_instruction=user_instruction)
             threading.Thread(
                 target=delayed_message,
