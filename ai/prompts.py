@@ -545,7 +545,7 @@ Convert user input into a Telegram poll (JSON only).
 
 Rules:
 - Extract a clear, concise question.
-- If options are given, use them exactly and dont add more options.
+- If options are given, use them exactly and dont suggest more options.
 - If not, generate 2–4 relevant and balanced options.
 - Engagement Style: Rewrite as if you are an active Telegram channel manager. Make it conversational, engaging, with subtle curiosity, emotional touch, or light humor when appropriate. Avoid repetition, stiff language, and robotic tone.
 - If input is vague or random, create a general, natural, interactive question.
