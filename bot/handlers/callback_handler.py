@@ -89,6 +89,7 @@ def register(bot):
                 )
                 bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
                 bot.answer_callback_query(call.id, f"تم اختيار المستوى: {selected_level}")
+                print(f"LEVEL RAW: '{selected_level}'", flush=True)
     
         # معالجة اختيار عدد الأسئلة
         elif data.startswith("count_"):
