@@ -1,5 +1,5 @@
 from ai.llm_client import generate_smart_response
-from ai.prompts import build_poll_prompt
+from ai.prompts import build_poll_prompt, safe_generate
 from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
 from storage.quiz_repository import store_content
@@ -28,7 +28,8 @@ def normalize_poll(poll):
 
 def generate_and_store_question(user_id, prompt):
     print(f"DEBUG: [User: {user_id}] Sending prompt to LLM...", flush=True)
-    raw_poll = generate_smart_response(prompt)
+    raw_poll = safe_generate(user_id, prompt)
+    print(f"raw_response: {raw_poll}", flush=True)
     
     if not raw_poll:
         print(f"DEBUG: [User: {user_id}] LLM returned empty response!", flush=True)
