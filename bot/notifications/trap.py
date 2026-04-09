@@ -41,6 +41,12 @@ def send_daily_challenge_message():
                 
                 
             elif status == "cooling":
+                if clean_branches:
+                    if random.random() < 0.8:  # 80% للخيار الثاني
+                        text = build_dynamic_message(user_id)
+                    else:
+                        text = random.choice([get_message("COOLING_USER_STREAK", streak=streak), get_message("COOLING_USER_STREAK1", streak=streak)])
+            
                 text = build_dynamic_message(user_id)
                 if text is False:
                     text = random.choice([get_message("COOLING_USER_STREAK", streak=streak), get_message("COOLING_USER_STREAK1", streak=streak)])
