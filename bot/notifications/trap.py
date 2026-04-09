@@ -33,7 +33,7 @@ def send_daily_challenge_message():
                     if random.random() < 0.8:  # 80% للخيار الثاني
                         text = build_dynamic_message(user_id)
                     else:
-                        text = random.choice([get_message("ACTIVE_USER_STREAK", streak=streak), build_dynamic_message(user_id), get_message("RETURNING_USER_STREAK")])
+                        text = random.choice([get_message("ACTIVE_USER_STREAK", streak=streak), get_message("RETURNING_USER_STREAK")])
                         
                 text = random.choice([get_message("ACTIVE_USER_STREAK", streak=streak), build_dynamic_message(user_id), get_message("RETURNING_USER_STREAK")])
                 if text is False:
