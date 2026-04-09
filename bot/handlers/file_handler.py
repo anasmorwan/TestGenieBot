@@ -16,7 +16,7 @@ from services.backup_service import smart_restore, is_db_valid
 from models.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 from services.user_trap import update_last_active
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
-
+from storage.sqlite_db import set_user_has_quizzes
 
 import threading
     
@@ -182,6 +182,7 @@ def register(bot):
             time.sleep(2)
     
             quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False)
+            set_user_has_quizzes(user_id)
         
         
         except Exception as e:
