@@ -1,3 +1,6 @@
+import random
+
+
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.main_menu import main_menu_keyboard
 from storage.messages import get_message
