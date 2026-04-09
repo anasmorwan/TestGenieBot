@@ -13,7 +13,7 @@ import random
 
 def send_daily_challenge_message():
     conn = get_connection()
-    cursor = conn.cursor
+    cursor = conn.cursor()
     user_ids = [5048253124, 6948343253]
     for user_id in user_ids:
         
