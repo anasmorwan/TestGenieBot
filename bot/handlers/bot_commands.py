@@ -90,12 +90,17 @@ def register(bot):
                 
             
             
-            quiz_message = random.choice([get_message("QUIZ_SETUP"), get_message("QUIZ_SETUP_1")])
+            quiz_message = [
+              get_message("QUIZ_SETUP"), 
+              get_message("QUIZ_SETUP_1")
+            ]
+            weights = [0.2, 0.8]
+            text = random.choices(quiz_message, weights=weights, k=1)[0]
 
             keyboard = get_testgenie_keyboard(user_id=user_id, selected_level=level, selected_count=count)
             
             bot.send_message(chat_id,
-            text=quiz_message,
+            text=text,
             reply_markup=keyboard,
             parse_mode="HTML")
 
