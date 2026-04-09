@@ -225,7 +225,7 @@ def get_top_interest(cursor, user_id):
 def get_last_branches(cursor, user_id):
     cursor.execute("""
         SELECT branch
-        FROM user_quizzes
+        FROM user_mistakes
         WHERE user_id = ?
         ORDER BY created_at DESC
         LIMIT 2
