@@ -12,6 +12,8 @@ import random
 
 
 def send_daily_challenge_message():
+    conn = get_connection()
+    cursor = conn.cursor
     user_ids = [5048253124, 6948343253]
     for user_id in user_ids:
         
@@ -20,7 +22,7 @@ def send_daily_challenge_message():
             keyboard = streak_keyboard()
             status = get_inactivity_level(user_id)
             text = get_message("NEW_USER_STREAK")
-            branches = get_last_branches(user_id)
+            branches = get_last_branches(cursor, user_id)
             clean_branches = [b[0] for b in branches if b[0]]
     
             
