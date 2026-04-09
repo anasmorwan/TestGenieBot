@@ -60,6 +60,7 @@ def register(bot):
         # معالجة اختيار المستوى
         if data.startswith("level_"):
             selected_level = data.split("_")[1]
+            selected_level_clean = selected_level.replace("🔒", "").strip()
             # شرط: المستوى يجب أن يكون واحداً من ['متقدم', 'متوسط', 'مبتدئ']
             # قاموس الترجمة من التسمية الظاهرة إلى القيمة المخزنة
             LEVEL_MAPPING = {
@@ -70,7 +71,7 @@ def register(bot):
             difficulty = LEVEL_MAPPING.get(selected_level, 'early')
 
             # عند معالجة اختيار المستخدم
-            if selected_level == "متقدم":
+            if selected_level_clean == "متقدم":
                 if not is_paid_user_active(user_id):
                     bot.answer_callback_query(call.id, "🔓 المستوى المتقدم للمشتركين فقط")
                     return
