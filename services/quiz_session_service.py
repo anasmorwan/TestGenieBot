@@ -409,7 +409,7 @@ class QuizManager:
                # else:
                 #    state["waiting_for_extension"]
 
-            if state["index"] >= len(state["questions"]):
+            if state["index"] >= len(state["questions"]) and source == "dynamic_mix":
                 if waiting_for_extension:
 
                     distribution = get_question_distribution(chat_id, total_questions=3)
