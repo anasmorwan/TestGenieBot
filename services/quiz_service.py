@@ -2,7 +2,7 @@
 from ai.llm_client import generate_smart_response
 from ai.prompts import build_quiz_prompt, pro_quiz_generator, safe_generate, build_adaptive_quiz_prompt
 from utils.json_utils import extract_json_objects_safely, parse_llm_json
-from services.usage import is_paid_user_active
+from services.usage import is_paid_user_active, get_current_pro_quota
 from ai.beta_prompts import generate_smart_batch_prompt
 from storage.messages import get_message
 from storage.session_store import user_messages_remaining
@@ -149,6 +149,10 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
                 
             
             if user_has_quizzes(user_id):
+                if get_current_pro_quota(user_id):
+                    # prompt = generate_smart_batch_prompt(user_id, content, num_questions=question_count)
+                    # raw_response = safe_generate(user_id, prompt)
+                    pass
                 pass
                 
             prompt = build_quiz_prompt(user_id, content, question_count, user_instruction=user_instruction)
