@@ -23,7 +23,7 @@ def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=
     markup.row(*level_buttons)
 
     # Row 2: Number of questions
-    counts = [15, 10, 5]
+    counts = [15, 10, 5, count_pro]
     count_buttons = []
     for count in counts:
         text = f"✅ {count} سؤال" if count == selected_count else f"{count} سؤال"
@@ -37,9 +37,10 @@ def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=
             InlineKeyboardButton(text="🔒 20 سؤال - Pro", callback_data="count_pro")
         )
     else:
+        text = f"✅ 20 سؤال - Pro" if count == selected_count else f"20 سؤال - Pro"
         markup.row(
             InlineKeyboardButton(text="⚙️ مخصص", callback_data="count_custom"),
-            InlineKeyboardButton(text="20 سؤال - Pro", callback_data="count_pro")
+            InlineKeyboardButton(text=text, callback_data="count_pro")
         )
 
     # Row 4: Start generation
