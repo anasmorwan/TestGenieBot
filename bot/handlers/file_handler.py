@@ -106,7 +106,7 @@ def register(bot):
                     return
                 elif content.startswith("not_supported"):
                     parts = content.split()
-                    ext = part[1]
+                    ext = parts[1]
                     keyboard = saved_quiz_upsell()
                     bot.edit_message_text(
                         chat_id=chat_id,
