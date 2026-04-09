@@ -489,6 +489,13 @@ class QuizManager:
                 # keyboard = share_quiz_button(quiz_code)
                 keyboard = None
                 try:
+                    if source == "mistakes":
+                        with self.lock:
+                            wrong = state.get("wrong_count", 0)
+                            total = len(state.get("questions"))
+                            wrongs_ratio = wrong / total
+
+                    
                     if wrongs_ratio <= 0.4:
                         keyboard = too_mistakes_keyboard(wrong)
                     else:
