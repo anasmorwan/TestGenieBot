@@ -4,6 +4,28 @@ from utils.json_utils import extract_json_objects_safely, parse_llm_json
 from services.usage import is_paid_user_active
 from storage.quiz_repository import store_content
 
+
+def normalize_poll(poll):
+    if not isinstance(poll, dict):
+        return None
+
+    # الحالة 1: الشكل المتوقع من البرومبت
+    if "poll" in poll:
+        return {
+            "question": poll.get("poll"),
+            "options": poll.get("answers", [])
+        }
+
+    # الحالة 2: شكل مختلف من LLM
+    if "question" in poll:
+        return {
+            "question": poll.get("question"),
+            "options": poll.get("options", [])
+        }
+
+    return None
+
+
 def generate_and_store_question(user_id, prompt):
     print(f"DEBUG: [User: {user_id}] Sending prompt to LLM...", flush=True)
     raw_poll = generate_smart_response(prompt)
