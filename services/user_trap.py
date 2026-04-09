@@ -15,7 +15,7 @@ def generate_challenge(bot, user_id, new_count, challenge_count):
         is_pro = is_paid_user_active(user_id)
         
         num_quizzes = challenge_count + new_count
-        extended_quizzes = generate_challenge_quiz(content, num_quizzes, is_pro)
+        extended_quizzes = generate_challenge_quiz(content, user_id, num_quizzes, is_pro)
         
         return extended_quizzes  # ✅ ترجع القائمة، وليس العدد
     
