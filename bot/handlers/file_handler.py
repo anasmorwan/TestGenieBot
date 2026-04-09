@@ -110,7 +110,7 @@ def register(bot):
                     keyboard = saved_quiz_upsell()
                     bot.edit_message_text(
                         chat_id=chat_id,
-                        message_id=message_id,
+                        message_id=waiting_msg.message_id,
                         text=get_message("OCR_NEEDED"),
                         reply_markup=keyboard,
                         parse_mode="HTML"
