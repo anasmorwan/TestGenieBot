@@ -26,33 +26,44 @@ def normalize_poll(poll):
     return None
 
 
+import traceback
+
 def generate_and_store_question(user_id, prompt):
     print(f"DEBUG: [User: {user_id}] Sending prompt to LLM...", flush=True)
-    raw_poll = safe_generate(user_id, prompt)
-    print("RAW LLM RESPONSE:", raw_poll, flush=True)
-    
-    
-    
+    try:
+        raw_poll = safe_generate(user_id, prompt)
+        print(f"DEBUG: [User: {user_id}] RAW TYPE: {type(raw_poll)}", flush=True)
+        print(f"DEBUG: [User: {user_id}] RAW REPR: {repr(raw_poll)[:1000]}", flush=True)
+    except Exception:
+        traceback.print_exc()
+        raise
+
     if not raw_poll:
         print(f"DEBUG: [User: {user_id}] LLM returned empty response!", flush=True)
         return None, None
 
-    print(f"DEBUG: [User: {user_id}] Parsing LLM JSON response...", flush=True)
-    poll = parse_llm_json(raw_poll)
-    print("PARSED POLL:", poll, flush=True)
-    print("TYPE:", type(poll), flush=True)
-    
+    try:
+        print(f"DEBUG: [User: {user_id}] Parsing LLM JSON response...", flush=True)
+        poll = parse_llm_json(raw_poll)
+        print(f"DEBUG: [User: {user_id}] PARSED TYPE: {type(poll)}", flush=True)
+        print(f"DEBUG: [User: {user_id}] PARSED REPR: {repr(poll)[:1000]}", flush=True)
+    except Exception:
+        traceback.print_exc()
+        raise
+
     if not poll:
         print(f"DEBUG: [User: {user_id}] Failed to parse JSON from LLM.", flush=True)
         return None, None
 
-    print(f"DEBUG: [User: {user_id}] Storing poll content in DB...", flush=True)
-    # ملاحظة: تأكد أن المتغير اسمه poll وليس result كما كان في الكود السابق
-    poll_code = store_content(user_id, poll, content_type="poll")
-    
-    print(f"DEBUG: [User: {user_id}] Poll stored successfully with code: {poll_code}", flush=True)
-    return poll_code, poll
+    try:
+        print(f"DEBUG: [User: {user_id}] Storing poll content in DB...", flush=True)
+        poll_code = store_content(user_id, poll, content_type="poll")
+        print(f"DEBUG: [User: {user_id}] Poll stored successfully with code: {poll_code}", flush=True)
+    except Exception:
+        traceback.print_exc()
+        raise
 
+    return poll_code, poll
 def generate_poll(user_id, content, channel_name=None):
     try:
         print(f"DEBUG: [User: {user_id}] Building poll prompt. Channel: {channel_name}", flush=True)
