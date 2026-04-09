@@ -13,7 +13,7 @@ from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_key
 from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from services.user_trap import update_last_active
-
+from storage.sqlite_db import set_user_has_quizzes
 import time
 
 
@@ -160,6 +160,7 @@ def register(bot):
                     message_id=waiting_msg.message_id,
                     text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
                     )
+                set_user_has_quizzes(user_id)
                 print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
             
             
