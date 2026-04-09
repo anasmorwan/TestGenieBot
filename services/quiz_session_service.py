@@ -472,6 +472,17 @@ class QuizManager:
             if source == "dynamic_mix" and not has_text:
                 bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                 return
+
+            elif is_allowed and remaining == 2 and remaining_pro != 0: 
+                keyboard = pro_quota_keyboard()
+                text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)])
+                bot.send_message(
+                    chat_id,
+                    text=text,
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
+                return
                 
             elif source == "generated_quiz" or has_text:
             
@@ -494,21 +505,7 @@ class QuizManager:
                     print(f"❌ فشل إرسال النتيجة: {e}")
                     bot.send_message(chat_id, f"خطأ: {str(e)}")
 
-            elif is_allowed and remaining == 2 and remaining_pro != 0: 
-                keyboard = pro_quota_keyboard()
-                text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)])
-                bot.send_message(
-                    chat_id,
-                    text=text,
-                    reply_markup=keyboard,
-                    parse_mode="HTML"
-                )
-                return
-                                     
-                    
-                
-
-
+        
         
         elif is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
