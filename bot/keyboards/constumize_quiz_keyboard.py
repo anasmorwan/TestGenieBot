@@ -1,6 +1,6 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from storage.session_store import user_states
-
+from services.usage import is_paid_user_active
 
 
 def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=10):
@@ -12,7 +12,10 @@ def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=
     markup = InlineKeyboardMarkup(row_width=3)
 
     # Row 1: Levels
-    levels = ['متقدم 🔒', 'متوسط', 'مبتدئ']
+    if not is_paid_user_active(user_id):
+        levels = ['متقدم 🔒', 'متوسط', 'مبتدئ']
+    else:
+        levels = ['متقدم', 'متوسط', 'مبتدئ']
     level_buttons = []
     for level in levels:
         text = f"✅ {level}" if level == selected_level else level
@@ -28,10 +31,16 @@ def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=
     markup.row(*count_buttons)
 
     # Row 3: Custom and Pro
-    markup.row(
-        InlineKeyboardButton(text="⚙️ مخصص", callback_data="count_custom"),
-        InlineKeyboardButton(text="🔒 20 سؤال - Pro", callback_data="count_pro")
-    )
+    if not is_paid_user_active(user_id):
+        markup.row(
+            InlineKeyboardButton(text="⚙️ مخصص", callback_data="count_custom"),
+            InlineKeyboardButton(text="🔒 20 سؤال - Pro", callback_data="count_pro")
+        )
+    else:
+        markup.row(
+            InlineKeyboardButton(text="⚙️ مخصص", callback_data="count_custom"),
+            InlineKeyboardButton(text="20 سؤال - Pro", callback_data="count_pro")
+        )
 
     # Row 4: Start generation
     if user_states.get(user_id) == "set_configs":
