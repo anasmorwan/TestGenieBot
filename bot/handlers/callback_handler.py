@@ -128,6 +128,12 @@ def register(bot):
                 selected_count = 20
                 user_selections[chat_id]['count'] = selected_count
                 if init_user_quiz_count(user_id, 20):
+                    new_markup = get_testgenie_keyboard(
+                        user_id=user_id,
+                        selected_level=user_selections[chat_id]['level'],
+                        selected_count=selected_count
+                    )
+                    bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
                     bot.answer_callback_query(call.id, f"✅ تمت إختيار {selected_count} سؤال")
                     
     
