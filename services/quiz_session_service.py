@@ -6,7 +6,7 @@ import threading
 from datetime import datetime
 
 from models.quiz import QuizQuestion
-from storage.sqlite_db import get_connection, get_question_distribution
+from storage.sqlite_db import get_connection, user_has_quizzes, get_question_distribution
 
 
 
@@ -469,12 +469,13 @@ class QuizManager:
             is_allowed, info = can_generate(chat_id)
             remaining_pro = get_current_pro_quota(chat_id)
             remaining = info.get("remaining")
+            has_quizzes = user_has_quizzes(user_id)
             
             if source == "dynamic_mix" and not has_text:
                 bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                 return
 
-            elif is_allowed and remaining == 2 and remaining_pro != 0: 
+            elif is_allowed and remaining == 2 and not has_quizzes: 
                 keyboard = pro_quota_keyboard()
                 text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)])
                 bot.send_message(
