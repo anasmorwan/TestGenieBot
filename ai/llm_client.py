@@ -28,8 +28,6 @@ gemini_model = None
 if GEMINI_API_KEY:
     try:
         gemini_model = genai.Client(api_key=GEMINI_API_KEY)
-        for m in gemini_model.models.list():
-            print(m.name, flush=True)
         logging.info("✅ 1. Gemini configured successfully")
     except Exception as e:
         logging.warning(f"❌ Gemini failed: {e}")
