@@ -284,7 +284,7 @@ def build_dynamic_message(user_id):
 
     xp, streak, level, last_topic = profile if profile else (0, 0, "beginner", None)
     
-    if profile is not None and mistake is not None and interest is not None and learning is not None:
+    if profile is not None and mistake is not None and interest is not None:
         parts = []
 
         # 1) Hook
