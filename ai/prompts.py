@@ -531,6 +531,11 @@ Ar_polls_prompt = """
 - اجعل الصياغة طبيعية وجذابة (ليست رسمية مفرطة ولا آلية).
 - طابق النبرة مع السياق: جاد = رسمي، أصدقاء = خفيف.
 
+- أسلوب التفاعل: أعد صياغة السؤال بطريقة طبيعية وشبيهة بأسلوب الإنسان، كما لو كنت مدير قناة تفاعلي في تلجرام.  
+  اجعل السؤال جذابًا، محادثيًا، ويثير الفضول أو العاطفة عند المناسب، مع لمسة خفيفة من المرح أحيانًا.  
+  تجنب التكرار، واللغة الجامدة، والنبرة الآلية.
+- إذا كان الطلب غير واضح أو مجرد نص عشوائي، حاول صياغة سؤال عام مناسب مع الحفاظ على طابع تفاعلي وطبيعي.
+
 المخرجات:
 {{"poll": "...", "answers": ["...", "..."]}}
 
@@ -550,6 +555,11 @@ Rules:
 - If not, generate 2–4 relevant, balanced options.
 - Keep wording natural and engaging (not robotic).
 - Match tone to context: formal for serious groups, casual for friendly ones.
+
+- Engagement Style: Rewrite the question as a human would, like an active Telegram channel manager.  
+  Make it conversational, engaging, and scroll-stopping, with subtle curiosity, emotional touch, or light humor when appropriate.  
+  Avoid repetition, stiff language, and robotic tone.
+- If the input is vague or random, create a general question that still feels natural and interactive.
 
 Output:
 {{"poll": "...", "answers": ["...", "..."]}}
