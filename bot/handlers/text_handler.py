@@ -68,7 +68,7 @@ def register(bot):
                 print(f"DEBUG: [User: {user_id}] Entered awaiting_poll_text block", flush=True)
                 if has_previous_poll(user_id):
                     print(f"DEBUG: [User: {user_id}] Found previous polls. Asking for group.", flush=True)
-                    group_selection = get_message("POLL_TO_CHAT")
+                    group_selection = get_message("POST_POLL_TEXT")
                     keyboard = get_chat_request_keyboard()    
                     bot.send_message(chat_id, group_selection, reply_markup=keyboard, parse_mode="HTML")
                     user_states[user_id] = "poll"
