@@ -29,7 +29,9 @@ def normalize_poll(poll):
 def generate_and_store_question(user_id, prompt):
     print(f"DEBUG: [User: {user_id}] Sending prompt to LLM...", flush=True)
     raw_poll = safe_generate(user_id, prompt)
-    print(f"raw_response: {raw_poll}", flush=True)
+    print("RAW LLM RESPONSE:", raw_poll, flush=True)
+    
+    
     
     if not raw_poll:
         print(f"DEBUG: [User: {user_id}] LLM returned empty response!", flush=True)
@@ -37,6 +39,8 @@ def generate_and_store_question(user_id, prompt):
 
     print(f"DEBUG: [User: {user_id}] Parsing LLM JSON response...", flush=True)
     poll = parse_llm_json(raw_poll)
+    print("PARSED POLL:", poll, flush=True)
+    print("TYPE:", type(poll), flush=True)
     
     if not poll:
         print(f"DEBUG: [User: {user_id}] Failed to parse JSON from LLM.", flush=True)
