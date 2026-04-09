@@ -76,7 +76,7 @@ def register(bot):
                     bot.answer_callback_query(call.id, "🔓 المستوى المتقدم للمشتركين فقط")
                     return
                     
-            if selected_level in ['متوسط', 'مبتدئ']:
+            if selected_level in ['متوسط', 'مبتدئ', 'متقدم']:
                 user_selections[chat_id]['level'] = selected_level
                      
             
