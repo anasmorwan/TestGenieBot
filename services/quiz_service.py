@@ -147,7 +147,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
                 parse_mode="HTML"
                 )
                 print(f"✉️ first message sent 📤", flush=True)
-            prompt = build_quiz_prompt(content, question_count, user_instruction=user_instruction)
+            prompt = build_quiz_prompt(content, num_questions=question_count, user_instruction=user_instruction)
             threading.Thread(
                 target=delayed_message,
                 args=(bot, user_id, 3, selected_text)
@@ -169,15 +169,13 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         
             save_user_knowledge(user_id, content, detected_domain)
             print(f"📖 raw user knowledge saved", flush=True)
+            return normalize_quizzes(quizzes)[:question_count]
         except Exception as e:
             print(f"ERROR: {str(e)}")
+
+        return normalize_quizzes(quizzes)[:question_count]
         
 
-        
-        # if not isinstance(quizzes, list):
-            #return []
-            
-        return normalize_quizzes(quizzes)[:question_count]
 
 
 def generate_challenge_quiz(content, user_id, num_questions, is_pro):
