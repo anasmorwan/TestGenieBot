@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Union
 from utils.json_utils import parse_llm_json
 from ai.llm_client import generate_smart_response, generate_free_response
 from services.usage import is_paid_user_active
+from storage.sqlite_db import get_user_difficulty
 
 # ============================================================
 #  Language detection
@@ -103,6 +104,8 @@ def build_pro_quiz_prompt(content: str, num_questions: int, lang: str) -> str:
     Clean prompt for pro mode.
     Keeps the schema minimal to reduce language drift.
     """
+    difficulty = get_user_difficulty(user_id)
+    
     language_instruction = build_strict_language_prompt(lang)
 
     return f"""
@@ -136,6 +139,7 @@ Return ONLY a JSON object in this structure:
 - correct_index must be between 0 and 3.
 - Keep questions concise and academically strong.
 - {surface_level_rule}
+- Difficulty level: {difficulty}
 - Do not include markdown.
 - Do not wrap the JSON in code fences.
 
@@ -404,13 +408,14 @@ surface_level_rule = "Avoid shallow, text-bound, surface-level retrieval, and de
 
 
 
-def build_quiz_prompt(content: Any, num_questions: int, user_instruction: str = None) -> str:
+def build_quiz_prompt(user_id, content: Any, num_questions: int, user_instruction: str = None) -> str:
     # --- إضافة الحماية ---
     if isinstance(content, tuple):
         content = content[0]
     content = str(content) if content else ""
     
     target_lang = detect_text_language(content)
+    difficulty = get_user_difficulty(user_id)
 
     user_part = f"User instruction:\n{user_instruction}" if user_instruction else ""
 
@@ -441,6 +446,7 @@ def build_quiz_prompt(content: Any, num_questions: int, user_instruction: str = 
 Generate {num_questions} quiz questions.
 
 {user_part}
+Difficulty level: {difficulty}
 
 {quiz_format}
 
