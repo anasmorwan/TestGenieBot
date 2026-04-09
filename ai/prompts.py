@@ -527,7 +527,7 @@ Ar_polls_prompt = """
 - طابق النبرة مع السياق: جاد = رسمي، أصدقاء = خفيف.
 
 المخرجات:
-{"question": "...", "answers": ["...", "..."]}
+{"poll": "...", "answers": ["...", "..."]}
 
 {context_clause}
 
@@ -547,7 +547,7 @@ Rules:
 - Match tone to context: formal for serious groups, casual for friendly ones.
 
 Output:
-{"question": "...", "answers": ["...", "..."]}
+{"poll": "...", "answers": ["...", "..."]}
 
 {context_clause}
 
