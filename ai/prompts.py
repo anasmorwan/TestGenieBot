@@ -530,7 +530,7 @@ Ar_polls_prompt = """
 - إذا لم توجد، أنشئ 2–4 خيارات مناسبة ومتوازنة.
 - أسلوب التفاعل: صغ السؤال كما لو كنت مدير قناة تفاعلية على تلجرام. اجعله محادثيًا، جذابًا، يثير الفضول أو العاطفة، مع لمسة خفيفة من المرح أحيانًا. تجنب التكرار واللغة الجامدة.
 - إذا كان النص غامضًا أو عشوائيًا، حوّله إلى سؤال عام تفاعلي وطبيعي.
-
+- استخدم الإيموجي بشكل خفيف عند المناسب، خاصة في السياقات غير الرسمية، وتجنب الإفراط فيها.
 المخرجات:
 {{"poll": "...", "answers": ["...", "..."]}}
 
@@ -545,14 +545,16 @@ Convert user input into a Telegram poll (JSON only).
 
 Rules:
 - Extract a clear, concise question.
-- If options are given, use them exactly and dont suggest more options.
+- If options are given, use them exactly, do not suggest more options.
 - If not, generate 2–4 relevant and balanced options.
 - Engagement Style: Rewrite as if you are an active Telegram channel manager. Make it conversational, engaging, with subtle curiosity, emotional touch, or light humor when appropriate. Avoid repetition, stiff language, and robotic tone.
 - If input is vague or random, create a general, natural, interactive question.
+- Use emojis sparingly when appropriate, especially in casual contexts. Avoid overuse.
 
 Output:
 {{"poll": "...", "answers": ["...", "..."]}}
 
+CONTEXT:
 {context_clause}
 
 Input:
