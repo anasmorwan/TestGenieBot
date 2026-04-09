@@ -517,45 +517,41 @@ Content to analyze:
 #  برومبت الاستطلاعات
 # ============================================================
 Ar_polls_prompt = """
-أنت خبير في صياغة استطلاعات الرأي (Polls) التفاعلية لمنصة تلجرام.
-مهمتك هي تحليل نص المستخدم وتحويله إلى استطلاع رأي احترافي بصيغة JSON.
+حوّل نص المستخدم إلى استطلاع تلجرام بصيغة JSON فقط.
 
 القواعد:
-1. استخلص السؤال الرئيسي بوضوح واجعله قصيراً وجذاباً.
-2. إذا قدم المستخدم خيارات، استخدمها كما هي (لا تزد عليها ولا تغير معناها).
-3. إذا لم يقدم المستخدم خيارات، صغ خيارات ذكية (بحد أقصى 4 وحد أدنى 2) بناءً على سياق السؤال.
-4. إذا كان الطلب غير واضح أو مجرد نص عشوائي، حاول صياغة سؤال عام حوله.
-5. **أسلوب التفاعل**: أعد صياغة السؤال بأسلوب طبيعي ومتجدد يجذب الانتباه ويحفّز التفاعل. احرص على تنويع الصياغة واستخدام نبرة محادثة بشرية، مع إدخال عنصر فضول أو تأثير عاطفي عند المناسب. تجنب التكرار واللغة الجامدة أو الآلية.
+- استخرج سؤالًا واضحًا وقصيرًا.
+- إن وُجدت خيارات، استخدمها كما هي.
+- إن لم توجد، أنشئ 2-4 خيارات مناسبة ومتوازنة.
+- اجعل الصياغة طبيعية وجذابة (ليست رسمية مفرطة ولا آلية).
+- طابق النبرة مع السياق: جاد = رسمي، أصدقاء = خفيف.
 
-المخرجات يجب أن تكون JSON فقط بالمفاتيح التالية:
-- "poll": نص السؤال.
-- "answers": قائمة (List) بالخيارات.
+المخرجات:
+{"poll": "...", "answers": ["...", "..."]}
 
 {context_clause}
 
-نص المستخدم:
+النص:
 {user_input}
 """
 
 
 en_polls_prompt = """
-Act as an expert Telegram Poll Architect. Your task is to analyze the user's input and structure it into a professional poll format.
+Convert user input into a Telegram poll (JSON only).
 
-Guidelines:
-1. **Extraction**: Identify the core question. If the user input is vague, rephrase it into a clear, engaging poll question.
-2. **Options**: 
-   - If the user provided specific options, use them exactly as they are.
-   - If no options are provided, generate 2 to 4 contextually relevant and high-quality options.
-3. **Smart Context**: Detect if the user wants a "Quiz" (one correct answer) or a "Regular Poll" (opinion-based).
-4. **Engagement Style**: Rewrite the question to sound human, engaging, and scroll-stopping. Prefer conversational tone, subtle curiosity, or a hook. Avoid generic or robotic phrasing.
+Rules:
+- Extract a clear, concise question.
+- If options are given, keep them unchanged.
+- If not, generate 2–4 relevant, balanced options.
+- Keep wording natural and engaging (not robotic).
+- Match tone to context: formal for serious groups, casual for friendly ones.
 
-Output MUST be a valid JSON object with these keys:
-- "poll": (String) The final question text.
-- "answers": (Array of Strings) The options for the poll.
+Output:
+{"poll": "...", "answers": ["...", "..."]}
 
 {context_clause}
 
-User Input:
+Input:
 {user_input}
 """
 
