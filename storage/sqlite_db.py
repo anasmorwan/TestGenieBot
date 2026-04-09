@@ -358,7 +358,7 @@ def get_user_knowledge(user_id):
         
 
 #--------------------------
-#    🔹 دوال مساعدة
+#    🔹 دوال مساعدة (الصعوبة و عدد الاختبارات)
 #--------------------------
 def update_user_difficulty(user_id, difficulty):
     """
@@ -501,6 +501,37 @@ def get_user_question_count(user_id):
     finally:
         conn.close()
 
+#--------------------------
+#    🔹 دوال مساعدة اعدادات config المستخدمين
+#--------------------------
+def set_user_has_quizzes(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+    
+    c.execute("""
+        UPDATE users 
+        SET has_quizzes = 1 
+        WHERE user_id = ?
+    """, (user_id,))
+    
+    conn.commit()
+    conn.close()
+
+def user_has_quizzes(user_id):
+    conn = get_connection()
+    c = conn.cursor()
+    
+    c.execute("""
+        SELECT has_quizzes FROM users 
+        WHERE user_id = ?
+    """, (user_id,))
+    
+    result = c.fetchone()
+    conn.close()
+    
+    # ترجع True إذا كانت القيمة 1، وإلا False
+    return result is not None and result[0] == 1
+    
 #--------------------------
 #    🔹 دوال مساعدة user_major
 #--------------------------
@@ -789,6 +820,10 @@ def safe_add_column():
     if not column_exists("user_mistakes", "branch"):
         c.execute("""
         ALTER TABLE user_mistakes ADD COLUMN branch TEXT 
+        """)
+    if not column_exists("users", "has_quizzes"):
+        c.execute("""
+        ALTER TABLE users ADD COLUMN has_quizzes BOOLEAN DEFAULT 0 
         """)
         
     
