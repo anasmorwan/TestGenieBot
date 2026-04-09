@@ -69,16 +69,16 @@ def register(bot):
             }
 
             # عند معالجة اختيار المستخدم
-            if selected_level in ['متوسط', 'مبتدئ']:
-                user_selections[chat_id]['level'] = selected_level
             if selected_level == "متقدم":
                 if not is_paid_user_active(user_id):
                     bot.answer_callback_query(call.id, "🔓 المستوى المتقدم للمشتركين فقط")
                     return
-
                 else:
-                    user_selections[chat_id]['level'] = selected_level            
-    
+                    user_selections[chat_id]['level'] = selected_level
+                    
+            if selected_level in ['متوسط', 'مبتدئ']:
+                user_selections[chat_id]['level'] = selected_level
+                     
             # ترجمة التسمية إلى القيمة المناسبة للدالة
             difficulty = LEVEL_MAPPING.get(selected_level, 'early')
             
