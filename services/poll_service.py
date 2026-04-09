@@ -78,6 +78,7 @@ def generate_poll(user_id, content, channel_name=None):
         return poll_code, poll
 
     except Exception as e:
-        print(f"DEBUG: [User: {user_id}] Exception in generate_poll: {str(e)}", flush=True)
-        raise ValueError(f"خطأ توليد الاستطلاع: {str(e)}")
-
+        import traceback
+        traceback.print_exc()
+        print(f"DEBUG: [User: {user_id}] Exception in generate_poll: {repr(e)}", flush=True)
+        raise ValueError(f"خطأ توليد الاستطلاع: {repr(e)}") from e
