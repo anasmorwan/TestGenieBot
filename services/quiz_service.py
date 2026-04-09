@@ -180,11 +180,11 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         return normalize_quizzes(quizzes)[:question_count]
 
 
-def generate_challenge_quiz(content, num_questions, is_pro):
+def generate_challenge_quiz(content, user_id, num_questions, is_pro):
     try:
         
         prompt = build_adaptive_quiz_prompt(content, num_questions, is_pro)
-        raw_response = generate_smart_response(prompt)
+        raw_response = safe_generate(user_id, prompt)
         
         # 🧪 اطبع الرد الخام فوراً قبل أي معالجة
         print(f"DEBUG: Raw AI Response: {raw_response[:200]}...", flush=True)
