@@ -21,16 +21,23 @@ def send_daily_challenge_message():
             status = get_inactivity_level(user_id)
             text = get_message("NEW_USER_STREAK")
             branches = get_last_branches(user_id)
+            clean_branches = [b[0] for b in branches if b[0]]
+    
             
             
             if status == "new":
                 text = random.choice([get_message("NEW_USER_STREAK", streak=streak), get_message("USER_STREAK", streak=streak)])
             
             if status == "active":
-                if 
+                if clean_branches:
+                    if random.random() < 0.8:  # 80% للخيار الثاني
+                        text = build_dynamic_message(user_id)
+                    else:
+                        text = random.choice([get_message("ACTIVE_USER_STREAK", streak=streak), build_dynamic_message(user_id), get_message("RETURNING_USER_STREAK")])
+                        
                 text = random.choice([get_message("ACTIVE_USER_STREAK", streak=streak), build_dynamic_message(user_id), get_message("RETURNING_USER_STREAK")])
                 if text is False:
-                    text = active_user_streak
+                    text = get_message("ACTIVE_USER_STREAK")
                 
                 
             elif status == "cooling":
