@@ -222,6 +222,18 @@ def get_top_interest(cursor, user_id):
     
     return cursor.fetchone()
 
+def get_last_branches(cursor, user_id):
+    cursor.execute("""
+        SELECT branch
+        FROM user_quizzes
+        WHERE user_id = ?
+        ORDER BY created_at DESC
+        LIMIT 2
+    """, (user_id,))
+    
+    return cursor.fetchall()  # تعيد قائمة
+
+
 def get_top_interest(cursor, user_id):
     cursor.execute("""
         SELECT domain_name, points
@@ -233,23 +245,23 @@ def get_top_interest(cursor, user_id):
     
     return cursor.fetchone()
 
-def get_last_learning(cursor, user_id):
-    cursor.execute("""
-        SELECT specialty, updated_at
-        FROM user_knowledge
-        WHERE user_id = ?
-    """, (user_id,))
+# def get_last_learning(cursor, user_id):
+ #   cursor.execute("""
+  #      SELECT specialty, updated_at
+  #      FROM user_knowledge
+  #      WHERE user_id = ?
+ #   """, (user_id,))
     
-    row = cursor.fetchone()
+  #  row = cursor.fetchone()
     
-    if not row:
-        return None
+#    if not row:
+   #     return None
     
-    specialty, updated_at = row
-    return {
-        "specialty": specialty,
-        "updated_at": updated_at
-    }
+  #  specialty, updated_at = row
+  #  return {
+     #   "specialty": specialty,
+    #    "updated_at": updated_at
+  #  }
 
 def get_user_profile(cursor, user_id):
     cursor.execute("""
@@ -267,7 +279,8 @@ def build_dynamic_message(user_id):
     profile = get_user_profile(cursor, user_id)
     mistake = get_top_mistake(cursor, user_id)
     interest = get_top_interest(cursor, user_id)
-    learning = get_last_learning(cursor, user_id)
+    # learning = get_last_learning(cursor, user_id)
+    branches = get_last_branches(cursor, user_id)
 
     xp, streak, level, last_topic = profile if profile else (0, 0, "beginner", None)
     
@@ -286,8 +299,11 @@ def build_dynamic_message(user_id):
             parts.append(f"📚 واضح أنك مهتم بـ {domain}")
 
         # 3) آخر تعلم (المهم)
-        if learning and learning.get("specialty"):
-            parts.append(f"🧠 آخر مراجعة كانت عن {learning['specialty']}")
+        if branches:
+            first_branch = branches[0][0]
+            if len(branches) > 1:
+                second_branch = branches[1][0]
+            parts.append(f"🧠 آخر مراجعة كانت عن الـ{first_branch}")
 
         # 4) الأخطاء
         if mistake:
@@ -765,6 +781,12 @@ def safe_add_column():
         c.execute("""
         ALTER TABLE users_trap ADD COLUMN last_quiz_time TEXT 
         """)
+
+    if not column_exists("user_mistakes", "branch"):
+        c.execute("""
+        ALTER TABLE user_mistakes ADD COLUMN branch TEXT 
+        """)
+        
     
 
     conn.commit()
