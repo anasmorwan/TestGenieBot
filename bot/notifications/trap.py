@@ -12,10 +12,10 @@ import random
 
 
 def send_daily_challenge_message():
-    conn = get_connection()
-    cursor = conn.cursor()
     user_ids = [5048253124, 6948343253]
     for user_id in user_ids:
+        conn = get_connection()
+        cursor = conn.cursor()
         
         if is_inactive(user_id):
             streak, xp = update_progress(user_id)
