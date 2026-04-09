@@ -191,21 +191,31 @@ RAW OUTPUT:
 # ============================================================
 #  Validation helpers
 # ============================================================
+def safe_generate(user_id, prompt):
+    try:
+        return generate_smart_response(prompt)
+    except Exception as e:
+        print(f"DEBUG: [User: {user_id}] safe_generate error: {e}", flush=True)
+        return None
 def safe_generate(user_id, prompt: str) -> str:
     """
     دالة وسيطة لضمان استخراج النص فقط في حال كانت 
     generate_smart_response تُرجع Tuple
     """  
-    if is_paid_user_active(user_id):    
+    try:
+        if is_paid_user_active(user_id):    
+            response = generate_smart_response(prompt)
+            if isinstance(response, tuple):
+                return response[0]
+            return response
+    
         response = generate_smart_response(prompt)
         if isinstance(response, tuple):
             return response[0]
         return response
-    
-    response = generate_smart_response(prompt)
-    if isinstance(response, tuple):
-        return response[0]
-    return response
+    except Exception as e:
+        print(f"DEBUG: [User: {user_id}] safe_generate error: {e}", flush=True)
+        return None
 
 
 def normalize_llm_output(full_data: Any) -> Dict[str, Any]:
