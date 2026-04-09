@@ -69,11 +69,17 @@ def register(bot):
             }
 
             # عند معالجة اختيار المستخدم
-            if selected_level in ['متقدم', 'متوسط', 'مبتدئ']:
+            if selected_level in ['متوسط', 'مبتدئ']:
                 user_selections[chat_id]['level'] = selected_level
+            if selected_level == "متقدم":
+                if not is_paid_user_active(user_id):
+                    bot.answer_callback_query(call.id, "🔓 هذه الميزة للمشتركين المميزين فقط - قم بالترقية الآن!")
+                else:
+                    user_selections[chat_id]['level'] = selected_level            
     
             # ترجمة التسمية إلى القيمة المناسبة للدالة
             difficulty = LEVEL_MAPPING.get(selected_level, 'early')
+            
             if update_user_difficulty(user_id, difficulty):
                 # تحديث لوحة المفاتيح
                 new_markup = get_testgenie_keyboard(
@@ -115,7 +121,7 @@ def register(bot):
             # شرط: زر Pro (20 سؤال)
             elif count_value == "pro":
                 if not is_paid_user_active(user_id):
-                    bot.answer_callback_query(call.id, "🔓 هذه الميزة للمشتركين المميزين فقط - قم بالترقية الآن!", show_alert=True)
+                    bot.answer_callback_query(call.id, "🔓 هذه الميزة للمشتركين المميزين فقط - قم بالترقية الآن!")
                 selected_count = 20
                 if init_user_quiz_count(user_id, 20):
                     bot.answer_callback_query(call.id, f"✅ تمت إختيار {selected_count} سؤال")
