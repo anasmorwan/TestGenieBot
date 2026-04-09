@@ -3,7 +3,7 @@ from storage.session_store import user_states
 from services.usage import is_paid_user_active
 
 
-def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=10):
+def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=10, is_set=False):
     """
     Returns InlineKeyboardMarkup for TestGenie test creation
     selected_level: 'متقدم', 'متوسط', 'مبتدئ'
@@ -48,8 +48,13 @@ def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=
             InlineKeyboardButton(text="🚀 ابدأ توليد الاختبار الآن", callback_data="start_test")
         )
     else:
-        markup.row(
-            InlineKeyboardButton(text="🚀 حفظ الإعدادات", callback_data="start_test")
-        )
+        if is_set:
+            markup.row(
+                InlineKeyboardButton(text="👇 إبدأ الآن", callback_data="start_test")
+            )
+        else:
+            markup.row(
+                InlineKeyboardButton(text="🚀 حفظ الإعدادات", callback_data="start_test")
+            )
         
     return markup
