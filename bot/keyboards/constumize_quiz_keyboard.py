@@ -12,7 +12,7 @@ def get_testgenie_keyboard(user_id, selected_level='متوسط', selected_count=
     markup = InlineKeyboardMarkup(row_width=3)
 
     # Row 1: Levels
-    levels = ['متقدم', 'متوسط', 'مبتدئ']
+    levels = ['متقدم 🔒', 'متوسط', 'مبتدئ']
     level_buttons = []
     for level in levels:
         text = f"✅ {level}" if level == selected_level else level
