@@ -481,7 +481,7 @@ def build_adaptive_quiz_prompt(content: str, num_questions: int, is_pro: bool) -
 1. OUTPUT: ONLY a valid JSON object. No conversational text or markdown blocks.
 
 2. FORMAT: 
-{QUIZ_FORMAT}
+{quiz_format}
 
 3. LIMITS: Question < 250 chars. EACH option < 95 chars. Explanation < 200 chars.
 4. QUALITY: Avoid "All of the above". Focus on academic reasoning.
