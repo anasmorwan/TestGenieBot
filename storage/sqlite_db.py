@@ -12,6 +12,15 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS quizzes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content_hash TEXT UNIQUE NOT NULL,
+        quiz_data TEXT NOT NULL,
+        created_at TEXT NOT NULL
+)
+""")
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_knowledge (
