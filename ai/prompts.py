@@ -526,7 +526,7 @@ Ar_polls_prompt = """
 
 القواعد:
 - استخرج سؤالًا واضحًا وقصيرًا.
-- إذا وُجدت خيارات، استخدمها كما هي.
+- إذا وُجدت خيارات، استخدمها كما هي لا تزد عليها.
 - إذا لم توجد، أنشئ 2–4 خيارات مناسبة ومتوازنة.
 - أسلوب التفاعل: صغ السؤال كما لو كنت مدير قناة تفاعلية على تلجرام. اجعله محادثيًا، جذابًا، يثير الفضول أو العاطفة، مع لمسة خفيفة من المرح أحيانًا. تجنب التكرار واللغة الجامدة.
 - إذا كان النص غامضًا أو عشوائيًا، حوّله إلى سؤال عام تفاعلي وطبيعي.
@@ -545,7 +545,7 @@ Convert user input into a Telegram poll (JSON only).
 
 Rules:
 - Extract a clear, concise question.
-- If options are given, use them exactly.
+- If options are given, use them exactly and dont add more options.
 - If not, generate 2–4 relevant and balanced options.
 - Engagement Style: Rewrite as if you are an active Telegram channel manager. Make it conversational, engaging, with subtle curiosity, emotional touch, or light humor when appropriate. Avoid repetition, stiff language, and robotic tone.
 - If input is vague or random, create a general, natural, interactive question.
