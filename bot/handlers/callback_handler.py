@@ -73,7 +73,9 @@ def register(bot):
                 user_selections[chat_id]['level'] = selected_level
             if selected_level == "متقدم":
                 if not is_paid_user_active(user_id):
-                    bot.answer_callback_query(call.id, "🔓 هذه الميزة للمشتركين المميزين فقط - قم بالترقية الآن!")
+                    bot.answer_callback_query(call.id, "🔓 المستوى المتقدم للمشتركين فقط")
+                    return
+
                 else:
                     user_selections[chat_id]['level'] = selected_level            
     
@@ -118,11 +120,13 @@ def register(bot):
                     bot.answer_callback_query(call.id, "✨ أرسل عدد أسئلة من [1 — 20]")
                     user_states[user_id] = count_value
         
-            # شرط: زر Pro (20 سؤال)
+            # شط: زر Pro (20 سؤال)
             elif count_value == "pro":
                 if not is_paid_user_active(user_id):
-                    bot.answer_callback_query(call.id, "🔓 هذه الميزة للمشتركين المميزين فقط - قم بالترقية الآن!")
+                    bot.answer_callback_query(call.id, "🔓 20 سؤال للمشتركين فقط - قم بالترقية الآن!")
+                    return
                 selected_count = 20
+                user_selections[chat_id]['count'] = selected_count
                 if init_user_quiz_count(user_id, 20):
                     bot.answer_callback_query(call.id, f"✅ تمت إختيار {selected_count} سؤال")
                     
@@ -131,6 +135,13 @@ def register(bot):
         elif data == "start_test":
             level = user_selections[chat_id]['level']
             count = user_selections[chat_id]['count']
+            if level == "متقدم" and not is_paid_user_active(user_id):
+                bot.answer_callback_query(call.id, "🔓 المستوى المتقدم للمشتركين فقط", show_alert=True)
+                return
+
+            if count == 20 and not is_paid_user_active(user_id):
+                bot.answer_callback_query(call.id, "🔓 20 سؤال للمشتركين فقط", show_alert=True)
+                return
         
             # شرط: التأكد من وجود مستوى وعدد صالحين قبل البدء
             if level and count:
