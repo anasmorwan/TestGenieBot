@@ -270,7 +270,7 @@ class QuizManager:
     def save_mistake(self, user_id, q_obj):
         conn = get_connection()
         c = conn.cursor()
-    
+
         options_json = json.dumps(q_obj.options)
     
         # 🔴 التحقق من الحد الأقصى للمستخدم المجاني
@@ -287,15 +287,15 @@ class QuizManager:
             if mistake_count >= 10:
                 conn.close()
                 return False  # لم يتم الحفظ
-    
+
         # التحقق من وجود السؤال
         c.execute("""
             SELECT id, fail_count, correct_count FROM user_mistakes 
             WHERE user_id = ? AND question_text = ?
         """, (user_id, q_obj.question))
-    
+
         existing = c.fetchone()
-    
+
         if existing:
             # ✅ تحديث الخطأ الموجود: زيادة fail_count وإعادة تعيين correct_count
             c.execute("""
@@ -304,21 +304,22 @@ class QuizManager:
                     correct_index = ?, 
                     explanation = ?, 
                     last_failed = ?, 
+                    branch = ?,
                     fail_count = fail_count + 1,
                     correct_count = 0
                 WHERE user_id = ? AND question_text = ?
             """, (options_json, q_obj.correct_index, q_obj.explanation, 
-                  datetime.now().isoformat(), user_id, q_obj.question))
+                  datetime.now().isoformat(), q_obj.branch, user_id, q_obj.question))
         else:
             # ✅ إدراج خطأ جديد
             c.execute("""
                 INSERT INTO user_mistakes 
                 (user_id, question_text, options, correct_index, explanation, 
-                 last_failed, created_at, fail_count, correct_count)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0)
+                 last_failed, created_at, branch, fail_count, correct_count)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0)
             """, (user_id, q_obj.question, options_json, q_obj.correct_index, 
-                  q_obj.explanation, datetime.now().isoformat(), datetime.now().isoformat()))
-    
+                    q_obj.explanation, datetime.now().isoformat(), datetime.now().isoformat(), q_obj.branch))
+
         conn.commit()
         conn.close()
         return True
