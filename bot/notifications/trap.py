@@ -24,7 +24,7 @@ def send_daily_challenge_message():
             text = get_message("NEW_USER_STREAK")
             branches = get_last_branches(cursor, user_id)
             clean_branches = [b[0] for b in branches if b[0]]
-            conn.close()
+            
     
             
             
@@ -69,6 +69,7 @@ def send_daily_challenge_message():
                 
             try:
                 mybot.send_message(chat_id=user_id, text=text, reply_markup=keyboard, parse_mode="HTML")
+                conn.close()
                 
             except Exception as e:
                 print(f"خطأ في إرسال تحدي اليوم:\n\n {e}")
