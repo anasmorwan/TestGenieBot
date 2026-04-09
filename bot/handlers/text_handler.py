@@ -10,7 +10,7 @@ from services.backup_service import smart_restore, is_db_valid
 from bot.keyboards.quiz_buttons import quiz_keyboard
 from storage.session_store import user_states, get_state_safe, get_chat_title, temp_texts
 from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
-from services.poll_service import generate_poll
+from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from services.user_trap import update_last_active
 
@@ -98,9 +98,14 @@ def register(bot):
                     action_keyboard = send_poll_keyboard(user_id, poll_code) 
                 
                     # استخراج البيانات
-                    q_text = poll.get('poll', 'Poll') if isinstance(poll, dict) else poll.question
-                    q_options = poll.get('answers', []) if isinstance(poll, dict) else poll.options
-                
+                    normalized = normalize_poll(poll)
+
+                    if not normalized:
+                        raise ValueError(f"Invalid poll structure: {poll}")
+
+                    q_text = normalized["question"]
+                    q_options = normalized["options"]
+                    
                     bot.delete_message(chat_id, waiting_msg.message_id)
 
                     bot.send_poll(
