@@ -1,6 +1,6 @@
 from bot.bot_instance import mybot
 from services.user_trap import should_show_daily, get_inactivity_level, update_progress, get_user_content, is_inactive
-from storage.sqlite_db import get_connection, build_dynamic_message
+from storage.sqlite_db import get_connection, build_dynamic_message, get_last_branches
 from storage.session_store import user_streak
 from datetime import timedelta, datetime, date
 from bot.keyboards.actions_keyboard import streak_keyboard
@@ -20,13 +20,14 @@ def send_daily_challenge_message():
             keyboard = streak_keyboard()
             status = get_inactivity_level(user_id)
             text = get_message("NEW_USER_STREAK")
-            
+            branches = get_last_branches(user_id)
             
             
             if status == "new":
                 text = random.choice([get_message("NEW_USER_STREAK", streak=streak), get_message("USER_STREAK", streak=streak)])
             
             if status == "active":
+                if 
                 text = random.choice([get_message("ACTIVE_USER_STREAK", streak=streak), build_dynamic_message(user_id), get_message("RETURNING_USER_STREAK")])
                 if text is False:
                     text = active_user_streak
