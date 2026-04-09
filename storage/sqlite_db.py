@@ -282,6 +282,10 @@ def build_dynamic_message(user_id):
     # learning = get_last_learning(cursor, user_id)
     branches = get_last_branches(cursor, user_id)
 
+    # استخراج القيم الحقيقية فقط
+    clean_branches = [b[0] for b in branches if b[0]]
+    
+
     xp, streak, level, last_topic = profile if profile else (0, 0, "beginner", None)
     
     if profile is not None and mistake is not None and interest is not None:
@@ -299,13 +303,12 @@ def build_dynamic_message(user_id):
             parts.append(f"📚 واضح أنك مهتم بـ {domain}")
 
         # 3) آخر تعلم (المهم)
-        if branches:
-            if branches is not None:
-                first_branch = branches[0][0]
-                if len(branches) > 1:
-                    second_branch = branches[1][0]
-                parts.append(f"🧠 آخر مراجعة كانت عن الـ{first_branch}")
-
+        if clean_branches:
+            first_branch = clean_branches[0]
+            if len(clean_branches) > 1:
+                second_branch = clean_branches[1]
+            parts.append(f"🧠 آخر مراجعة كانت عن الـ{first_branch}")
+    
         # 4) الأخطاء
         if mistake:
             q_text, fails, corrects = mistake
