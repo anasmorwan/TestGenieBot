@@ -24,6 +24,7 @@ def send_daily_challenge_message():
             text = get_message("NEW_USER_STREAK")
             branches = get_last_branches(cursor, user_id)
             clean_branches = [b[0] for b in branches if b[0]]
+            conn.close()
     
             
             
