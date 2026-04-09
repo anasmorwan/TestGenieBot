@@ -37,6 +37,8 @@ def register(bot):
         chat_id = msg.chat.id
         text = msg.text
         update_last_active(user_id)
+        if text.startswith("/"):
+            return
 
         try:
             plan = check_subscription_valid(user_id)
