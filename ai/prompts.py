@@ -191,12 +191,7 @@ RAW OUTPUT:
 # ============================================================
 #  Validation helpers
 # ============================================================
-def safe_generate(user_id, prompt):
-    try:
-        return generate_smart_response(prompt)
-    except Exception as e:
-        print(f"DEBUG: [User: {user_id}] safe_generate error: {e}", flush=True)
-        return None
+
 def safe_generate(user_id, prompt: str) -> str:
     """
     دالة وسيطة لضمان استخراج النص فقط في حال كانت 
