@@ -32,6 +32,7 @@ from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
 from ‎services.referral import reward_referral_if_needed
 from bot.keyboards.referral_keyboard import referral_keyboard
+from bot.keyboards.customized_poll import get_poll_customize_keyboard
 import random
 import json
 import time
@@ -120,7 +121,7 @@ def register(bot):‎
 
         elif data == "customize_poll":
             text = temp_texts.get(user_id)
-            keyboard = customize_poll_keyboard(text)
+            keyboard = get_poll_customize_keyboard()
             bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
