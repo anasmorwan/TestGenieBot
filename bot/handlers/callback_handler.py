@@ -24,7 +24,7 @@ from services.user_trap import generate_challenge
 from services.usage import get_subscription_full, can_generate, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
-from storage.session_store import user_selections, user_states
+from storage.session_store import user_selections, user_states, user_poll_selections
 from storage.sqlite_db import get_question_distribution, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
 from services.user_trap import update_last_active 
 from storage.session_store import user_states, temp_texts
@@ -41,6 +41,13 @@ import time
 
 
 def register(bot):‎
+    def clean_goal(text):
+        return text.replace("📊", "").replace("⚖️", "").replace("🤝", "").strip()
+
+  
+    def clean_tone(text):
+        return text.replace("😊", "").replace("🎯", "").replace("🔥", "").strip()
+        
     def show_referral_message(bot, chat_id, user_id):
         keyboard = referral_keyboard(user_id)
         bot.send_message(
@@ -53,6 +60,8 @@ def register(bot):‎
         func=lambda call: any([
             call.data.startswith("post_poll:"),
             call.data.startswith("regenerate:"),
+            call.data.startswith("goal_")
+            call.data.startswith("tone_")
             call.data == "customize_poll"
             
         ])
@@ -82,7 +91,54 @@ def register(bot):‎
             )
             user_states[user_id] = f"post_poll:{poll_code}"
             
+        elif data.startswith("customize_poll"):         
+            keyboard = get_poll_customize_keyboard()
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=get_message("CUSTOMIZE_POLL"),
+                reply_markup=keyboard,
+                parse_mode="HTML"
+            )
+        
+    
+        if chat_id not in user_selections:
+            user_poll_selections[chat_id] = {'selected_tone': 'ودي', 'selected_goal': 'رأي'}
+
+        if data.startswith("goal_"):
+            selected_goal = data.split("_", 1)[1]  # تأخذ النص كاملاً مثل "📊 رأي"
+            selected_goal_clean = clean_goal(selected_goal)
             
+            user_poll_selections[chat_id]['selected_goal'] = selected_goal_clean
+        
+            # تحديث لوحة المفاتيح
+            new_markup = get_poll_customize_keyboard(
+                selected_tone=user_selections[chat_id]['selected_tone'],
+                selected_goal=selected_goal
+            )
+            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+            bot.answer_callback_query(call.id, f"تم اختيار الهدف: {selected_goal}")
+    
+        # معالجة اختيار الطابع
+        elif data.startswith("tone_"):
+            selected_tone = data.split("_", 1)[1]  # تأخذ النص كاملاً مثل "😊 ودي"
+            selected_tone_clean = clean_tone(selected_tone)
+            user_poll_selections[chat_id]['selected_tone'] = selected_tone_clean
+        
+            # تحديث لوحة المفاتيح
+            new_markup = get_poll_customize_keyboard(
+                selected_tone=selected_tone,
+                selected_goal=user_selections[chat_id]['selected_goal']
+            )
+            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+            bot.answer_callback_query(call.id, f"تم اختيار الطابع: {selected_tone}")
+    
+        # معالجة التخصيص المتقدم
+        elif data == "poll_advanced":
+            bot.answer_callback_query(call.id, "⚙️ سيتم فتح نافذة التخصيص المتقدم قريباً")
+            # هنا يمكن إرسال لوحة مفاتيح متقدمة أو رسالة جديدة
+    
+
         elif data.startswith("regenerate"):   
             try:
                 allowed, info = can_generate(user_id)
@@ -129,57 +185,9 @@ def register(bot):‎
                 print("File handler ERROR:", e, flush=True)
                 bot.send_message(chat_id, f"❌ Error: {str(e)}")
 
-        elif data.startswith("customize_poll"):
-            
-            keyboard = get_poll_customize_keyboard()
-            bot.edit_message_text(
-                chat_id=chat_id,
-                message_id=message_id,
-                text=get_message("CUSTOMIZE_POLL"),
-                reply_markup=keyboard,
-                parse_mode="HTML"
-            )
-            pass
-        
-    
-        if chat_id not in user_selections:
-            user_selections[chat_id] = {'selected_tone': '😊 ودي', 'selected_goal': '📊 رأي'}
 
-        if data.startswith("goal_"):
-            selected_goal = data.split("_", 1)[1]  # تأخذ النص كاملاً مثل "📊 رأي"
-            user_selections[chat_id]['selected_goal'] = selected_goal
-        
-            # تحديث لوحة المفاتيح
-            new_markup = get_poll_customize_keyboard(
-                selected_tone=user_selections[chat_id]['selected_tone'],
-                selected_goal=selected_goal
-            )
-            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
-            bot.answer_callback_query(call.id, f"تم اختيار الهدف: {selected_goal}")
-    
-        # معالجة اختيار الطابع
-        elif data.startswith("tone_"):
-            selected_tone = data.split("_", 1)[1]  # تأخذ النص كاملاً مثل "😊 ودي"
-            user_selections[chat_id]['selected_tone'] = selected_tone
-        
-            # تحديث لوحة المفاتيح
-            new_markup = get_poll_customize_keyboard(
-                selected_tone=selected_tone,
-                selected_goal=user_selections[chat_id]['selected_goal']
-            )
-            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
-            bot.answer_callback_query(call.id, f"تم اختيار الطابع: {selected_tone}")
-    
-        # معالجة التخصيص المتقدم
-        elif data == "poll_advanced":
-            bot.answer_callback_query(call.id, "⚙️ سيتم فتح نافذة التخصيص المتقدم قريباً")
-            # هنا يمكن إرسال لوحة مفاتيح متقدمة أو رسالة جديدة
-    
-        # معالجة إعادة التوليد
-        elif data == "regenerate":
-            bot.answer_callback_query(call.id, "🚀 جاري إعادة توليد الاستطلاع...")
-            # هنا يتم استدعاء دالة توليد الاستطلاع بناءً على الإعدادات الحالية
-            # مثلاً: generate_poll(chat_id, user_selections[chat_id]['selected_goal'], user_selections[chat_id]['selected_tone'])
+
+
 
     @bot.callback_query_handler(
         func=lambda call: any([
