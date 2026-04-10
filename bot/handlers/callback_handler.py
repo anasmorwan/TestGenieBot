@@ -119,8 +119,11 @@ def register(bot):‎
                 print("File handler ERROR:", e, flush=True)
                 bot.send_message(chat_id, f"❌ Error: {str(e)}")
 
-        elif data == "customize_poll":
-            text = temp_texts.get(user_id)
+        elif data.startswith("customize_poll"):
+            parts = data.split(":")
+            text = parts[1]
+            # text = temp_texts.get(user_id)
+            #selected_tone="ودي", selected_goal="رأي")
             keyboard = get_poll_customize_keyboard()
             bot.edit_message_text(
                 chat_id=chat_id,
