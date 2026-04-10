@@ -2,7 +2,7 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
 
-def get_poll_customize_keyboard(selected_tone="ودي", selected_goal="رأي"):
+def get_poll_customize_keyboard(text, selected_tone="ودي", selected_goal="رأي"):
     markup = InlineKeyboardMarkup(row_width=3)
 
     # 🎯 الهدف
@@ -28,7 +28,7 @@ def get_poll_customize_keyboard(selected_tone="ودي", selected_goal="رأي"):
 
     # 🚀 توليد
     markup.row(
-        InlineKeyboardButton("🚀 إعادة توليد الاستطلاع", callback_data="regenerate_poll")
+        InlineKeyboardButton("🚀 إعادة توليد الاستطلاع", callback_data=f"regenerate:{text}")
     )
 
     return markup
