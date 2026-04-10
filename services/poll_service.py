@@ -64,10 +64,10 @@ def generate_and_store_question(user_id, prompt):
         raise
 
     return poll_code, poll
-def generate_poll(user_id, content, channel_name=None):
+def generate_poll(user_id, content, tone=None, goal=None, channel_name=None):
     try:
         print(f"DEBUG: [User: {user_id}] Building poll prompt. Channel: {channel_name}", flush=True)
-        prompt = build_poll_prompt(content, channel_name=channel_name)
+        prompt = build_poll_prompt(content, tone, goal, channel_name=channel_name)
         
         poll_code, poll = generate_and_store_question(user_id, prompt)
         
