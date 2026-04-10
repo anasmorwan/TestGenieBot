@@ -39,7 +39,7 @@
         }
       }
     },
-    stage_execution_map = {
+    "stage_execution_map": {
     "early": {
         "length_rules": "VERY SHORT. Question text under 100 characters. Options under 30 characters each.",
         "style_rules": "Direct recall and definitions. NO patient scenarios. Ask 'What is...', 'Which of the following...'",
