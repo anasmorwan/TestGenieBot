@@ -594,7 +594,7 @@ class QuizManager:
             user_difficlty = get_user_difficulty(chat_id)
 
             
-            header = f"{current_index + 1}/{total}\n\n"
+            header = f"{current_index + 1}/{total} •\n\n"
             if user_difficlty == "early":
                 header = f"{current_index + 1}/{total} • {branch}\n\n"
                 
