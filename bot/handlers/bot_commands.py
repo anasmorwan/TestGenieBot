@@ -109,5 +109,34 @@ def register(bot):
             bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
 
 
+    @bot.message_handler(commands=["premium"])
+    def user_info(msg):
+        try:
+            user_id = msg.from_user.id
+            chat_id = msg.chat.id
+
+            
+            quiz_message = [
+              get_message("QUIZ_SETUP"), 
+              get_message("QUIZ_SETUP_1")
+            ]
+            weights = [0.2, 0.8]
+            text = random.choices(quiz_message, weights=weights, k=1)[0]
+
+            keyboard = get_testgenie_keyboard(user_id=user_id, selected_level=level, selected_count=count)
+            
+            bot.send_message(chat_id,
+            text=text,
+            reply_markup=keyboard,
+            parse_mode="HTML")
+
+            
+        except Exception as e:
+            bot.reply_to(msg, f"❌ الخطأ: {str(e)}")
+
+
+
+
+
 
 
