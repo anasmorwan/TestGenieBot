@@ -39,6 +39,23 @@
         }
       }
     },
+    stage_execution_map = {
+    "early": {
+        "length_rules": "VERY SHORT. Question text under 100 characters. Options under 30 characters each.",
+        "style_rules": "Direct recall and definitions. NO patient scenarios. Ask 'What is...', 'Which of the following...'",
+        "distractor_rules": "Distractors should be clearly incorrect to build confidence."
+    },
+    "mid": {
+        "length_rules": "MODERATE. Question text 100-180 characters. Options under 50 characters each.",
+        "style_rules": "1-step mechanisms or short clinical vignettes. Focus on 'Why' and 'How'.",
+        "distractor_rules": "Distractors should represent common misconceptions or related but incorrect concepts."
+    },
+    "advanced": {
+        "length_rules": "MAXIMUM ALLOWED. Question text up to 240 characters (Must fit in Telegram Poll). Options up to 80 characters.",
+        "style_rules": "Complex clinical case scenarios (Patient age, symptoms, basic labs). Multi-step clinical reasoning. Focus on 'Next best step' or 'Most likely diagnosis'.",
+        "distractor_rules": "Highly competitive distractors. Options must include common clinical pitfalls or rare exceptions."
+      }
+    },
     "subject_type_matrix": {
       "anatomy": {
         "high": ["recall", "interpretation", "clinical_reasoning"],
