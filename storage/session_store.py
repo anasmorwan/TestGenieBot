@@ -10,6 +10,10 @@ temp_texts = {}
 # bot/handlers/callback_handler.py
 user_selections = {}
 
+# bot/handlers/callback_handler.py
+user_poll_selections = {}
+
+
 last_active = {}
 
 # services/quiz_service.py:
