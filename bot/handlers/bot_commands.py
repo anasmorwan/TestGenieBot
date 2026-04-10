@@ -116,12 +116,13 @@ def register(bot):
             chat_id = msg.chat.id
 
             
-            quiz_message = [
-              get_message("QUIZ_SETUP"), 
-              get_message("QUIZ_SETUP_1")
+            premium_msg = [
+              get_message("UPGRADE_MAIN"), 
+              get_message("UPGRADE_BACKUP_1")
+              get_message("UPGRADE_BACKUP_2")
             ]
-            weights = [0.2, 0.8]
-            text = random.choices(quiz_message, weights=weights, k=1)[0]
+            weights = [0.8, 0.1, 0.1]
+            text = random.choices(premium_msg, weights=weights, k=1)[0]
 
             keyboard = get_testgenie_keyboard(user_id=user_id, selected_level=level, selected_count=count)
             
