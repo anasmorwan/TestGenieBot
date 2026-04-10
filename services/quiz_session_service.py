@@ -434,6 +434,7 @@ class QuizManager:
                     return
 
                 self.finish_quiz(chat_id, bot, shared, only_mistakes)
+                print("⚡ finishing quiz.", flush=True)
                 return
 
             self.send_current_question(chat_id, bot)
@@ -448,6 +449,7 @@ class QuizManager:
         
     
     def finish_quiz(self, chat_id, bot, is_shared_user=None, only_mistakes=False):
+        print("entered finish quiz...", flush=True)
     
         state = self.sessions.pop(chat_id, None)
         if not state:
@@ -470,22 +472,26 @@ class QuizManager:
         self.poll_map.pop(chat_id, None)
         wrongs_ratio = wrong / total
         user_major = get_user_major(chat_id)
+        print("values obtained...", flush=True)
 
         # --------------------------------
         #          Logics
         # --------------------------------
     
         if not is_paid_user_active(chat_id) and not shared:
+            print("user is not paid...", flush=True)
             is_allowed, info = can_generate(chat_id)
             remaining_pro = get_current_pro_quota(chat_id)
             remaining = info.get("remaining")
             has_quizzes = user_has_quizzes(user_id)
             
             if source == "dynamic_mix" and not has_text:
+                print("Not paid not has text and dynamic...", flush=True)
                 bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                 return
 
             elif is_allowed and remaining == 2 and not has_quizzes: 
+                print("sending quota offer...", flush=True)
                 keyboard = pro_quota_keyboard()
                 text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)])
                 bot.send_message(
@@ -497,6 +503,7 @@ class QuizManager:
                 return
                 
             elif source == "generated_quiz" or has_text:
+                print("sending final message...", flush=True)
             
                 # keyboard = share_quiz_button(quiz_code)
                 keyboard = None
@@ -509,10 +516,12 @@ class QuizManager:
 
                     
                     if wrongs_ratio <= 0.4:
+                        print("ratio less than 0.4 obtaining keyboard..", flush=True)
                         keyboard = too_mistakes_keyboard(wrong)
                     else:
+                        print("ratio less more 0.4. keyboard few..", flush=True)
                         keyboard = few_mistakes_keyboard(wrong)
-                    
+                    print("sending the main message...", flush=True)
                     bot.send_message(
                         chat_id=chat_id,
                         text=build_result_message(user_id, score, total, streak, xp),
