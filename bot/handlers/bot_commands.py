@@ -3,6 +3,7 @@ import random
 
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.main_menu import main_menu_keyboard
+from bot.keyboards.plans_keyboard import paid_plans_keyboard
 from storage.messages import get_message
 from storage.session_store import user_states
 from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
@@ -124,7 +125,7 @@ def register(bot):
             weights = [0.8, 0.1, 0.1]
             text = random.choices(premium_msg, weights=weights, k=1)[0]
 
-            keyboard = get_testgenie_keyboard(user_id=user_id, selected_level=level, selected_count=count)
+            keyboard = paid_plans_keyboard()
             
             bot.send_message(chat_id,
             text=text,
