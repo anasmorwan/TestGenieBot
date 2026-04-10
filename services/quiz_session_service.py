@@ -6,7 +6,7 @@ import threading
 from datetime import datetime
 
 from models.quiz import QuizQuestion
-from storage.sqlite_db import get_connection, user_has_quizzes, get_question_distribution
+from storage.sqlite_db import get_connection, get_user_difficulty, user_has_quizzes, get_question_distribution
 
 
 
@@ -591,8 +591,13 @@ class QuizManager:
             branch = getattr(q, 'branch', '')
             current_index = state.get("index")
             total = len(questions)
+            user_difficlty = get_user_difficulty(chat_id)
 
-            header = f"{current_index + 1}/{total} • {branch}\n\n"
+            
+            header = f"{current_index + 1}/{total}\n\n"
+            if user_difficlty == "early":
+                header = f"{current_index + 1}/{total} • {branch}\n\n"
+                
 
             # 2. الحماية: قص النصوص لتطابق قيود تيليجرام (300 للسؤال، 100 للخيار، 200 للشرح)
             safe_question = header + str(q_text)[:285]
