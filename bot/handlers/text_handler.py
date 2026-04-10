@@ -13,7 +13,7 @@ from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_key
 from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from services.user_trap import update_last_active
-from storage.sqlite_db import set_user_has_quizzes
+from storage.sqlite_db import set_user_has_quizzes, init_user_quiz_count
 import time
 
 
@@ -127,7 +127,23 @@ def register(bot):
                     user_states.pop(user_id, None)
 
             elif state == "custom":
-                
+                if not text.isdigit():
+                    bot.send_message(chat_id, "⚠️ أرسل رقما فقط لتحديد الإختبارات")
+                    return
+    
+                num = int(text)
+                if not is_paid_user_active(user_id):
+                    if not (1 <= num <= 15):
+                        bot.send_message(chat_id, "✍️ متاح لك عدد إختبارات من 1-15 في خطتك")
+                        return
+                else:
+                    if not (1 <= num <= 20):
+                        bot.send_message(chat_id, "✍️ متاح لك عدد إختبارات من 1-20 في خطتك")
+                        return
+    
+                init_user_quiz_count(user_id, num)  # فقط إذا وصلنا لهنا يعني الرقم صحيح
+                user_states.pop(user_id, None)
+                return
 
             elif state is None or state == "" or state == "idle":
                 # الحالة الافتراضية توليد اختبار عادي
