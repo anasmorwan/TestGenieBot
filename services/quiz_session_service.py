@@ -414,7 +414,7 @@ class QuizManager:
                 distribution = get_question_distribution(chat_id, total_questions=3)
                 challenge_count = distribution["challenge_count"]
                 new_count = distribution["new_count"]
-                mistakes = distribution["reviews_count"]
+                mistakes = distribution["review_count"]
                 update = -mistakes
                 update_progress(chat_id, correct=update, total=None)
                     
