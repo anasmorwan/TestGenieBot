@@ -299,7 +299,7 @@ def register(bot):
                     new_markup = get_testgenie_keyboard(
                         user_id=user_id,
                         selected_level=user_selections[chat_id]['level'],
-                        selected_count=selected_count
+                        selected_count=count_pro
                     )
                     bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
                     bot.answer_callback_query(call.id, f"✅ تمت إختيار {selected_count} سؤال")
