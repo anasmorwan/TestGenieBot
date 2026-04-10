@@ -4,9 +4,9 @@ from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 def send_poll_keyboard(temp_text, poll_code):
     markup = InlineKeyboardMarkup(row_width=1)
     # regenerate:{temp_text}
-    btn_cust = InlineKeyboardButton("🪄 تخصيص", callback_data=f"customize_poll")
+    btn_cust = InlineKeyboardButton("🪄 تخصيص", callback_data=f"customize_poll:{temp_text}")
     btn_post = InlineKeyboardButton("🚀 نشر في القناة", callback_data=f"post_poll:{poll_code}")
-    btn_regenerate = InlineKeyboardButton("🔄 إعادة توليد", callback_data="customize_poll")
+    btn_regenerate = InlineKeyboardButton("🔄 إعادة توليد", callback_data="customize_poll:{temp_text}")
 
     
 
