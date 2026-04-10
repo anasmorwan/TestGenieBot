@@ -351,6 +351,7 @@ def sanitize_generated_questions(items, num_questions):
     return cleaned[:num_questions]
 
 
+    
 
 def generate_smart_batch_prompt(user_id, text_content, num_questions):
     from services.user_trap import save_user_knowledge
@@ -361,6 +362,7 @@ def generate_smart_batch_prompt(user_id, text_content, num_questions):
     with open(os.path.join(current_dir, "domain_profile.json"), "r", encoding="utf-8") as f:
         full_config = json.load(f)
         config = full_config["medicine"] # يمكن جعلها ديناميكية لاحقاً
+        stage_execution_map = config.get("stage_execution_map")
 
     # 1. التحليل المبدئي
     metadata = analyze_text_metadata(text_content, config)
@@ -373,6 +375,7 @@ def generate_smart_batch_prompt(user_id, text_content, num_questions):
     
     # 2. التطبيع الاحترافي للمستوى
     user_stage = normalize_stage_smart(user_id, metadata, config)
+    stage_rules = stage_execution_map.get(user_stage, stage_execution_map["early"])
 
     available_subjects = config.get("subjects", [])
     
@@ -417,6 +420,15 @@ SYSTEM ROLE: Expert {config['title']} Professor.
 
 GOAL: Generate {num_questions} MCQs from the SOURCE TEXT.
 TARGET LEVEL: {user_stage.upper()}
+
+TELEGRAM POLL CONSTRAINTS (CRITICAL):
+- Question text MUST NOT exceed 255 characters.
+- Each option MUST NOT exceed 100 characters.
+
+LEVEL-SPECIFIC EXECUTION RULES:
+- Length: {stage_rules['length_rules']}
+- Style: {stage_rules['style_rules']}
+- Distractors: {stage_rules['distractor_rules']}
 
 CONTEXT:
 - Subjects: {", ".join(subjects)}
