@@ -200,6 +200,7 @@ def init_db():
 #--------------------------
 #    🔹 دوال data-driven messages 
 #--------------------------
+
 def get_top_mistake(cursor, user_id):
     cursor.execute("""
         SELECT question_text, fail_count, correct_count
@@ -535,6 +536,20 @@ def user_has_quizzes(user_id):
 #--------------------------
 #    🔹 دوال مساعدة user_major
 #--------------------------
+def get_user_major(user_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT major FROM users WHERE user_id = ?
+    """, (user_id,))
+    
+    result = cursor.fetchone()
+    conn.close()
+    
+    return result[0] if result else None
+
+
 def update_user_major(user_id, detected_domain):
     conn = get_connection()
     cursor = conn.cursor()
