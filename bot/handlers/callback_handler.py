@@ -27,7 +27,8 @@ from services.backup_service import safe_backup, backup_all
 from storage.session_store import user_selections, user_states
 from storage.sqlite_db import get_question_distribution, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
 from services.user_trap import update_last_active 
-from storage.session_store import user_states
+from storage.session_store import user_states, temp_texts
+from services.poll_service import generate_poll
 import random
 import json
 import time
@@ -69,6 +70,7 @@ def register(bot):
         elif data.startswith("regenerate"):
             parts = data.split(":")
             text = parts[1]
+            new_poll = generate_poll(user_id, text, channel_name=None)
 
         elif data == "customize_poll":
             text = temp_texts.get(user_id)
