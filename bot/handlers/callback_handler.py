@@ -44,7 +44,43 @@ def register(bot):
         ])
     )
     def handle_polls(call: CallbackQuery):
-        pass
+        
+        chat_id = call.message.chat.id
+        data = call.data
+        user_id = call.from_user.id
+        message_id = call.message.message_id 
+        update_last_active(user_id)
+        
+        
+        # معالجة اختيار المستوى
+        if data.startswith("post_poll"):
+            parts = data.split(":")
+            poll_code = parts[1]
+            keyboard = 
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=get_message("POST_POLL"),
+                reply_markup=keyboard,
+                parse_mode="HTML"
+            )
+            # temp_texts.pop(user_id, None)
+            
+        elif data.startswith("regenerate"):
+            parts = data.split(":")
+            text = parts[1]
+
+        elif data == "customize_poll":
+            text = temp_texts.get(user_id)
+            keyboard = customize_poll_keyboard(text)
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=get_message("POST_POLL"),
+                reply_markup=keyboard,
+                parse_mode="HTML"
+            )
+            pass
 
     @bot.callback_query_handler(
         func=lambda call: any([
