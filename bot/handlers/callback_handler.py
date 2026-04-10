@@ -149,8 +149,11 @@ def register(bot):‎
                 consume_quiz(user_id)
                 reward_referral_if_needed(user_id)
                 
-                parts = data.split(":")
-                new_poll, poll_code = generate_poll(user_id, text, channel_name=None)
+                # parts = data.split(":")
+                tone = user_poll_selections[chat_id]['selected_tone']
+                goal = user_poll_selections[chat_id]['selected_goal']
+                
+                new_poll, poll_code = generate_poll(user_id, text, tone, goal, channel_name=None)
             
                 action_keyboard = send_poll_keyboard(poll_code) 
                 normalized = normalize_poll(new_poll)
