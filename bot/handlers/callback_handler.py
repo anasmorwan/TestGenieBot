@@ -62,10 +62,9 @@ def register(bot):
         func=lambda call: any([
             call.data.startswith("post_poll:"),
             call.data.startswith("regenerate:"),
-            call.data.startswith("goal_"),
-            call.data.startswith("tone_"),
-            call.data == "customize_poll",
-            call.data == "poll_advanced"
+            call.data.startswith("goal_"),      # <-- أضف الفاصلة هنا
+            call.data.startswith("tone_"),      # <-- وأضف الفاصلة هنا أيضاً
+            call.data == "customize_poll"
         ])
     )
     def handle_polls(call: CallbackQuery):
