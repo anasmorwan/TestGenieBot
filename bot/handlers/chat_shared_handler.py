@@ -6,7 +6,11 @@ from storage.session_store import user_states, get_state_safe, temp_texts
 from services.poll_service import generate_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
 from services.user_trap import update_last_active
+from storage.sqlite_db import get_connection
 
+
+
+    
 
 def publish_interactive_link(bot, target_chat_id, quiz_code, shared_by_name, watermark=True):
     announcement_text = (
