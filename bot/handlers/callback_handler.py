@@ -127,11 +127,11 @@ def register(bot):‎
             text = parts[1]
             # text = temp_texts.get(user_id)
             #selected_tone="ودي", selected_goal="رأي")
-            keyboard = get_poll_customize_keyboard()
+            keyboard = get_poll_customize_keyboard(text)
             bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
-                text=get_message("POST_POLL"),
+                text=get_message("CUSTOMIZE_POLL"),
                 reply_markup=keyboard,
                 parse_mode="HTML"
             )
