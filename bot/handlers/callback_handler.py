@@ -28,7 +28,7 @@ from storage.session_store import user_selections, user_states
 from storage.sqlite_db import get_question_distribution, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
 from services.user_trap import update_last_active 
 from storage.session_store import user_states, temp_texts
-from services.poll_service import generate_poll
+from services.poll_service import generate_poll, normalize_poll
 import random
 import json
 import time
@@ -67,29 +67,45 @@ def register(bot):
             )
             # temp_texts.pop(user_id, None)
             
-        elif data.startswith("regenerate"):
+        elif data.startswith("regenerate"):   
             try:
-            plan = check_subscription_valid(user_id)
-            allowed, info = can_generate(user_id)
+                allowed, info = can_generate(user_id)
 
-            if not allowed:
-                show_referral_message(bot, chat_id, user_id)
-                return  # ❗ هذا هو المفتاح
+                if not allowed:
+                    show_referral_message(bot, chat_id, user_id)
+                    return
+                consume_quiz(user_id)
+                reward_referral_if_needed(user_id)
                 
-            # 👇 استهلك محاولة
-            consume_quiz(user_id)
-            # backup_all()
-            # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
-            reward_referral_if_needed(user_id)
-            # backup_all()
-
-        except Exception as e:
-            print("File handler ERROR:", e, flush=True)
-            bot.send_message(chat_id, f"❌ Error: {str(e)}")
+                parts = data.split(":")
+                text = parts[1]
+                new_poll = generate_poll(user_id, text, channel_name=None)
             
-            parts = data.split(":")
-            text = parts[1]
-            new_poll = generate_poll(user_id, text, channel_name=None)
+                action_keyboard = send_poll_keyboard(user_id, poll_code) 
+                normalized = normalize_poll(new_poll)
+
+                if not normalized:
+                    raise ValueError(f"Invalid poll structure: {poll}")
+
+                q_text = normalized["question"]
+                q_options = normalized["options"]
+                    
+                bot.delete_message(chat_id, waiting_msg.message_id)
+
+                bot.send_poll(
+                    chat_id=chat_id,
+                    question=str(q_text)[:300],
+                    options=[str(opt) for opt in q_options if opt],
+                    type="regular",
+                    is_anonymous=False
+                )
+                
+                bot.send_message(chat_id, share_msg, reply_markup=action_keyboard, parse_mode="HTML")
+                
+            
+            except Exception as e:
+                print("File handler ERROR:", e, flush=True)
+                bot.send_message(chat_id, f"❌ Error: {str(e)}")
 
         elif data == "customize_poll":
             text = temp_texts.get(user_id)
