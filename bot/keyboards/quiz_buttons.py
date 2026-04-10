@@ -31,8 +31,8 @@ def too_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=False):
     keyboard = InlineKeyboardMarkup(row_width=1)
     if ad_compaign:
         buttons = [ 
-            InlineKeyboardButton("🎯 تدريب على أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
-            InlineKeyboardButton("👈 جرب الآن", callback_data=f"start_challenge:mistakes:{wrong_count}")
+            InlineKeyboardButton("🎯 تدريب على أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}"),
+            InlineKeyboardButton("👈 جرب الآن", link=f"{campaign_link}")
         ]
     buttons = [ 
     InlineKeyboardButton("🎯 تدريب على أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
@@ -47,7 +47,7 @@ def few_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=False):
     keyboard = InlineKeyboardMarkup(row_width=1)
     if ad_compaign:
         buttons = [ 
-            InlineKeyboardButton("🔥 جربه الآن", callback_data="go_generate"),
+            InlineKeyboardButton("🔥 جربه الآن", link=f"{campaign_link}"),
             InlineKeyboardButton("🧠 راجع أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
         ]
     buttons = [ 
