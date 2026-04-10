@@ -27,9 +27,13 @@ def share_quiz_button(quiz_code):
 
 
 
-def too_mistakes_keyboard(wrong_count):
+def too_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=False):
     keyboard = InlineKeyboardMarkup(row_width=1)
-    
+    if ad_compaign:
+        buttons = [ 
+            InlineKeyboardButton("🎯 تدريب على أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
+            InlineKeyboardButton("👈 جرب الآن", callback_data=f"start_challenge:mistakes:{wrong_count}")
+        ]
     buttons = [ 
     InlineKeyboardButton("🎯 تدريب على أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
         ]
@@ -39,13 +43,17 @@ def too_mistakes_keyboard(wrong_count):
 
 
 
-def few_mistakes_keyboard(wrong_count):
+def few_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=False):
     keyboard = InlineKeyboardMarkup(row_width=1)
-    
-    buttons = [ 
-    InlineKeyboardButton("🔥 تحدي جديد", callback_data="go_generate"),
-    InlineKeyboardButton("🧠 راجع أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
+    if ad_compaign:
+        buttons = [ 
+            InlineKeyboardButton("🔥 جربه الآن", callback_data="go_generate"),
+            InlineKeyboardButton("🧠 راجع أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
         ]
+    buttons = [ 
+        InlineKeyboardButton("🔥 تحدي جديد", callback_data="go_generate"),
+        InlineKeyboardButton("🧠 راجع أخطائي", callback_data=f"start_challenge:mistakes:{wrong_count}")
+    ]
     keyboard.add(*buttons)
     
     return keyboard
