@@ -293,8 +293,8 @@ def register(bot):
                 if not is_paid_user_active(user_id):
                     bot.answer_callback_query(call.id, "🔓 20 سؤال للمشتركين فقط - قم بالترقية الآن!")
                     return
-                selected_count = 20
-                user_selections[chat_id]['count'] = selected_count
+                selected = 20
+                user_selections[chat_id]['count'] = selected
                 if init_user_quiz_count(user_id, 20):
                     new_markup = get_testgenie_keyboard(
                         user_id=user_id,
