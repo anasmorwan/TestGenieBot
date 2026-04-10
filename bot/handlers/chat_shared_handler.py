@@ -152,6 +152,8 @@ def register(bot):
                     
 
                 return
+            elif state.get("post_poll"):
+                
                 
 
             else:
