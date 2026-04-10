@@ -6,7 +6,7 @@ import threading
 from datetime import datetime
 
 from models.quiz import QuizQuestion
-from storage.sqlite_db import get_connection, get_user_difficulty, user_has_quizzes, get_question_distribution
+from storage.sqlite_db import get_connection, get_user_major, get_user_difficulty, user_has_quizzes, get_question_distribution
 
 
 
@@ -410,11 +410,15 @@ class QuizManager:
                 #    state["waiting_for_extension"]
 
             if state["index"] >= len(state["questions"]) and source == "dynamic_mix":
+                
+                distribution = get_question_distribution(chat_id, total_questions=3)
+                challenge_count = distribution["challenge_count"]
+                new_count = distribution["new_count"]
+                mistakes = distribution["reviews_count"]
+                update = -mistakes
+                update_progress(chat_id, correct=update, total=None)
+                    
                 if waiting_for_extension:
-
-                    distribution = get_question_distribution(chat_id, total_questions=3)
-                    challenge_count = distribution["challenge_count"]
-                    new_count = distribution["new_count"]
                     
                     text = random.choice([get_message("WAITING_CHAL_QUIZ_1", new_count=new_count, challenge_count=challenge_count), get_message("WAITING_CHAL_QUIZ")])
                     waiting_msg = bot.edit_message_text(
@@ -465,10 +469,12 @@ class QuizManager:
         source = state.get("source")
         self.poll_map.pop(chat_id, None)
         wrongs_ratio = wrong / total
+        user_major = get_user_major(chat_id)
 
         # --------------------------------
         #          Logics
         # --------------------------------
+    
         if not is_paid_user_active(chat_id) and not shared:
             is_allowed, info = can_generate(chat_id)
             remaining_pro = get_current_pro_quota(chat_id)
