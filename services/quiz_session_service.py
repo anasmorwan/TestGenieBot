@@ -516,7 +516,7 @@ class QuizManager:
                         keyboard = few_mistakes_keyboard(wrong)
                     bot.send_message(
                         chat_id=chat_id,
-                        text=build_result_message(user_id, score, total, streak, xp),
+                        text=build_result_message(chat_id, score, total, streak, xp),
                         reply_markup=keyboard,
                         parse_mode="HTML"
                     )
