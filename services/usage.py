@@ -315,6 +315,12 @@ def get_plan_limits(plan):
             "ocr_limit": 5,
             "days": 30
         }
+    elif plan == "fast_bunddle":
+        return {
+            "quiz_limit": 15,
+            "ocr_limit": 0,
+            "days": 2
+        }
     else:
         return {
             "quiz_limit": 3,
@@ -452,7 +458,7 @@ def is_paid_user_active(user_id):
     plan, expires_at, daily_limit = sub
 
     # 2️⃣ التأكد أنه خطة مدفوعة
-    if plan not in ("pro", "pro_plus"):
+    if plan not in ("pro", "pro_plus", "fast_bundlle"):
         conn.close()
         return False
 
