@@ -449,7 +449,9 @@ class QuizManager:
         if not state:
             return
 
-        # ✅ استخراج جميع البيانات مرة واحدة في البداية
+        # --------------------------
+        #          Values
+        # --------------------------
         score = state.get("score", 0)
         total = len(state["questions"])
         quiz_code = state.get("quiz_code")
@@ -464,7 +466,9 @@ class QuizManager:
         self.poll_map.pop(chat_id, None)
         wrongs_ratio = wrong / total
 
-        
+        # --------------------------------
+        #          Logics
+        # --------------------------------
         if not is_paid_user_active(chat_id) and not shared:
             is_allowed, info = can_generate(chat_id)
             remaining_pro = get_current_pro_quota(chat_id)
