@@ -1,6 +1,6 @@
 from telebot import types
 from services.usage import is_paid_user_active
-from storage.quiz_repository import from get_connection, get_user_current_quiz, load_quiz
+from storage.quiz_repository import get_connection, get_user_current_quiz, load_quiz
 from storage.messages import get_message
 from storage.session_store import user_states, get_state_safe, temp_texts
 from services.poll_service import generate_poll
