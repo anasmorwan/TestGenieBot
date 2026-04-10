@@ -126,8 +126,8 @@ def register(bot):
                 finally:
                     user_states.pop(user_id, None)
 
-
-            
+            elif state == "custom":
+                
 
             elif state is None or state == "" or state == "idle":
                 # الحالة الافتراضية توليد اختبار عادي
