@@ -70,6 +70,7 @@ def register(bot):‎
         if data.startswith("post_poll"):
             parts = data.split(":")
             poll_code = parts[1]
+            
             keyboard = get_chat_request_keyboard()
             bot.edit_message_text(
                 chat_id=chat_id,
@@ -80,7 +81,6 @@ def register(bot):‎
             )
             user_states[user_id] = f"post_poll:{poll_code}"
             
-            temp_texts.pop(user_id, None)
             
         elif data.startswith("regenerate"):   
             try:
@@ -93,10 +93,10 @@ def register(bot):‎
                 reward_referral_if_needed(user_id)
                 
                 parts = data.split(":")
-                text = parts[1]
+                text = temp_texts[user_id]
                 new_poll, poll_code = generate_poll(user_id, text, channel_name=None)
             
-                action_keyboard = send_poll_keyboard(temp_text, user_id, poll_code) 
+                action_keyboard = send_poll_keyboard(poll_code) 
                 normalized = normalize_poll(new_poll)
 
                 if not normalized:
