@@ -701,7 +701,3 @@ def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
             )
             
     return prompt
-
-
-{tone_instruction}
-- Goal: {goal_instruction}
