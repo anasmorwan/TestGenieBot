@@ -18,6 +18,20 @@ from services.user_trap import update_last_active
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.sqlite_db import set_user_has_quizzes
 
+
+bot.reply_to(
+    message,
+    f"⚡ قبل ما نكمل...\n\n"
+    f"🧠 Qube مش مجرد اختبار...\n"
+    f"هو تجربة كاملة 👇\n\n"
+    f"📢 في القناة:\n"
+    f"• تحديات يومية 🔥\n"
+    f"• أسئلة جديدة باستمرار\n"
+    f"• تحفيز يخليك تستمر 🎯\n\n"
+    f"👇 انضم الآن وخليك ضمن التحدي:\n"
+    f"{invite_link}\n\n"
+    f"ثم ارجع وكمل اختبارك 🚀"
+)
 import threading
     
 
