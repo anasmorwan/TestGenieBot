@@ -34,13 +34,15 @@ from services.referral import reward_referral_if_needed
 from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.customized_poll import get_poll_customize_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
+from telegram import CallbackQuery
 import random
 import json
 import time
 
+# تأكد من وجود هذه المتغيرات والوظائف
+# user_poll_selections, update_last_active, can_generate, consume_quiz, get_message
 
-
-def register(bot):‎
+def register(bot):
     def clean_goal(text):
         return text.replace("📊", "").replace("⚖️", "").replace("🤝", "").strip()
 
@@ -55,6 +57,156 @@ def register(bot):‎
             reply_markup=keyboard,
             parse_mode="HTML"
         )
+
+    @bot.callback_query_handler(
+        func=lambda call: any([
+            call.data.startswith("post_poll:"),
+            call.data.startswith("regenerate:"),
+            call.data.startswith("goal_"),
+            call.data.startswith("tone_"),
+            call.data == "customize_poll",
+            call.data == "poll_advanced"
+        ])
+    )
+    def handle_polls(call: CallbackQuery):
+        chat_id = call.message.chat.id
+        data = call.data
+        user_id = call.from_user.id
+        message_id = call.message.message_id
+        
+        # تأكد من وجود هذه الدوال والمتغيرات
+        update_last_active(user_id)
+        text = temp_texts.get(user_id)
+        
+        # معالجة اختيار المستوى
+        if data.startswith("post_poll"):
+            parts = data.split(":")
+            poll_code = parts[1]
+            
+            keyboard = get_chat_request_keyboard()
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=get_message("POST_POLL"),
+                reply_markup=keyboard,
+                parse_mode="HTML"
+            )
+            user_states[user_id] = f"post_poll:{poll_code}"
+            
+        elif data.startswith("customize_poll"):
+            keyboard = get_poll_customize_keyboard()
+            bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=get_message("CUSTOMIZE_POLL"),
+                reply_markup=keyboard,
+                parse_mode="HTML"
+            )
+        
+        if chat_id not in user_poll_selections:
+            user_poll_selections[chat_id] = {'selected_tone': 'ودي', 'selected_goal': 'رأي'}
+
+        if data.startswith("goal_"):
+            selected_goal = data.split("_", 1)[1]
+            selected_goal_clean = clean_goal(selected_goal)
+            
+            user_poll_selections[chat_id]['selected_goal'] = selected_goal_clean
+            
+            # تأكد من وجود user_selections أو استخدم user_poll_selections
+            if 'user_selections' in globals() or 'user_selections' in locals():
+                new_markup = get_poll_customize_keyboard(
+                    selected_tone=user_selections[chat_id]['selected_tone'],
+                    selected_goal=selected_goal
+                )
+            else:
+                new_markup = get_poll_customize_keyboard(
+                    selected_tone=user_poll_selections[chat_id]['selected_tone'],
+                    selected_goal=selected_goal
+                )
+            
+            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+            bot.answer_callback_query(call.id, f"تم اختيار الهدف: {selected_goal}")
+    
+        elif data.startswith("tone_"):
+            selected_tone = data.split("_", 1)[1]
+            selected_tone_clean = clean_tone(selected_tone)
+            user_poll_selections[chat_id]['selected_tone'] = selected_tone_clean
+            
+            if 'user_selections' in globals() or 'user_selections' in locals():
+                new_markup = get_poll_customize_keyboard(
+                    selected_tone=selected_tone,
+                    selected_goal=user_selections[chat_id]['selected_goal']
+                )
+            else:
+                new_markup = get_poll_customize_keyboard(
+                    selected_tone=selected_tone,
+                    selected_goal=user_poll_selections[chat_id]['selected_goal']
+                )
+            
+            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+            bot.answer_callback_query(call.id, f"تم اختيار الطابع: {selected_tone}")
+    
+        elif data == "poll_advanced":
+            bot.answer_callback_query(call.id, "⚙️ سيتم فتح نافذة التخصيص المتقدم قريباً")
+
+        elif data.startswith("regenerate"):
+            try:
+                # تأكد من وجود هذه الدوال
+                allowed, info = can_generate(user_id)
+                
+            
+                if not allowed:
+                    show_referral_message(bot, chat_id, user_id)
+                    return
+                
+                consume_quiz(user_id)
+                reward_referral_if_needed(user_id)
+                
+                tone = user_poll_selections[chat_id]['selected_tone']
+                goal = user_poll_selections[chat_id]['selected_goal']
+                
+                new_poll, poll_code = generate_poll(user_id, text, tone, goal, channel_name=None)
+                
+                action_keyboard = send_poll_keyboard(poll_code)
+                normalized = normalize_poll(new_poll)
+                
+                if not normalized:
+                    raise ValueError(f"Invalid poll structure: {new_poll}")
+                
+                q_text = normalized["question"]
+                q_options = normalized["options"]
+                
+                bot.edit_message_text(
+                    chat_id,
+                    message_id=message_id,
+                    text=get_message("SEND_POLL"),
+                    reply_markup=action_keyboard,
+                    parse_mode="HTML"
+                )
+                
+                bot.send_poll(
+                    chat_id=chat_id,
+                    question=str(q_text)[:300],
+                    options=[str(opt) for opt in q_options if opt],
+                    type="regular",
+                    is_anonymous=False
+                )
+                
+                bot.send_message(
+                    chat_id,
+                    get_message("SEND_POLL"),
+                    reply_markup=action_keyboard,
+                    parse_mode="HTML"
+                )
+                
+            except Exception as e:
+                print("File handler ERROR:", e, flush=True)
+                bot.send_message(
+                chat_id, f"❌ Error: {str(e)}")
+                reply_markup=keyboard,
+                parse_mode="HTML"
+            )
+        
     @bot.callback_query_handler(
         func=lambda call: any([
             call.data.startswith("post_poll:"),
