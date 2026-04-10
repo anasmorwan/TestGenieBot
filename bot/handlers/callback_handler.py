@@ -64,6 +64,7 @@ def register(bot):‎
         user_id = call.from_user.id
         message_id = call.message.message_id 
         update_last_active(user_id)
+        text = temp_texts.get(user_id)
         
         
         # معالجة اختيار المستوى
@@ -93,7 +94,6 @@ def register(bot):‎
                 reward_referral_if_needed(user_id)
                 
                 parts = data.split(":")
-                text = temp_texts[user_id]
                 new_poll, poll_code = generate_poll(user_id, text, channel_name=None)
             
                 action_keyboard = send_poll_keyboard(poll_code) 
@@ -130,11 +130,8 @@ def register(bot):‎
                 bot.send_message(chat_id, f"❌ Error: {str(e)}")
 
         elif data.startswith("customize_poll"):
-            parts = data.split(":")
-            text = parts[1]
-            # text = temp_texts.get(user_id)
-            #selected_tone="ودي", selected_goal="رأي")
-            keyboard = get_poll_customize_keyboard(text)
+            
+            keyboard = get_poll_customize_keyboard()
             bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=message_id,
