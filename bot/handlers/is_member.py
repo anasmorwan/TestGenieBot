@@ -1,5 +1,4 @@
 import telebot
-from telebot.types import Message, CallbackQuery
 import os
 from dotenv import load_dotenv
 
@@ -12,7 +11,7 @@ CHANNEL_USERNAME = os.getenv("CHANNEL_USERNAME")  # مثال: @my_channel
 
 
 
-def is_user_member(user_id):
+def is_user_member(user_id, bot):
 
     try:
         # طريقة 1: باستخدام معرف القناة الرقمي
@@ -29,7 +28,7 @@ def is_user_member(user_id):
         print(f"خطأ في التحقق من العضوية: {e}")
         return False
 
-def get_channel_invite_link():
+def get_channel_invite_link(bot):
     """الحصول على رابط دعوة القناة (اختياري)"""
     try:
         invite_link = bot.create_chat_invite_link(
