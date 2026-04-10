@@ -672,10 +672,26 @@ def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
     if channel_name:
         if target_lang == "Arabic":
             context_clause = f"\nملاحظة: هذا الاستطلاع مخصص لمجتمع/قناة باسم '{channel_name}'. يجب تعديل النبرة والمفردات لتناسب هذا الجمهور.\nمهم: يجب أن يكون السؤال وجميع الخيارات باللغة العربية فقط."
-            prompt = Ar_polls_prompt.format(context_clause=context_clause, user_input=content)
+            goal_instruction = build_goal_instruction(goal)
+            tone_instruction = build_tone_instruction(tone)
+            
+            prompt = Ar_polls_prompt.format(
+                context_clause=context_clause,
+                user_input=content,
+                goal_instruction=goal_instruction,
+                tone_instruction=tone_instruction
+            )
         else:
             context_clause = f"\nNote: This poll is intended for a community/channel named '{channel_name}'. Adjust the tone and vocabulary to suit this audience.\nImportant: The question and all answer options must be in English only."
-            prompt = en_polls_prompt.format(context_clause=context_clause, user_input=content)
+            goal_instruction = build_goal_instruction(goal, lang="en")
+            tone_instruction = build_tone_instruction(tone, lang="en")
+            
+            prompt = en_polls_prompt.format(
+                context_clause=context_clause, 
+                user_input=content, 
+                goal_instruction=goal_instruction,
+                tone_instruction=tone_instruction
+            )
     else:
         if target_lang == "Arabic":
             context_clause = "\nمهم: يجب أن يكون السؤال وجميع الخيارات باللغة العربية فقط."
