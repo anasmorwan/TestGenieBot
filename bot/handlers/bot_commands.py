@@ -119,7 +119,7 @@ def register(bot):
             
             premium_msg = [
               get_message("UPGRADE_MAIN"), 
-              get_message("UPGRADE_BACKUP_1")
+              get_message("UPGRADE_BACKUP_1"),
               get_message("UPGRADE_BACKUP_2")
             ]
             weights = [0.8, 0.1, 0.1]
