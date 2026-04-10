@@ -622,7 +622,7 @@ Input:
 
 def build_tone_instruction(tone, lang="ar"):
     if not tone:
-        return "Ignore this field." if lang == "en" else "تجاهل هذا الحقل."
+        return "No specific preference — use the most suitable style for the context." if lang == "en" else "لا يوجد تخصيص — استخدم الأسلوب الأنسب للسياق."
 
     mapping_ar = {
         "رسمي": "استخدم أسلوبًا رسميًا ومهنيًا واضحًا.",
@@ -641,7 +641,7 @@ def build_tone_instruction(tone, lang="ar"):
 
 def build_goal_instruction(goal, lang="ar"):
     if not goal:
-        return "Ignore this field." if lang == "en" else "تجاهل هذا الحقل."
+        return "No specific preference — use the most suitable style for the context." if lang == "en" else "لا يوجد تخصيص — استخدم الأسلوب الأنسب للسياق."
 
     mapping_ar = {
         "رأي": "صغ السؤال لطلب آراء المستخدمين.",
