@@ -31,13 +31,22 @@ from storage.session_store import user_states, temp_texts
 from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
 from ‎services.referral import reward_referral_if_needed
+from bot.keyboards.referral_keyboard import referral_keyboard
 import random
 import json
 import time
 
 
 
-def register(bot):
+def register(bot):‎
+    def show_referral_message(bot, chat_id, user_id):
+        keyboard = referral_keyboard(user_id)
+        bot.send_message(
+            chat_id=chat_id, 
+            text=get_message("REFERRAL_1"),
+            reply_markup=keyboard,
+            parse_mode="HTML"
+        )
     @bot.callback_query_handler(
         func=lambda call: any([
             call.data.startswith("post_poll:"),
@@ -81,13 +90,13 @@ def register(bot):
                 
                 parts = data.split(":")
                 text = parts[1]
-                new_poll = generate_poll(user_id, text, channel_name=None)
+                new_poll, poll_code = generate_poll(user_id, text, channel_name=None)
             
                 action_keyboard = send_poll_keyboard(user_id, poll_code) 
                 normalized = normalize_poll(new_poll)
 
                 if not normalized:
-                    raise ValueError(f"Invalid poll structure: {poll}")
+                    raise ValueError(f"Invalid poll structure: {new_poll}")
 
                 q_text = normalized["question"]
                 q_options = normalized["options"]
