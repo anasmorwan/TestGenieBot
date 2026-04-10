@@ -30,7 +30,7 @@ from services.user_trap import update_last_active
 from storage.session_store import user_states, temp_texts
 from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
-from ‎services.referral import reward_referral_if_needed
+from services.referral import reward_referral_if_needed
 from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.customized_poll import get_poll_customize_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
