@@ -202,8 +202,8 @@ def register(bot):
             except Exception as e:
                 print("File handler ERROR:", e, flush=True)
                 bot.send_message(
-                chat_id, f"❌ Error: {str(e)}")
-                reply_markup=keyboard,
+                chat_id,
+                text=f"❌ Error: {str(e)}",
                 parse_mode="HTML"
             )
         
