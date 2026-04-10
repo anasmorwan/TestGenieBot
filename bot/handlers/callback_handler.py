@@ -115,7 +115,7 @@ def register(bot):‎
                     is_anonymous=False
                 )
                 
-                bot.send_message(chat_id, share_msg, reply_markup=action_keyboard, parse_mode="HTML")
+                bot.send_message(chat_id, get_message("SEND_POLL"), reply_markup=action_keyboard, parse_mode="HTML")
                 
             
             except Exception as e:
