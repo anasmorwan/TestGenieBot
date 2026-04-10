@@ -68,6 +68,25 @@ def register(bot):
             # temp_texts.pop(user_id, None)
             
         elif data.startswith("regenerate"):
+            try:
+            plan = check_subscription_valid(user_id)
+            allowed, info = can_generate(user_id)
+
+            if not allowed:
+                show_referral_message(bot, chat_id, user_id)
+                return  # ❗ هذا هو المفتاح
+                
+            # 👇 استهلك محاولة
+            consume_quiz(user_id)
+            # backup_all()
+            # 👇 تحقق هل هذا مستخدم جديد تمت دعوته
+            reward_referral_if_needed(user_id)
+            # backup_all()
+
+        except Exception as e:
+            print("File handler ERROR:", e, flush=True)
+            bot.send_message(chat_id, f"❌ Error: {str(e)}")
+            
             parts = data.split(":")
             text = parts[1]
             new_poll = generate_poll(user_id, text, channel_name=None)
