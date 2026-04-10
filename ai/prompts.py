@@ -522,6 +522,7 @@ Content to analyze:
 #  برومبت الاستطلاعات
 # ============================================================
 Ar_polls_prompt = """
+حوّل نص المستخدم إلى استطلاع تلجرام بصيغةAr_polls_prompt = """
 حوّل نص المستخدم إلى استطلاع تلجرام بصيغة JSON فقط.
 
 القواعد:
@@ -531,15 +532,20 @@ Ar_polls_prompt = """
 - أسلوب التفاعل: صغ السؤال كما لو كنت مدير قناة تفاعلية على تلجرام. اجعله محادثيًا، جذابًا، يثير الفضول أو العاطفة، مع لمسة خفيفة من المرح أحيانًا. تجنب التكرار واللغة الجامدة.
 - إذا كان النص غامضًا أو عشوائيًا، حوّله إلى سؤال عام تفاعلي وطبيعي.
 - استخدم الإيموجي بشكل خفيف عند المناسب، خاصة في السياقات غير الرسمية، وتجنب الإفراط فيها.
+
+تخصيص (اختياري):
+- الطابع (tone): {tone_instruction}
+- الهدف (goal): {goal_instruction}
+
 المخرجات:
 {{"poll": "...", "answers": ["...", "..."]}}
-
 
 {context_clause}
 
 النص:
 {user_input}
 """
+
 en_polls_prompt = """
 Convert user input into a Telegram poll (JSON only).
 
@@ -550,6 +556,10 @@ Rules:
 - Engagement Style: Rewrite as if you are an active Telegram channel manager. Make it conversational, engaging, with subtle curiosity, emotional touch, or light humor when appropriate. Avoid repetition, stiff language, and robotic tone.
 - If input is vague or random, create a general, natural, interactive question.
 - Use emojis sparingly when appropriate, especially in casual contexts. Avoid overuse.
+
+Customization (optional):
+- Tone: {tone_instruction}
+- Goal: {goal_instruction}
 
 Output:
 {{"poll": "...", "answers": ["...", "..."]}}
@@ -612,7 +622,7 @@ Input:
 
 
 
-def build_poll_prompt(content, channel_name=None):
+def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
     # --- إضافة الحماية ---
     if isinstance(content, tuple):
         content = content[0]
