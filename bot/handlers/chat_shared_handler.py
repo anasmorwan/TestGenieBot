@@ -153,6 +153,18 @@ def register(bot):
 
                 return
             elif state.get("post_poll"):
+                poll_code = 
+                is_anonymous = True
+                if request_id == 1:
+                    is_anonymous = False
+                    
+                bot.send_poll(
+                    chat_id=chat_id_to_publish, # تأكد من أن chat_id هو المعرف الصحيح للمستقبل
+                    question=str(q_text)[:300],
+                    options=[str(opt) for opt in q_options if opt][:10], # التليجرام يقبل 10 خيارات كحد أقصى
+                    type="regular",
+                    is_anonymous=is_anonymous
+                )
                 
                 
 
