@@ -102,7 +102,7 @@ def generate_smart_response(prompt: str) -> str:
                 messages=[{"role": "user", "content": prompt}],
                 model="llama-3.3-70b-instruct",
                 temperature=0.8,
-                top_p=0.9
+                top_p=0.9,
                 
             )
 
