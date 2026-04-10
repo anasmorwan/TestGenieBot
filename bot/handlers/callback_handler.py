@@ -106,6 +106,13 @@ def register(bot):‎
                 q_options = normalized["options"]
                     
                 # bot.delete_message(chat_id, message_id)
+                bot.edit_message_text(
+                    chat_id,
+                    message_id=message_id,
+                    text=get_message("SEND_POLL"),
+                    keyboard=
+                    parse_mode="HTML"
+                )
 
                 bot.send_poll(
                     chat_id=chat_id,
