@@ -620,6 +620,45 @@ Input:
 {user_input}
 """
 
+def build_tone_instruction(tone, lang="ar"):
+    if not tone:
+        return "Ignore this field." if lang == "en" else "تجاهل هذا الحقل."
+
+    mapping_ar = {
+        "رسمي": "استخدم أسلوبًا رسميًا ومهنيًا واضحًا.",
+        "ودي": "استخدم أسلوبًا وديًا وخفيفًا وقريبًا من المحادثة.",
+        "حماسي": "اجعل الصياغة حماسية وتدفع للتفاعل.",
+    }
+
+    mapping_en = {
+        "رسمي": "Use a formal and professional tone.",
+        "ودي": "Use a friendly and conversational tone.",
+        "حماسي": "Make the tone energetic and engaging.",
+    }
+
+    mapping = mapping_en if lang == "en" else mapping_ar
+    return mapping.get(tone, "Ignore this field." if lang == "en" else "تجاهل هذا الحقل.")
+
+def build_goal_instruction(goal, lang="ar"):
+    if not goal:
+        return "Ignore this field." if lang == "en" else "تجاهل هذا الحقل."
+
+    mapping_ar = {
+        "رأي": "صغ السؤال لطلب آراء المستخدمين.",
+        "مقارنة": "صغ السؤال للمقارنة بين خيارات واضحة.",
+        "قرار": "اجعل السؤال يساعد في اتخاذ قرار مباشر.",
+        "ترفيهي": "اجعل السؤال خفيفًا وممتعًا للتفاعل.",
+    }
+
+    mapping_en = {
+        "رأي": "Frame the question to gather opinions.",
+        "مقارنة": "Frame the question as a comparison between options.",
+        "قرار": "Make the question help in making a clear decision.",
+        "ترفيهي": "Make the question light and fun to engage users.",
+    }
+
+    mapping = mapping_en if lang == "en" else mapping_ar
+    return mapping.get(goal, "Ignore this field." if lang == "en" else "تجاهل هذا الحقل.")
 
 
 def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
@@ -640,9 +679,29 @@ def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
     else:
         if target_lang == "Arabic":
             context_clause = "\nمهم: يجب أن يكون السؤال وجميع الخيارات باللغة العربية فقط."
-            prompt = Ar_polls_prompt.format(context_clause=context_clause, user_input=content)
+            goal_instruction = build_goal_instruction(goal)
+            tone_instruction = build_tone_instruction(tone)
+            
+            prompt = Ar_polls_prompt.format(
+                context_clause=context_clause,
+                user_input=content,
+                goal_instruction=goal_instruction,
+                tone_instruction=tone_instruction
+            )
         else:
             context_clause = "\nImportant: The question and all answer options must be in English only."
-            prompt = en_polls_prompt.format(context_clause=context_clause, user_input=content)
+            goal_instruction = build_goal_instruction(goal, lang="en")
+            tone_instruction = build_tone_instruction(tone, lang="en")
+            
+            prompt = en_polls_prompt.format(
+                context_clause=context_clause, 
+                user_input=content, 
+                goal_instruction=goal_instruction,
+                tone_instruction=tone_instruction
+            )
             
     return prompt
+
+
+{tone_instruction}
+- Goal: {goal_instruction}
