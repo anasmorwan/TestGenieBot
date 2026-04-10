@@ -110,7 +110,7 @@ def register(bot):‎
                     chat_id,
                     message_id=message_id,
                     text=get_message("SEND_POLL"),
-                    keyboard=
+                    keyboard=action_keyboard,
                     parse_mode="HTML"
                 )
 
