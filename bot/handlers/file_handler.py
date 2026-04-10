@@ -17,7 +17,7 @@ from models.pattern_detection import detect_quiz_pattern # استيراد الد
 from services.user_trap import update_last_active
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.sqlite_db import set_user_has_quizzes
-from bot.handler.is_member import get_channel_invite_link, is_user_member
+from bot.handlers.is_member import get_channel_invite_link, is_user_member
 
 
 import threading
@@ -34,6 +34,16 @@ def register(bot):
         reply_markup=keyboard,
         parse_mode="HTML"
     )
+    def show_channel_invitation(bot, chat_id):
+        invite_link = get_channel_invite_link(bot)
+        bot.send_message(
+        chat_id=chat_id, 
+        text=get_message("CHANNEL", invite_link=invite_link),
+        reply_markup=keyboard,
+        parse_mode="HTML"
+        )
+
+    
 
     @bot.message_handler(content_types=["document"])
     def handle_file(msg):
@@ -51,7 +61,10 @@ def register(bot):
             allowed, info = can_generate(user_id)
 
             if not allowed:
-                show_referral_message(bot, chat_id, user_id)
+                if is_user_member(user_id, bot):
+                    show_referral_message(bot, chat_id, user_id)
+                
+                show_channel_invitation(bot, chat_id)  
                 return  # ❗ هذا هو المفتاح
                 
                 
