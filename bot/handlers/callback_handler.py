@@ -34,9 +34,17 @@ import time
 
 
 
-
 def register(bot):
-    
+    @bot.callback_query_handler(
+        func=lambda call: any([
+            call.data.startswith("post_poll:"),
+            call.data.startswith("regenerate:"),
+            call.data == "customize_poll"
+            
+        ])
+    )
+    def handle_polls(call: CallbackQuery):
+        pass
 
     @bot.callback_query_handler(
         func=lambda call: any([
