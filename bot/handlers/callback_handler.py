@@ -102,7 +102,7 @@ def register(bot):‎
             )
         
     
-        if chat_id not in user_selections:
+        if chat_id not in user_poll_selections:
             user_poll_selections[chat_id] = {'selected_tone': 'ودي', 'selected_goal': 'رأي'}
 
         if data.startswith("goal_"):
