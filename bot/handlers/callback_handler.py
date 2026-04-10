@@ -96,7 +96,7 @@ def register(bot):‎
                 text = parts[1]
                 new_poll, poll_code = generate_poll(user_id, text, channel_name=None)
             
-                action_keyboard = send_poll_keyboard(user_id, poll_code) 
+                action_keyboard = send_poll_keyboard(temp_text, user_id, poll_code) 
                 normalized = normalize_poll(new_poll)
 
                 if not normalized:
