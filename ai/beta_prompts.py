@@ -268,7 +268,8 @@ def build_exact_question_plan(stage_weights, num_questions):
     return counts, plan
 
 def normalize_stage_smart(user_id, metadata, config):
-    user_level = get_user_difficulty(user_id)
+    user_level = get_user_difficulty(user_id) # e.g., "early", "mid", "advanced"
+    
     # مصفوفة الرتب لتسهيل المقارنة الرياضية
     rank = {"early": 1, "mid": 2, "advanced": 3}
     
@@ -284,11 +285,13 @@ def normalize_stage_smart(user_id, metadata, config):
         b = subject_biases.get(s, "early")
         max_bias_rank = max(max_bias_rank, rank.get(b, 1))
 
-    # 2. منطق الرفع (Promotion Logic)
-    current_rank = rank.get(ai_difficulty, 1)
+    # 2. تحديد رتبة المستخدم الحالية
+    user_rank = rank.get(user_level, 1)
     
-    # إذا كانت المادة صعبة بطبعها (مثل Pathology) والنموذج قال early، نرفعها لـ Mid
-    final_rank_val = max(current_rank, max_bias_rank)
+    # 3. منطق الرفع (Promotion Logic)
+    # نأخذ أعلى قيمة بين مستوى المستخدم، وصعوبة المادة، وتقييم الذكاء الاصطناعي للنص
+    current_rank = rank.get(ai_difficulty, 1)
+    final_rank_val = max(current_rank, max_bias_rank, user_rank)
     
     # إذا كان المستوى المعرفي هو 'evaluation' (اتخاذ قرار)، يجب أن تكون حتماً advanced
     if cognitive_level == "evaluation":
