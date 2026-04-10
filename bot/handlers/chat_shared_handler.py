@@ -192,7 +192,7 @@ def register(bot):
                 poll_data = load_quiz(poll_code)
                 
                 is_anonymous = True
-                if request_id == 1:
+                if request_id == 2:
                     is_anonymous = False
 
                 q_text, q_options = extract_poll(poll_data)
