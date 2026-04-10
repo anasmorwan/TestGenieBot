@@ -11,7 +11,7 @@ bot = telebot.TeleBot(BOT_TOKEN)
 
 # --- بيانات مؤقتة للمستخدمين ---
 user_data = {}  # هيكل: {user_id: {"content": str, "buttons": list, "step": str}}
-def register(bot):
+def register():
     # --- Step 1: بدء الأمر ---
     @bot.message_handler(commands=['create_post'])
     def cmd_create_post(message: Message):
