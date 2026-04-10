@@ -105,7 +105,7 @@ def register(bot):‎
                 q_text = normalized["question"]
                 q_options = normalized["options"]
                     
-                bot.delete_message(chat_id, message_id)
+                # bot.delete_message(chat_id, message_id)
 
                 bot.send_poll(
                     chat_id=chat_id,
