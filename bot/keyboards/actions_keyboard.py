@@ -6,7 +6,7 @@ def send_poll_keyboard(temp_text, poll_code):
     # regenerate:{temp_text}
     btn_cust = InlineKeyboardButton("🪄 تخصيص", callback_data=f"customize_poll:{temp_text}")
     btn_post = InlineKeyboardButton("🚀 نشر في القناة", callback_data=f"post_poll:{poll_code}")
-    btn_regenerate = InlineKeyboardButton("🔄 إعادة توليد", callback_data="customize_poll:{temp_text}")
+    btn_regenerate = InlineKeyboardButton("🔄 إعادة توليد", callback_data=f"customize_poll:{temp_text}")
 
     
 
