@@ -1,6 +1,6 @@
 from telebot import types
 from services.usage import is_paid_user_active
-from storage.quiz_repository import get_user_current_quiz
+from storage.quiz_repository import from get_connection, get_user_current_quiz, load_quiz
 from storage.messages import get_message
 from storage.session_store import user_states, get_state_safe, temp_texts
 from services.poll_service import generate_poll
@@ -9,6 +9,35 @@ from services.user_trap import update_last_active
 from storage.sqlite_db import get_connection
 
 
+def extract_poll(poll):
+    # 1. نظام استخراج البيانات المرن (Flexible Extraction)
+    q_text = "Poll"
+    q_options = []
+
+    if isinstance(poll, dict):
+        # إذا كان قاموساً (JSON parsed)
+        q_text = poll.get('poll') or poll.get('question') or "Poll"
+        q_options = poll.get('answers') or poll.get('options') or []
+        
+    elif isinstance(poll, list) and len(poll) > 0:
+    # إذا عاد كقائمة (بعض المكتبات تعيد الاستطلاع كأول عنصر في قائمة)
+        first_item = poll[0]
+        if isinstance(first_item, dict):
+            q_text = first_item.get('poll') or first_item.get('question')
+            q_options = first_item.get('answers') or first_item.get('options')
+    
+    else:
+        # إذا كان كائناً (Object/Class instance)
+        # نستخدم getattr لتجنب AttributeError
+        q_text = getattr(poll, 'poll', getattr(poll, 'question', "Poll"))
+        q_options = getattr(poll, 'answers', getattr(poll, 'options', []))
+
+    # 2. التحقق النهائي قبل الإرسال
+    if not q_options:
+        raise ValueError("لم يتم العثور على خيارات في الاستطلاع المولد")
+
+    print(f"DEBUG: Question extracted: {q_text[:20]}...", flush=True)
+    return q_text, q_options
 
     
 
@@ -156,11 +185,17 @@ def register(bot):
                     
 
                 return
-            elif state.get("post_poll"):
-                poll_code = 
+                
+            elif state.startswith("post_poll"):
+                parts = state.spilt(":")
+                poll_code = parts[1]
+                poll_data = load_quiz(poll_code)
+                
                 is_anonymous = True
                 if request_id == 1:
                     is_anonymous = False
+
+                q_text, q_options = extract_poll(poll_data)
                     
                 bot.send_poll(
                     chat_id=chat_id_to_publish, # تأكد من أن chat_id هو المعرف الصحيح للمستقبل
