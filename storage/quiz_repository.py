@@ -80,6 +80,23 @@ def store_content(user_id, content_data, content_type):
     conn.commit()
     conn.close()
     return code
+
+def load_quiz(quiz_code):
+    conn = get_connection()
+    c = conn.cursor()
+
+    c.execute(
+        "SELECT quiz_data FROM user_quizzes WHERE quiz_code=?",
+        (quiz_code,)
+    )
+
+    row = c.fetchone()
+    conn.close()
+
+    if not row:
+        return None
+
+    return json.loads(row[0])
     
 #----------------------------
 #  🔹 cleanup old quizzes
