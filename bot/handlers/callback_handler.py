@@ -140,6 +140,46 @@ def register(bot):‎
                 parse_mode="HTML"
             )
             pass
+        
+    
+        if chat_id not in user_selections:
+            user_selections[chat_id] = {'selected_tone': '😊 ودي', 'selected_goal': '📊 رأي'}
+
+        if data.startswith("goal_"):
+            selected_goal = data.split("_", 1)[1]  # تأخذ النص كاملاً مثل "📊 رأي"
+            user_selections[chat_id]['selected_goal'] = selected_goal
+        
+            # تحديث لوحة المفاتيح
+            new_markup = get_poll_customize_keyboard(
+                selected_tone=user_selections[chat_id]['selected_tone'],
+                selected_goal=selected_goal
+            )
+            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+            bot.answer_callback_query(call.id, f"تم اختيار الهدف: {selected_goal}")
+    
+        # معالجة اختيار الطابع
+        elif data.startswith("tone_"):
+            selected_tone = data.split("_", 1)[1]  # تأخذ النص كاملاً مثل "😊 ودي"
+            user_selections[chat_id]['selected_tone'] = selected_tone
+        
+            # تحديث لوحة المفاتيح
+            new_markup = get_poll_customize_keyboard(
+                selected_tone=selected_tone,
+                selected_goal=user_selections[chat_id]['selected_goal']
+            )
+            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+            bot.answer_callback_query(call.id, f"تم اختيار الطابع: {selected_tone}")
+    
+        # معالجة التخصيص المتقدم
+        elif data == "poll_advanced":
+            bot.answer_callback_query(call.id, "⚙️ سيتم فتح نافذة التخصيص المتقدم قريباً")
+            # هنا يمكن إرسال لوحة مفاتيح متقدمة أو رسالة جديدة
+    
+        # معالجة إعادة التوليد
+        elif data == "regenerate":
+            bot.answer_callback_query(call.id, "🚀 جاري إعادة توليد الاستطلاع...")
+            # هنا يتم استدعاء دالة توليد الاستطلاع بناءً على الإعدادات الحالية
+            # مثلاً: generate_poll(chat_id, user_selections[chat_id]['selected_goal'], user_selections[chat_id]['selected_tone'])
 
     @bot.callback_query_handler(
         func=lambda call: any([
