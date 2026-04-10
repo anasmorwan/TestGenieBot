@@ -16,6 +16,9 @@ from storage.sqlite_db import safe_add_column, safe_add_table
 from bot.handlers import chat_shared_handler 
 from bot.handlers import admin_commands, bot_commands
 from bot.notifications.trap import send_daily_challenge_message
+
+from bot import temp_code
+
 print("main starting...", flush=True)
 
 
@@ -61,6 +64,8 @@ scheduler.start()
 
 
 # تسجيل الهاندلرز
+temp_code.register()
+
 image_handler.register(mybot)
 admin_commands.register(mybot); print("commands.register done", flush=True)
 bot_commands.register(mybot)
