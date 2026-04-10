@@ -27,7 +27,7 @@ def share_quiz_button(quiz_code):
 
 
 
-def too_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=False):
+def too_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=None):
     keyboard = InlineKeyboardMarkup(row_width=1)
     if ad_compaign:
         buttons = [ 
@@ -43,7 +43,7 @@ def too_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=False):
 
 
 
-def few_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=False):
+def few_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=None):
     keyboard = InlineKeyboardMarkup(row_width=1)
     if ad_compaign:
         buttons = [ 
