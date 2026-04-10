@@ -78,7 +78,9 @@ def register(bot):‎
                 reply_markup=keyboard,
                 parse_mode="HTML"
             )
-            # temp_texts.pop(user_id, None)
+            user_states[user_id] = f"post_poll:{poll_code}"
+            
+            temp_texts.pop(user_id, None)
             
         elif data.startswith("regenerate"):   
             try:
