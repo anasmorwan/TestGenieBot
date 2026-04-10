@@ -30,6 +30,7 @@ from services.user_trap import update_last_active
 from storage.session_store import user_states, temp_texts
 from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
+from ‎services.referral import reward_referral_if_needed
 import random
 import json
 import time
