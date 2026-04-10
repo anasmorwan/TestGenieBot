@@ -21,7 +21,7 @@ from bot.handlers.chat_shared_handler import publish_interactive_link
 from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
 from services.quiz_session_service import quiz_manager
 from services.user_trap import generate_challenge
-from services.usage import get_subscription_full, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
+from services.usage import get_subscription_full, can_generate, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
 from storage.session_store import user_selections, user_states
@@ -29,6 +29,7 @@ from storage.sqlite_db import get_question_distribution, get_recent_mistakes, in
 from services.user_trap import update_last_active 
 from storage.session_store import user_states, temp_texts
 from services.poll_service import generate_poll, normalize_poll
+from bot.keyboards.actions_keyboard import send_poll_keyboard
 import random
 import json
 import time
