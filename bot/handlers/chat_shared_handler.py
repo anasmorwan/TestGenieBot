@@ -168,7 +168,7 @@ def register(bot):
                         is_anonymous=False
                     )
                 
-                    action_keyboard = send_poll_keyboard(user_id, poll_code) 
+                    action_keyboard = send_poll_keyboard(poll_code) 
                 
                     
                 
