@@ -63,6 +63,7 @@ def send_main_menu(chat_id, message_id=None):
             parse_mode=parse_mode
         )
     else:
+        text = ux_text
         mybot.send_message(
             chat_id=chat_id,
             text=text,
