@@ -545,6 +545,13 @@ class QuizManager:
         self.poll_map.pop(chat_id, None)
         wrongs_ratio = wrong / total
         user_major = get_user_major(chat_id)
+        keyboard = share_quiz_button(quiz_code)
+        
+        if wrongs_ratio <= 0.4:
+            keyboard = too_mistakes_keyboard(wrong)
+        else:
+            keyboard = few_mistakes_keyboard(wrong)
+                    
         
         # --------------------------------
         #          Logics
@@ -573,15 +580,8 @@ class QuizManager:
                 )
                 return
                 
-            elif source in ["generated_quiz", "dynamic_mix"] or has_text:
-                
-                # keyboard = share_quiz_button(quiz_code)
-                keyboard = None
+            elif source in ["generated_quiz", "dynamic_mix"]:     
                 try:    
-                    if wrongs_ratio <= 0.4:
-                        keyboard = too_mistakes_keyboard(wrong)
-                    else:
-                        keyboard = few_mistakes_keyboard(wrong)
                     bot.send_message(
                         chat_id=chat_id,
                         text=build_result_message(chat_id, score, total, streak, xp),
@@ -592,25 +592,22 @@ class QuizManager:
                 except Exception as e:
                     print(f"❌ فشل إرسال النتيجة: {e}")
                     bot.send_message(chat_id, f"خطأ: {str(e)}")
+                    
+            elif source == "mistakes":
+                pass
+            else:
+                pass
 
         
         
         elif is_paid_user_active(chat_id) and not shared:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
-            if source == "dynamic_mix":
-                if not has_text:
-                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
-                    return
+            if source == "dynamic_mix" and not has_text: 
+                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+                return
                 
             
-            if source == "generated_quiz" or has_text:
-                keyboard = share_quiz_button(quiz_code)
-                if wrongs_ratio <= 0.4:
-                    keyboard = too_mistakes_keyboard(wrong)
-                else:
-                    keyboard = few_mistakes_keyboard(wrong)
-                    
-            
+            elif source in ["generated_quiz", "dynamic_mix"]:
                 try:
                     bot.send_message(
                         chat_id=chat_id,
@@ -622,6 +619,13 @@ class QuizManager:
                 except Exception as e:
                     print(f"❌ فشل إرسال النتيجة: {e}")
                     bot.send_message(chat_id, f"خطأ: {str(e)}")
+                    
+            elif source == "mistakes":
+                pass
+            elif source == "user_review":
+                pass
+            else:
+                pass
 
         
         elif shared:
@@ -636,12 +640,6 @@ class QuizManager:
                 
             if source == "generated_quiz" or has_text:
                 try:
-                    keyboard = share_quiz_button(quiz_code)
-                    if wrongs_ratio <= 0.4:
-                        keyboard = too_mistakes_keyboard(wrong)
-                    else:
-                        keyboard = few_mistakes_keyboard(wrong)
-                    
                     bot.send_message(
                         chat_id=chat_id,
                         text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
