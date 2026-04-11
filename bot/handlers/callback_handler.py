@@ -426,7 +426,7 @@ def register(bot):
                         mistakes = get_recent_mistakes(user_id, total_mistakes)
                         quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=True)
                         
-                    elif challenge_type == "mixed_review":
+                    elif challenge_type == "user_review":
                         allowed, info = can_generate(user_id)
                 
             
