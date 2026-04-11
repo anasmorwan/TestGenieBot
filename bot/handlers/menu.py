@@ -1,6 +1,6 @@
 # menu.py
 # تم النقل
-from storage.sqlite_db import is_user_exist, get_today_attempts, get_normal_questions_total, log_new_user, get_user_mistakes_stats
+from storage.sqlite_db import is_user_exist, calculate_daily_review_limit, get_today_attempts, get_normal_questions_total, log_new_user, get_user_mistakes_stats
 from storage.messages import get_message
 from services.user_trap import update_last_active
 
@@ -16,6 +16,7 @@ def send_main_menu(chat_id, message_id=None):
     
     base_text = get_message("BASE_TEXT")
     ux_text = get_message("UX_TEXT")
+    limit = calculate_daily_review_limit(chat_id)
     
     mistakes_stat = get_user_mistakes_stats(chat_id)
     total_mistakes = mistakes_stat.get("total_mistakes")
@@ -27,36 +28,28 @@ def send_main_menu(chat_id, message_id=None):
         todays_score = todays_attempts[0]["correct_answers"]
     else:
         print("لا توجد محاولات لهذا اليوم")
-    #return {
-       # "total_mistakes": total_mistakes,
-     #   "recent_mistakes": recent_mistakes,
-     #   "avg_fail_count": round(avg_fail, 2)
- #   }
+
     
     new_text = get_message("MAIN_MENU", total_today=todays_score, mistakes_count=total_mistakes)
     
     # النص المتغير (التحية أو مقدمة مخصصة)
     welcome_new_user = "<b>👋 مرحباً بك في Qube</b>\n\n"
     welcome_returning_user = "<b>أهلاً بك، أنا Qube.. كيف يمكنني أن أختبر ذكاءك اليوم؟\n\n"
+    
+    text = ux_text
+    keyboard = None
+    parse_mode = "HTML"
 
     
     if is_user_exist(chat_id):
         text = new_text
-        keyboard = smart_ui_keyboard(recent_mistakes)
+        keyboard = smart_ui_keyboard(limit)
         parse_mode = "HTML"
         
-
-    else:    
-        text = ux_text
-        keyboard = None
-        parse_mode = "HTML"
-    
     
     if message_id:
-        
         text = new_text
-        smart_ui_keyboard(recent_mistakes)
-        # keyboard = main_menu_keyboard(bot_username)
+        keyboard = smart_ui_keyboard(limit)
         
         mybot.edit_message_text(
             text=text,
@@ -65,29 +58,10 @@ def send_main_menu(chat_id, message_id=None):
             message_id=message_id,
             parse_mode=parse_mode
         )
-    else:
-        if is_user_exist(chat_id):
-            text = new_text
-            keyboard = smart_ui_keyboard(recent_mistakes)
-        else:
-            text = ux_text
-            keyboard = None
-            
+    else:           
         mybot.send_message(
             chat_id=chat_id,
             text=text,
             reply_markup=keyboard,
             parse_mode=parse_mode
         )
-
-
-#attempts = []
-#    for row in results:
- # attempt = {
- #           'id': row[0],
-      #      'user_id': row[1],
-      #      'correct_answers': row[2],
-     #       'total_questions': row[3],
- #           'quiz_type': row[4],
-   #         'created_at': row[5]
-   #     }
