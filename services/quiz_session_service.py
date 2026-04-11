@@ -589,7 +589,7 @@ class QuizManager:
                 )
                 return
                 
-        if source in ["generated_quiz", "dynamic_mix"]:     
+        if source in ["generated_quiz", "dynamic_mix", mistakes, user_review]:     
             try:    
                 bot.send_message(
                     chat_id=chat_id,
