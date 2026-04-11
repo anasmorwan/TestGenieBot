@@ -26,7 +26,7 @@ from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
 from storage.session_store import user_selections, user_states, user_poll_selections
 from storage.sqlite_db import get_question_distribution, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
-from services.user_trap import update_last_active 
+from services.user_trap import update_last_active, get_user_content
 from storage.session_store import user_states, temp_texts
 from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.actions_keyboard import send_poll_keyboard
@@ -410,7 +410,29 @@ def register(bot):
                         mistakes = get_recent_mistakes(user_id, total_mistakes)
                         quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=True)
                         
-                    elif challenge_type == "random":
+                    elif challenge_type == "mixed_review":
+                        allowed, info = can_generate(user_id)
+                
+            
+                        if not allowed:
+                            show_referral_message(bot, chat_id, user_id)
+                            return
+                
+                        consume_quiz(user_id)
+                        reward_referral_if_needed(user_id)
+                
+                        content = get_user_content(user_id)
+                        if content is None:
+                            bot send_message(
+                                chat_id,
+                                text=get_message("MIXED_REVISION"),
+                                parse_mode="HTML"
+                            )
+                        bot send_message(
+                            chat_id,
+                            text=get_message("MIXED_REVISION"),
+                            parse_mode="HTML"
+                        )
                         
             
                     else:
