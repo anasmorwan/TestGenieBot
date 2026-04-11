@@ -226,6 +226,9 @@ class QuizManager:
                 }
             only_generate = True
             threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id, waitinf_msg.message_id, only_generate)).start()
+        except Exception as e:
+            print(f"❌ Error in start_user_review: {str(e)}")
+            
     
 
     def start_mistakes_review(self, chat_id, mistakes_list, bot, only_mistakes=False):
