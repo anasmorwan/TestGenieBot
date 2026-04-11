@@ -134,6 +134,7 @@ class QuizManager:
                     "extended": False,
                     "quiz_code": quiz_code,
                     "wrong_count": 0,
+                    "has_saved_texts": False
                     "is_shared_user": is_shared_user   # ✅ أضف هذا السطر
                 }
         
@@ -561,7 +562,7 @@ class QuizManager:
                 bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
                 return
 
-            elif is_allowed and remaining == 2 and not has_quizzes: 
+            elif is_allowed and remaining == 2 and remaining_pro != 0: 
                 keyboard = pro_quota_keyboard()
                 text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)])
                 bot.send_message(
@@ -572,18 +573,11 @@ class QuizManager:
                 )
                 return
                 
-            elif source == "generated_quiz" or has_text:
+            elif source in ["generated_quiz", "dynamic_mix"] or has_text:
                 
                 # keyboard = share_quiz_button(quiz_code)
                 keyboard = None
-                try:
-                    if source == "mistakes":
-                        with self.lock:
-                            wrong = state.get("wrong_count", 0)
-                            total = len(state.get("questions"))
-                            wrongs_ratio = wrong / total
-
-                    
+                try:    
                     if wrongs_ratio <= 0.4:
                         keyboard = too_mistakes_keyboard(wrong)
                     else:
