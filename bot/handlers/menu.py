@@ -1,6 +1,6 @@
 # menu.py
 # تم النقل
-from storage.sqlite_db import is_user_exist, log_new_user
+from storage.sqlite_db import is_user_exist, log_new_user, get_user_mistakes_stats
 from storage.messages import get_message
 from services.user_trap import update_last_active
 
@@ -17,6 +17,7 @@ def send_main_menu(chat_id, message_id=None):
     base_text = get_message("BASE_TEXT")
     ux_text = get_message("UX_TEXT")
     new_text = get_message("MAIN_MENU", total_today=total_today, mistakes_count=mistakes_count)
+    mistakes = get_user_mistakes_stats(user_id)
     
     # النص المتغير (التحية أو مقدمة مخصصة)
     welcome_new_user = "<b>👋 مرحباً بك في Qube</b>\n\n"
