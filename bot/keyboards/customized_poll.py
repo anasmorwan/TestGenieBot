@@ -23,7 +23,7 @@ def get_poll_customize_keyboard(selected_tone="ودي", selected_goal="رأي"):
 
     # ⚙️ خيارات إضافية
     markup.row(
-        InlineKeyboardButton("⚙️ تخصيص متقدم", callback_data="poll_advanced")
+        InlineKeyboardButton("⚙️ حفظ", callback_data="poll_advanced")
     )
 
     # 🚀 توليد
