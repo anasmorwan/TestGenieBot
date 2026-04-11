@@ -438,7 +438,13 @@ def register(bot):
                         if not is_user_member(user_id):
                             show_channel_invitation(bot, chat_id)
                             
+                        
                         reward_referral_if_needed(user_id)
+                        bot.send_message(
+                            chat_id,
+                            text=get_message("START_USER_REVIEW"),
+                            parse_mode="HTML"
+                        )
                         quiz_manager.start_user_review(user_id, bot)
                         
                     else:
