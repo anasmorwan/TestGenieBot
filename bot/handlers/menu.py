@@ -1,6 +1,6 @@
 # menu.py
 # تم النقل
-from storage.sqlite_db import is_user_exist, log_new_user, get_user_mistakes_stats
+from storage.sqlite_db import is_user_exist, get_today_attempts, get_normal_questions_total, log_new_user, get_user_mistakes_stats
 from storage.messages import get_message
 from services.user_trap import update_last_active
 
@@ -17,9 +17,11 @@ def send_main_menu(chat_id, message_id=None):
     base_text = get_message("BASE_TEXT")
     ux_text = get_message("UX_TEXT")
     
-    mistakes_stat = get_user_mistakes_stats(user_id)
+    mistakes_stat = get_user_mistakes_stats(chat_id)
     total_mistakes = mistakes_stat.get("total_mistakes")
     recent_mistakes = mistakes_stat.get("recent_mistakes")
+    total_questions = get_normal_questions_total(chat_id)
+    todays_q = get_today_attempts(chat_id)
     
     #return {
        # "total_mistakes": total_mistakes,
