@@ -126,17 +126,11 @@ def register(bot):
             
             user_poll_selections[chat_id]['selected_goal'] = selected_goal_clean
             
-            # تأكد من وجود user_selections أو استخدم user_poll_selections
-            if 'user_selections' in globals() or 'user_selections' in locals():
-                new_markup = get_poll_customize_keyboard(
-                    selected_tone=user_selections[chat_id]['selected_tone'],
-                    selected_goal=selected_goal
-                )
-            else:
-                new_markup = get_poll_customize_keyboard(
-                    selected_tone=user_poll_selections[chat_id]['selected_tone'],
-                    selected_goal=selected_goal
-                )
+
+            new_markup = get_poll_customize_keyboard(
+                selected_tone=user_poll_selections[chat_id]['selected_tone'],
+                selected_goal=selected_goal
+            )
             
             bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
             bot.answer_callback_query(call.id, f"تم اختيار الهدف: {selected_goal}")
@@ -146,23 +140,25 @@ def register(bot):
             selected_tone_clean = clean_tone(selected_tone)
             user_poll_selections[chat_id]['selected_tone'] = selected_tone_clean
             
-            if 'user_selections' in globals() or 'user_selections' in locals():
-                new_markup = get_poll_customize_keyboard(
-                    selected_tone=selected_tone,
-                    selected_goal=user_selections[chat_id]['selected_goal']
-                )
-            else:
-                new_markup = get_poll_customize_keyboard(
-                    selected_tone=selected_tone,
-                    selected_goal=user_poll_selections[chat_id]['selected_goal']
-                )
+            
+            new_markup = get_poll_customize_keyboard(
+                selected_tone=selected_tone,
+                user_poll_selections[chat_id]['selected_goal']
+            )
             
             bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
             bot.answer_callback_query(call.id, f"تم اختيار الطابع: {selected_tone}")
     
         elif data == "poll_advanced":
-            bot.answer_callback_query(call.id, "⚙️ سيتم فتح نافذة التخصيص المتقدم قريباً")
-
+            new_markup = get_poll_customize_keyboard(
+                selected_tone=user_poll_selections[chat_id]['selected_tone'],
+                selected_goal=user_poll_selections[chat_id]['selected_goal'], 
+                is_set=True
+            )
+            
+            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+            bot.answer_callback_query(call.id, f"✅ تم حفظ الإعدادات بنجاح")
+    
         elif data.startswith("regenerate"):
             try:
                 # تأكد من وجود هذه الدوال
