@@ -897,44 +897,37 @@ def get_recent_mistakes(user_id, limit=10):
     conn.close()
     return mistakes  # ترجع قائمة، ويمكن أن تكون فارغة []
 
+
 def get_smart_review_batch(user_id, limit):
-    """ترجع مجموعة ذكية من الأسئلة للمراجعة"""
+    """ترجع مجموعة ذكية من الأسئلة للمراجعة - نسخة مبسطة"""
     conn = get_connection()
     c = conn.cursor()
     
-    # 60% من الأخطاء الأكثر تكراراً (نقاط الضعف القوية)
-    high_priority_limit = round(limit * 0.6)
+    limit = int(limit)
+    high_priority_limit = int(round(limit * 0.6))
+    
+    # جلب جميع الأخطاء دفعة واحدة مع ترتيب ذكي
     c.execute("""
         SELECT id, question_text, options, correct_index, 
-               explanation, fail_count, last_failed, created_at
+               explanation, fail_count, last_failed, created_at,
+               CASE 
+                   -- نعطي وزناً للأخطاء المتكررة أكثر من القديمة
+                   WHEN fail_count > 2 THEN 1
+                   ELSE 2
+               END as priority_group
         FROM user_mistakes 
         WHERE user_id = ? AND fail_count > 0
-        ORDER BY fail_count DESC, last_failed DESC
+        ORDER BY 
+            priority_group ASC,           -- الأكثر تكراراً أولاً
+            fail_count DESC,              -- ثم حسب عدد مرات الخطأ
+            created_at ASC                -- ثم الأقدم
         LIMIT ?
-    """, (user_id, high_priority_limit))
+    """, (user_id, limit))
     
-    high_priority = c.fetchall()
-    
-    # 40% من الأخطاء الأقدم (لمنع النسيان)
-    old_limit = limit - len(high_priority)
-    c.execute("""
-        SELECT id, question_text, options, correct_index, 
-               explanation, fail_count, last_failed, created_at
-        FROM user_mistakes 
-        WHERE user_id = ? AND fail_count > 0
-        AND id NOT IN ({})
-        ORDER BY created_at ASC, last_failed ASC
-        LIMIT ?
-    """.format(','.join(['?']*len(high_priority)) if high_priority else '0'), 
-       (user_id, *[m[0] for m in high_priority], old_limit))
-    
-    old_mistakes = c.fetchall()
-    
+    all_mistakes = c.fetchall()
     conn.close()
     
-    # دمج النتائج وتحويلها للصيغة المطلوبة
-    all_mistakes = list(high_priority) + list(old_mistakes)
-    
+    # تحديد الأولوية بناءً على fail_count
     return [{
         "id": m[0],
         "questions": {
@@ -944,7 +937,7 @@ def get_smart_review_batch(user_id, limit):
             "explanation": m[4]
         },
         "fail_count": m[5],
-        "priority": "high" if m in high_priority else "old"
+        "priority": "high" if m[5] > 2 else "old"  # fail_count > 2 = أولوية عالية
     } for m in all_mistakes]
 
 
