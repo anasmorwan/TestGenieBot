@@ -15,7 +15,7 @@ from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from services.user_trap import update_last_active
 from storage.sqlite_db import set_user_has_quizzes, init_user_quiz_count
 import time
-
+import random
 
 def register(bot):
 
@@ -162,14 +162,26 @@ def register(bot):
                 maybe_cleanup()
                 quiz_len = len(quizzes)
 
-                bot.edit_message_text(
-                    chat_id=chat_id,
-                    message_id=waiting_msg.message_id,
-                    text=get_message("QUIZ_CREATED", count=quiz_len),
-                    reply_markup=quiz_keyboard(quiz_code), 
-                    parse_mode="HTML"
-                )
-                time.sleep(2)
+                action = random.choice(["delete", "edit"])
+                if action == "delete":
+                    bot.delete_message(chat_id, message_id=waiting_msg.message_id)
+                    bot.send_message(
+                        chat_id=chat_id,
+                        text=get_message("QUIZ_CREATED", count=quiz_len),
+                        reply_markup=quiz_keyboard(quiz_code),
+                        parse_mode="HTML"
+                    )
+                    time.sleep(2)
+                else:
+                    bot.edit_message_text(
+                        chat_id,
+                        message_id=msg_id,
+                        text=get_message("QUIZ_CREATED", count=quiz_len),
+                        reply_markup=quiz_keyboard(quiz_code),
+                        parse_mode="HTML"
+                       )
+                    time.sleep(2)
+            
                 if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False):
                     bot.edit_message_text(
                     chat_id=chat_id,
