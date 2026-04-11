@@ -34,6 +34,7 @@ from services.referral import reward_referral_if_needed
 from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.customized_poll import get_poll_customize_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
+from bot.handlers.is_member import get_channel_invite_link, is_user_member
 import random
 import json
 import time
@@ -42,6 +43,10 @@ import time
 # user_poll_selections, update_last_active, can_generate, consume_quiz, get_message
 
 def register(bot):
+    # ==========================
+    # -------- utils -----------
+    # ==========================
+    
     def clean_goal(text):
         return text.replace("📊", "").replace("⚖️", "").replace("🤝", "").strip()
 
@@ -56,7 +61,18 @@ def register(bot):
             reply_markup=keyboard,
             parse_mode="HTML"
         )
-
+    def show_channel_invitation(bot, chat_id):
+        invite_link = get_channel_invite_link(bot)
+        bot.send_message(
+        chat_id=chat_id, 
+        text=get_message("CHANNEL", invite_link=invite_link),
+        reply_markup=keyboard,
+        parse_mode="HTML"
+        )
+    
+    # ==========================
+    # -------- Main code -----------
+    # ==========================
     @bot.callback_query_handler(
         func=lambda call: any([
             call.data.startswith("post_poll:"),
@@ -419,24 +435,12 @@ def register(bot):
                             return
                 
                         consume_quiz(user_id)
-                        if not is_member(user_id):
+                        if not is_user_member(user_id):
+                            show_channel_invitation(bot, chat_id)
                             
                         reward_referral_if_needed(user_id)
-                
-                        content = get_user_content(user_id)
-                        if content is None:
-                            bot send_message(
-                            chat_id,
-                            text=get_message("NO_TEXT"),
-                            parse_mode="HTML"
-                            )
-                        bot send_message(
-                            chat_id,
-                            text=get_message("MIXED_REVISION"),
-                            parse_mode="HTML"
-                        )
+                        quiz_manager.start_user_review(chat_id, mistakes, bot, waitinf_msg.message_id)
                         
-            
                     else:
                         distribution = get_question_distribution(user_id, total_questions=3)
                         review_count = distribution["review_count"]
