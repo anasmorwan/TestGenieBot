@@ -374,18 +374,42 @@ class QuizManager:
         conn = get_connection()
         c = conn.cursor()
     
-        # زيادة العداد أولاً
+        # جلب القيم الحالية للسؤال
         c.execute("""
-            UPDATE user_mistakes 
-            SET correct_count = correct_count + 1 
+            SELECT fail_count, correct_count 
+            FROM user_mistakes 
             WHERE user_id = ? AND question_text = ?
         """, (user_id, question_text))
     
-        # حذف الأسئلة التي أتقنها المستخدم (أجاب عليها صح مرتين)
-        c.execute("""
-            DELETE FROM user_mistakes 
-            WHERE user_id = ? AND correct_count >= 2
-        """, (user_id,))
+        result = c.fetchone()
+    
+        if result:
+            fail_count, correct_count = result
+        
+            # زيادة correct_count
+            new_correct_count = correct_count + 1
+        
+            # تعديل fail_count حسب القيمة الحالية
+            if fail_count > 1:
+                new_fail_count = fail_count // 2  # قسمة صحيحة على 2
+            elif fail_count == 1:
+                new_fail_count = 0  # تصفير
+            else:
+                new_fail_count = fail_count  # يبقى كما هو (0)
+        
+            # تحديث القيم
+            c.execute("""
+                UPDATE user_mistakes 
+                SET correct_count = ?, fail_count = ?
+                WHERE user_id = ? AND question_text = ?
+            """, (new_correct_count, new_fail_count, user_id, question_text))
+        
+            # حذف السؤال فقط إذا كان fail_count = 0 من البداية و correct_count >= 2
+            c.execute("""
+                DELETE FROM user_mistakes 
+                WHERE user_id = ? AND question_text = ?
+                AND fail_count = 0 AND correct_count >= 2
+            """, (user_id, question_text))
     
         conn.commit()
         conn.close()
@@ -426,9 +450,12 @@ class QuizManager:
 
                 if is_correct:
                     state["score"] += 1
-                    if source != "mistakes":
+                    if source not in ["mistakes", "user_review"]:
                         update_progress(chat_id, correct=1, total=None)
-                    if state.get("source") == "dynamic_mix":
+                    if source == "user_review":
+                        update_progress(chat_id, correct=0.5, total=None)
+                        
+                    if source in ["dynamic_mix", "mistakes"]:
                         try:
                             self.increment_correct_count(chat_id, q.question)
                         except Exception as db_e:
