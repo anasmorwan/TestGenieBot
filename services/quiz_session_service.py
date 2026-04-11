@@ -578,7 +578,7 @@ class QuizManager:
             
             
 
-            elif is_allowed and remaining == 2 and remaining_pro != 0: 
+            if is_allowed and remaining == 2 and remaining_pro != 0: 
                 keyboard = pro_quota_keyboard()
                 text = random.choice([get_message("QUOTA_OFFER_1", total=total, score=score), get_message("QUOTA_OFFER_2", total=total, score=score)])
                 bot.send_message(
@@ -589,7 +589,7 @@ class QuizManager:
                 )
                 return
                 
-            elif source in ["generated_quiz", "dynamic_mix"]:     
+            if source in ["generated_quiz", "dynamic_mix"]:     
                 try:    
                     bot.send_message(
                         chat_id=chat_id,
@@ -613,7 +613,7 @@ class QuizManager:
             extra_quiz_msg = get_message("QUIZ_LIMIT")
                 
             
-            elif source in ["generated_quiz", "dynamic_mix"]:
+            if source in ["generated_quiz", "dynamic_mix"]:
                 try:
                     bot.send_message(
                         chat_id=chat_id,
