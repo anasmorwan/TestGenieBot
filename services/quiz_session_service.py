@@ -51,7 +51,7 @@ class QuizManager:
             if user_id is not None:
                 print(f"📡 [API] Requesting quizzes from AI...", flush=True)
                 if only_generate:
-                    raw_quizzes = generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None)
+                    raw_quizzes = generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=message_id)
                 else:
                     raw_quizzes = generate_challenge(bot, user_id, new_count, challenge_count)
                 quizzes = normalize_quizzes(raw_quizzes)
