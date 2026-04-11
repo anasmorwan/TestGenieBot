@@ -71,7 +71,7 @@ class QuizManager:
                     state["is_extended"] = True
                     state["waiting_for_extension"] = False
 
-                    should_resume = should_resume = was_waiting and (current_index is 0 or current_index >= current_count)
+                    should_resume = was_waiting and (current_index is 0 or current_index >= current_count)
                     if only_generate:
                         should_resume = True
 
