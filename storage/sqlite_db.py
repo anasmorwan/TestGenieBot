@@ -321,6 +321,69 @@ def build_dynamic_message(user_id):
         return "\n\n".join(parts)
     else:
         return False   
+
+#--------------------------
+#    🔹حفظ تاريخ الأسئلة
+#--------------------------
+
+def save_quiz_attempt(user_id, correct_answers, total_questions):
+
+    conn = get_connection()  # اسم قاعدة البيانات
+    cursor = conn.cursor()
+    
+    # إدراج البيانات الجديدة
+    cursor.execute("""
+        INSERT INTO quiz_history (user_id, correct_answers, total_questions, quiz_type)
+        VALUES (?, ?, ?, 'normal')
+    """, (user_id, correct_answers, total_questions))
+    
+    conn.commit()
+    conn.close()
+    
+    print(f"✅ تم حفظ المحاولة: {correct_answers}/{total_questions} إجابة صحيحة")
+
+
+def get_normal_questions_total(user_id):
+    """
+    إرجاع عدد الأسئلة من الاختبارات العادية فقط (normal)
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT SUM(total_questions) as total
+        FROM quiz_history
+        WHERE user_id = ? AND quiz_type = 'normal'
+    """, (user_id,))
+    
+    result = cursor.fetchone()
+    conn.close()
+    
+    total = result[0] if result[0] is not None else 0
+    print(f"📊 المستخدم {user_id} أجاب على {total} سؤال في الاختبارات العادية")
+    return total
+
+def get_total_questions(user_id):
+    """
+    إرجاع عدد جميع الأسئلة التي أجاب عليها المستخدم (من كل المحاولات)
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT SUM(total_questions) as total
+        FROM quiz_history
+        WHERE user_id = ?
+    """, (user_id,))
+    
+    result = cursor.fetchone()
+    conn.close()
+    
+    total = result[0] if result[0] is not None else 0
+    print(f"📊 المستخدم {user_id} أجاب على {total} سؤال في المجمل")
+    return total
+
+
 #--------------------------
 #    🔹 دوال الادمن المساعدة
 #--------------------------
