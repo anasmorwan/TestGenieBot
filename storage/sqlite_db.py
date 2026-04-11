@@ -77,12 +77,12 @@ def init_db():
     """)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS quiz_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id INTEGER,
-    correct_answers INTEGER,
-    total_questions INTEGER,
-    quiz_type TEXT,  -- daily / normal
-    created_at TEXT DEFAULT CURRENT_TIMESTAMP
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        correct_answers INTEGER,
+        total_questions INTEGER,
+        quiz_type TEXT,  -- daily / normal
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
@@ -389,7 +389,7 @@ def get_today_attempts(user_id):
     """
     إرجاع جميع محاولات المستخدم التي تم حفظها اليوم
     """
-    conn = sqlite3.connect('quiz.db')
+    conn = get_connection()
     cursor = conn.cursor()
     
     # الحصول على تاريخ اليوم بصيغة YYYY-MM-DD
