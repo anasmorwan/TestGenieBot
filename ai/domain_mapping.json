@@ -1,0 +1,28 @@
+{
+  "domain_mapping": {
+    "medicine": "case_based_template",
+    "law": "case_based_template",
+    "engineering": "analytical_template",
+    "computer_science": "analytical_template",
+    "history": "descriptive_template",
+    "default": "general_fallback"
+  },
+  
+  "templates": {
+    "case_based_template": {
+      "title": "Case & Scenario Based",
+      "stages": { ... } 
+    },
+    "analytical_template": {
+      "title": "Analytical & Logical",
+      "stages": {
+        "early": { "weights": { "formulas": 0.4, "definitions": 0.6 } },
+        "advanced": { "weights": { "complex_calculation": 0.6, "troubleshooting": 0.4 } }
+      }
+    },
+    "general_fallback": {
+      "title": "General Academic",
+      "stages": { ... }
+    }
+  }
+}
