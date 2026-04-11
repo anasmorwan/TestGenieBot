@@ -416,7 +416,7 @@ def register(bot):
                 try:
                     parts = data.split(":")
                     challenge_type = parts[1] if len(parts) > 1 else None
-                    total_mistakes = parts[2] if len(parts) > 1 else None
+                    total_mistakes = parts[2] if len(parts) > 2 else None
 
                     if challenge_type == "mistakes":
                         mistakes = get_recent_mistakes(user_id, total_mistakes)
