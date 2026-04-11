@@ -440,12 +440,12 @@ def register(bot):
                             
                         
                         reward_referral_if_needed(user_id)
-                        bot.send_message(
+                        msg = bot.send_message(
                             chat_id,
                             text=get_message("START_USER_REVIEW"),
                             parse_mode="HTML"
                         )
-                        quiz_manager.start_user_review(user_id, bot)
+                        quiz_manager.start_user_review(msg.message_id, user_id, bot)
                         
                     else:
                         distribution = get_question_distribution(user_id, total_questions=3)
