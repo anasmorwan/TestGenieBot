@@ -31,7 +31,7 @@ def smart_ui_keyboard(mistakes):
 
     
     btn_mistakes = InlineKeyboardButton(f"📖 مراجعة أخطائي: {mistakes}", callback_data=f"start_challenge:mistakes:{mistakes}")
-    btn_random_quiz = InlineKeyboardButton("🧠 اختبرني عشوائياً", callback_data=f"questions_quiz")
+    btn_random_quiz = InlineKeyboardButton("🧠 اختبرني عشوائياً", callback_data=f"start_challenge:user_review")
     btn_settings = InlineKeyboardButton("⚙️ الإعدادات", callback_data=f"more_options")
     
 
