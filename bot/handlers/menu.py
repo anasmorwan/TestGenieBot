@@ -21,7 +21,8 @@ def send_main_menu(chat_id, message_id=None):
     total_mistakes = mistakes_stat.get("total_mistakes")
     recent_mistakes = mistakes_stat.get("recent_mistakes")
     total_questions = get_normal_questions_total(chat_id)
-    todays_q = get_today_attempts(chat_id)
+    todays_attempts = get_today_attempts(chat_id)
+    todays_score = todays_attempts[0]["correct_answers"]
     
     #return {
        # "total_mistakes": total_mistakes,
@@ -29,7 +30,7 @@ def send_main_menu(chat_id, message_id=None):
      #   "avg_fail_count": round(avg_fail, 2)
  #   }
     
-    new_text = get_message("MAIN_MENU", total_today=total_today, mistakes_count=total_mistakes
+    new_text = get_message("MAIN_MENU", total_today=todays_score, mistakes_count=total_mistakes)
     
     # النص المتغير (التحية أو مقدمة مخصصة)
     welcome_new_user = "<b>👋 مرحباً بك في Qube</b>\n\n"
@@ -68,3 +69,14 @@ def send_main_menu(chat_id, message_id=None):
             parse_mode=parse_mode
         )
 
+
+#attempts = []
+#    for row in results:
+ # attempt = {
+ #           'id': row[0],
+      #      'user_id': row[1],
+      #      'correct_answers': row[2],
+     #       'total_questions': row[3],
+ #           'quiz_type': row[4],
+   #         'created_at': row[5]
+   #     }
