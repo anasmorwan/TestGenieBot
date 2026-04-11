@@ -6,7 +6,7 @@ import threading
 from datetime import datetime
 
 from models.quiz import QuizQuestion
-from storage.sqlite_db import get_connection, get_user_major, get_user_difficulty, user_has_quizzes, get_question_distribution
+from storage.sqlite_db import get_connection, save_quiz_attempt, get_user_major, get_user_difficulty, user_has_quizzes, get_question_distribution
 
 
 
@@ -476,6 +476,8 @@ class QuizManager:
         # --------------------------------
         #          Logics
         # --------------------------------
+        # 1\ save quiz totals for user [for usage in the main menu]
+        save_quiz_attempt(chat_id, score, total)
     
         if not is_paid_user_active(chat_id) and not shared:
             is_allowed, info = can_generate(chat_id)
