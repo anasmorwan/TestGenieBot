@@ -190,19 +190,22 @@ class QuizManager:
         except Exception as e:
             print(f"❌ Error in start_mistakes_review: {str(e)}")
 
-    def start_user_review(self, chat_id, bot):
+    def start_user_review(self, msg, chat_id, bot):
         try:
     
             content = get_user_content(user_id)
             if content is None:
-                bot send_message(
-                chat_id,
-                text=get_message("NO_QUIZ_TEXT"),
-                parse_mode="HTML"
+                if msg:
+                    bot.edit_message_text(
+                    chat_id,
+                    message_id=msg,
+                    text=get_message("NO_QUIZ_TEXT"),
+                    parse_mode="HTML"
                 )
                 return
-            waitinf_msg = bot send_message(
+            waitinf_msg = bot.edit_message_text(
                 chat_id,
+                message_id=msg,
                 text=get_message("USER_REVIEW"),
                 parse_mode="HTML"
             )
