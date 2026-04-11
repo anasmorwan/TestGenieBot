@@ -558,8 +558,15 @@ class QuizManager:
         # --------------------------------
         # 1\ save quiz totals for user [for usage in the main menu]
         save_quiz_attempt(chat_id, score, total)
+
+        
+        if shared:
+            if quiz_code:
+                creator_id = get_quiz_creator(quiz_code)
+                log_quiz_attempt(chat_id, quiz_code, score, total)
+                
     
-        if not is_paid_user_active(chat_id) and not shared:
+        if not is_paid_user_active(chat_id):
             is_allowed, info = can_generate(chat_id)
             remaining_pro = get_current_pro_quota(chat_id)
             remaining = info.get("remaining")
@@ -600,7 +607,7 @@ class QuizManager:
 
         
         
-        elif is_paid_user_active(chat_id) and not shared:
+        elif is_paid_user_active(chat_id):
             extra_quiz_msg = get_message("QUIZ_LIMIT")
             if source == "dynamic_mix" and not has_text: 
                 bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
@@ -627,32 +634,10 @@ class QuizManager:
             else:
                 pass
 
-        
-        elif shared:
-            if quiz_code:
-                creator_id = get_quiz_creator(quiz_code)
-                log_quiz_attempt(chat_id, quiz_code, score, total)
-                
-            if source == "dynamic_mix":
-                if not has_text:
-                    bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
-                    return
-                
-            if source == "generated_quiz" or has_text:
-                try:
-                    bot.send_message(
-                        chat_id=chat_id,
-                        text=get_message("TRAP_MSG", total=total, xp=xp, score=score, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
-                        reply_markup=keyboard,
-                        parse_mode="HTML"
-                    )
-                except Exception as e:
-                    print(f"❌ فشل إرسال التقرير: {e}")
-                    bot.send_message(chat_id, f"خطأ: {str(e)}")
-
-
             
 
+
+    
     def send_quiz_poll(self, bot, chat_id, q, only_mistakes=False):
         try:
             
