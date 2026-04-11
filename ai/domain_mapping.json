@@ -11,7 +11,7 @@
   "templates": {
     "case_based_template": {
       "title": "Case & Scenario Based",
-      "stages": { ... } 
+      "stages": {} 
     },
     "analytical_template": {
       "title": "Analytical & Logical",
@@ -22,7 +22,7 @@
     },
     "general_fallback": {
       "title": "General Academic",
-      "stages": { ... }
+      "stages": {}
     }
   }
 }
