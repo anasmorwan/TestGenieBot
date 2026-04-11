@@ -19,7 +19,7 @@ from analytics.shared_quiz_analytics import get_hardest_question, get_success_ra
 from bot.keyboards.quiz_buttons import share_quiz_button, too_mistakes_keyboard, few_mistakes_keyboard, pro_quota_keyboard
 from services.usage import is_paid_user_active
 from services.user_trap import generate_challenge, update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
-from services.quiz_service import normalize_quizzes
+from services.quiz_service import normalize_quizzes, generate_quizzes_from_text
 
 
 
@@ -50,7 +50,10 @@ class QuizManager:
 
             if user_id is not None:
                 print(f"📡 [API] Requesting quizzes from AI...", flush=True)
-                raw_quizzes = generate_challenge(bot, user_id, new_count, challenge_count)
+                if only_generate:
+                    raw_quizzes = generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None)
+                else:
+                    raw_quizzes = generate_challenge(bot, user_id, new_count, challenge_count)
                 quizzes = normalize_quizzes(raw_quizzes)
                 print(f"✅ [API] Received {len(quizzes)} quizzes.", flush=True)
 
@@ -67,10 +70,9 @@ class QuizManager:
                     state["is_extended"] = True
                     state["waiting_for_extension"] = False
 
-                    should_resume = was_waiting and current_index >= current_count
-
-
-                    state["questions_resumed"] = True
+                    should_resume = should_resume = was_waiting and (current_index is 0 or current_index >= current_count)
+                    if only_generate:
+                        should_resume = True
 
             if should_resume:
                 if message_id:
@@ -215,7 +217,7 @@ class QuizManager:
                     "quiz_code": quiz_code,
                     "has_saved_texts": True,
                     "is_extended": False,
-                    "waiting_for_extension": False,
+                    "waiting_for_extension": True,
                     "questions_resumed": False
                 }
             threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
