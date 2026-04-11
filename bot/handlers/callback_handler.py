@@ -439,7 +439,7 @@ def register(bot):
                             show_channel_invitation(bot, chat_id)
                             
                         reward_referral_if_needed(user_id)
-                        quiz_manager.start_user_review(chat_id, mistakes, bot, waitinf_msg.message_id)
+                        quiz_manager.start_user_review(user_id, bot)
                         
                     else:
                         distribution = get_question_distribution(user_id, total_questions=3)
