@@ -46,3 +46,19 @@ def streak_keyboard():
     return markup
 
     
+
+
+def smart_ui_keyboard(x):
+    markup = InlineKeyboardMarkup(row_width=1)
+
+    
+    btn_refill = InlineKeyboardButton(f"📖 مراجعة أخطائي: {x}", callback_data=f"refill_quiz")
+    btn_new_quiz = InlineKeyboardButton("🧠 اختبرني عشوائياً", callback_data=f"questions_quiz")
+    btn_new_quiz = InlineKeyboardButton("⚙️ الإعدادات", callback_data=f"questions_quiz")
+    
+
+
+    markup.add(btn_refill, btn_new_quiz)
+    return markup
+
+
