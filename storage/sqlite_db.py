@@ -683,6 +683,10 @@ def update_user_major(user_id, detected_domain):
     conn.commit()
     
 
+
+#--------------------------
+#    🔹 users management 
+#--------------------------
 def migrate_users_to_trap():
     conn = get_connection()
     cursor = conn.cursor()
@@ -707,9 +711,6 @@ def migrate_users_to_trap():
     conn.commit()
     print(f"✅ تم نقل {count} مستخدم إلى جدول users_trap")
 
-    
-
-
 
 def is_user_exist(user_id):
     conn = get_connection()
@@ -729,7 +730,23 @@ def log_new_user():
     conn.commit()
 
 
-
+#--------------------------
+#    🔹 دوال الأخطاء للمستخدم
+#--------------------------
+def calculate_daily_review_limit(user_id):
+    stats = get_user_mistakes_stats(user_id)
+    total_mistakes = stats["total_mistakes"]
+    
+    # القاعدة: 10 أسئلة أساسية + (عدد الأخطاء الكلية ÷ 5)
+    # مثال: 50 خطأ → 10 + (50÷5) = 20 سؤال يومياً
+    # بحد أقصى 30 سؤال يومياً لتجنب الإرهاق
+    
+    base_limit = 10
+    dynamic_bonus = total_mistakes // 5
+    daily_limit = min(base_limit + dynamic_bonus, 30)
+    
+    return daily_limit
+    
 def get_user_mistakes_stats(user_id):
     """ترجع إحصائيات الأخطاء للمستخدم"""
     conn = get_connection()
@@ -743,19 +760,70 @@ def get_user_mistakes_stats(user_id):
     
     total_mistakes = c.fetchone()[0]
     
-    # الأخطاء الحديثة (آخر 7 أيام)
+    # الأخطاء في آخر 7 أيام (عدد الأسئلة الفريدة)
     week_ago = (datetime.now() - timedelta(days=7)).isoformat()
     c.execute("""
         SELECT COUNT(*) FROM user_mistakes 
-        WHERE user_id = ? AND last_failed > ?
+        WHERE user_id = ? AND fail_count > 0 AND last_failed > ?
     """, (user_id, week_ago))
     
+    week_mistakes = c.fetchone()[0]
+    
+    # الأخطاء في آخر 24 ساعة (للنشاط الحديث)
+    day_ago = (datetime.now() - timedelta(days=1)).isoformat()
+    c.execute("""
+        SELECT COUNT(*) FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0 AND last_failed > ?
+    """, (user_id, day_ago))
+    
     recent_mistakes = c.fetchone()[0]
+    
+    # الأخطاء الفعلية في آخر 7 أيام (ككائنات للمراجعة)
+    c.execute("""
+        SELECT id, question_text, options, correct_index, explanation, 
+               fail_count, last_failed
+        FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0 AND last_failed > ?
+        ORDER BY last_failed DESC
+    """, (user_id, week_ago))
+    
+    week_mistakes_list = []
+    for row in c.fetchall():
+        week_mistakes_list.append({
+            "id": row[0],
+            "question_text": row[1],
+            "options": json.loads(row[2]),
+            "correct_index": row[3],
+            "explanation": row[4],
+            "fail_count": row[5],
+            "last_failed": row[6]
+        })
+    
+    # الأخطاء الفعلية في آخر 24 ساعة
+    c.execute("""
+        SELECT id, question_text, options, correct_index, explanation, 
+               fail_count, last_failed
+        FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0 AND last_failed > ?
+        ORDER BY last_failed DESC
+    """, (user_id, day_ago))
+    
+    recent_mistakes_list = []
+    for row in c.fetchall():
+        recent_mistakes_list.append({
+            "id": row[0],
+            "question_text": row[1],
+            "options": json.loads(row[2]),
+            "correct_index": row[3],
+            "explanation": row[4],
+            "fail_count": row[5],
+            "last_failed": row[6]
+        })
     
     # متوسط تكرار الخطأ لكل سؤال
     c.execute("""
         SELECT AVG(fail_count) FROM user_mistakes 
-        WHERE user_id = ?
+        WHERE user_id = ? AND fail_count > 0
     """, (user_id,))
     
     avg_fail = c.fetchone()[0] or 0
@@ -764,7 +832,10 @@ def get_user_mistakes_stats(user_id):
     
     return {
         "total_mistakes": total_mistakes,
-        "recent_mistakes": recent_mistakes,
+        "week_mistakes_count": week_mistakes,           # عدد الأخطاء في آخر 7 أيام
+        "week_mistakes_list": week_mistakes_list,       # قائمة الأخطاء في آخر 7 أيام
+        "recent_mistakes_count": recent_mistakes,       # عدد الأخطاء في آخر 24 ساعة
+        "recent_mistakes_list": recent_mistakes_list,   # قائمة الأخطاء في آخر 24 ساعة
         "avg_fail_count": round(avg_fail, 2)
     }
 
@@ -824,6 +895,57 @@ def get_recent_mistakes(user_id, limit=10):
     
     conn.close()
     return mistakes  # ترجع قائمة، ويمكن أن تكون فارغة []
+
+def get_smart_review_batch(user_id, limit):
+    """ترجع مجموعة ذكية من الأسئلة للمراجعة"""
+    conn = get_connection()
+    c = conn.cursor()
+    
+    # 60% من الأخطاء الأكثر تكراراً (نقاط الضعف القوية)
+    high_priority_limit = int(limit * 0.6)
+    c.execute("""
+        SELECT id, question_text, options, correct_index, 
+               explanation, fail_count, last_failed, created_at
+        FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0
+        ORDER BY fail_count DESC, last_failed DESC
+        LIMIT ?
+    """, (user_id, high_priority_limit))
+    
+    high_priority = c.fetchall()
+    
+    # 40% من الأخطاء الأقدم (لمنع النسيان)
+    old_limit = limit - len(high_priority)
+    c.execute("""
+        SELECT id, question_text, options, correct_index, 
+               explanation, fail_count, last_failed, created_at
+        FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0
+        AND id NOT IN ({})
+        ORDER BY created_at ASC, last_failed ASC
+        LIMIT ?
+    """.format(','.join(['?']*len(high_priority)) if high_priority else '0'), 
+       (user_id, *[m[0] for m in high_priority], old_limit))
+    
+    old_mistakes = c.fetchall()
+    
+    conn.close()
+    
+    # دمج النتائج وتحويلها للصيغة المطلوبة
+    all_mistakes = list(high_priority) + list(old_mistakes)
+    
+    return [{
+        "id": m[0],
+        "questions": {
+            "question": m[1],
+            "options": json.loads(m[2]),
+            "correct_index": m[3],
+            "explanation": m[4]
+        },
+        "fail_count": m[5],
+        "priority": "high" if m in high_priority else "old"
+    } for m in all_mistakes]
+
 
 def get_question_distribution(user_id, total_questions=10):
     """تحديد نسبة الأسئلة حسب حالة المستخدم"""
