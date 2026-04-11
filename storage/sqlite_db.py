@@ -384,6 +384,52 @@ def get_total_questions(user_id):
     return total
 
 
+
+def get_today_attempts(user_id):
+    """
+    إرجاع جميع محاولات المستخدم التي تم حفظها اليوم
+    """
+    conn = sqlite3.connect('quiz.db')
+    cursor = conn.cursor()
+    
+    # الحصول على تاريخ اليوم بصيغة YYYY-MM-DD
+    today_date = datetime.now().strftime('%Y-%m-%d')
+    
+    # استعلام لجلب محاولات اليوم فقط
+    cursor.execute("""
+        SELECT id, user_id, correct_answers, total_questions, quiz_type, created_at
+        FROM quiz_history
+        WHERE user_id = ? AND DATE(created_at) = ?
+        ORDER BY created_at DESC
+    """, (user_id, today_date))
+    
+    results = cursor.fetchall()
+    conn.close()
+    
+    if not results:
+        print(f"📅 لا توجد محاولات للمستخدم {user_id} اليوم")
+        return []
+    
+    print(f"📅 محاولات المستخدم {user_id} اليوم ({today_date}):")
+    print("-" * 60)
+    
+    attempts = []
+    for row in results:
+        attempt = {
+            'id': row[0],
+            'user_id': row[1],
+            'correct_answers': row[2],
+            'total_questions': row[3],
+            'quiz_type': row[4],
+            'created_at': row[5]
+        }
+        attempts.append(attempt)
+        
+        print(f"  🎯 {attempt['quiz_type']}: {attempt['correct_answers']}/{attempt['total_questions']} - {attempt['created_at']}")
+    
+    return attempts
+
+
 #--------------------------
 #    🔹 دوال الادمن المساعدة
 #--------------------------
