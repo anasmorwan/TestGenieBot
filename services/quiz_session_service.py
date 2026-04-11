@@ -565,6 +565,10 @@ class QuizManager:
                 creator_id = get_quiz_creator(quiz_code)
                 log_quiz_attempt(chat_id, quiz_code, score, total)
                 
+        if source == "dynamic_mix" and not has_text:
+            bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+            return
+                
     
         if not is_paid_user_active(chat_id):
             is_allowed, info = can_generate(chat_id)
@@ -572,9 +576,7 @@ class QuizManager:
             remaining = info.get("remaining")
             has_quizzes = user_has_quizzes(chat_id)
             
-            if source == "dynamic_mix" and not has_text:
-                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
-                return
+            
 
             elif is_allowed and remaining == 2 and remaining_pro != 0: 
                 keyboard = pro_quota_keyboard()
@@ -609,9 +611,6 @@ class QuizManager:
         
         elif is_paid_user_active(chat_id):
             extra_quiz_msg = get_message("QUIZ_LIMIT")
-            if source == "dynamic_mix" and not has_text: 
-                bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
-                return
                 
             
             elif source in ["generated_quiz", "dynamic_mix"]:
