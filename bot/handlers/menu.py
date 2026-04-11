@@ -22,8 +22,11 @@ def send_main_menu(chat_id, message_id=None):
     recent_mistakes = mistakes_stat.get("recent_mistakes")
     total_questions = get_normal_questions_total(chat_id)
     todays_attempts = get_today_attempts(chat_id)
-    todays_score = todays_attempts[0]["correct_answers"]
-    
+    todays_score = None
+    if todays_attempts:
+        todays_score = todays_attempts[0]["correct_answers"]
+    else:
+        print("لا توجد محاولات لهذا اليوم")
     #return {
        # "total_mistakes": total_mistakes,
      #   "recent_mistakes": recent_mistakes,
