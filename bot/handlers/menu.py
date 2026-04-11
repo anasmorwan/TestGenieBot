@@ -7,7 +7,7 @@ from services.user_trap import update_last_active
 from bot.bot_instance import mybot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from bot.keyboards.main_menu import main_menu_keyboard
-from bot.keyboards.action_keyboard import smart_ui_keyboard
+from bot.keyboards.quiz_buttons import smart_ui_keyboard
 
 def send_main_menu(chat_id, message_id=None):
     
@@ -16,7 +16,7 @@ def send_main_menu(chat_id, message_id=None):
     
     base_text = get_message("BASE_TEXT")
     ux_text = get_message("UX_TEXT")
-    new_text = get_message("MAIN_MENU")
+    new_text = get_message("MAIN_MENU", total_today=total_today, mistakes_count=mistakes_count)
     
     # النص المتغير (التحية أو مقدمة مخصصة)
     welcome_new_user = "<b>👋 مرحباً بك في Qube</b>\n\n"
@@ -25,7 +25,7 @@ def send_main_menu(chat_id, message_id=None):
     
     if is_user_exist(chat_id):
         text = new_text
-        keyboard = smart_ui_keyboard(mistakes, total)
+        keyboard = smart_ui_keyboard(mistakes)
         parse_mode = "HTML"
         
 
@@ -38,7 +38,7 @@ def send_main_menu(chat_id, message_id=None):
     if message_id:
         
         text = new_text
-        smart_ui_keyboard(mistakes, total)
+        smart_ui_keyboard(mistakes)
         # keyboard = main_menu_keyboard(bot_username)
         
         mybot.edit_message_text(
