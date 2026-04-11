@@ -741,7 +741,7 @@ def calculate_daily_review_limit(user_id):
     # مثال: 50 خطأ → 10 + (50÷5) = 20 سؤال يومياً
     # بحد أقصى 30 سؤال يومياً لتجنب الإرهاق
     
-    base_limit = 10
+    base_limit = 7
     dynamic_bonus = total_mistakes // 5
     daily_limit = min(base_limit + dynamic_bonus, 30)
     
@@ -839,7 +839,7 @@ def get_user_mistakes_stats(user_id):
         "avg_fail_count": round(avg_fail, 2)
     }
 
-def get_user_mistakes_by_age(user_id):
+def get_user_mistakes_by_age(user_id, limit):
     """ترجع الأخطاء مرتبة حسب القدم (الأقدم أولاً)"""
     conn = get_connection()
     c = conn.cursor()
@@ -850,7 +850,8 @@ def get_user_mistakes_by_age(user_id):
         FROM user_mistakes 
         WHERE user_id = ? AND fail_count > 0
         ORDER BY created_at ASC
-    """, (user_id,))
+        LIMIT ?
+    """, (user_id, limit))
     
     mistakes = []
     for row in c.fetchall():
@@ -902,7 +903,7 @@ def get_smart_review_batch(user_id, limit):
     c = conn.cursor()
     
     # 60% من الأخطاء الأكثر تكراراً (نقاط الضعف القوية)
-    high_priority_limit = int(limit * 0.6)
+    high_priority_limit = round(limit * 0.6)
     c.execute("""
         SELECT id, question_text, options, correct_index, 
                explanation, fail_count, last_failed, created_at
