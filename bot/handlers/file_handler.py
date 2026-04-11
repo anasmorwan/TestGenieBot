@@ -19,7 +19,7 @@ from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.sqlite_db import set_user_has_quizzes
 from bot.handlers.is_member import get_channel_invite_link, is_user_member
 
-
+import random
 import threading
     
 
