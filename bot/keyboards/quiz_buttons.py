@@ -26,22 +26,6 @@ def share_quiz_button(quiz_code):
     return keyboard
 
 
-def smart_ui_keyboard(mistakes):
-    markup = InlineKeyboardMarkup(row_width=1)
-
-    
-    btn_mistakes = InlineKeyboardButton(f"📖 مراجعة أخطائي: {mistakes}", callback_data=f"start_challenge:mistakes:{mistakes}")
-    btn_random_quiz = InlineKeyboardButton("🧠 اختبرني عشوائياً", callback_data=f"start_challenge:user_review")
-    btn_settings = InlineKeyboardButton("⚙️ الإعدادات", callback_data=f"more_options")
-    
-
-
-    markup.add(btn_mistakes, btn_random_quiz, btn_settings)
-    return markup
-
-
-
-
 def too_mistakes_keyboard(wrong_count, ad_compaign=False, campaign_link=None):
     keyboard = InlineKeyboardMarkup(row_width=1)
     if ad_compaign:
