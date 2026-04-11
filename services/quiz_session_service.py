@@ -42,6 +42,7 @@ class QuizManager:
             distribution = get_question_distribution(user_id, total_questions=3)
             challenge_count = distribution["challenge_count"]
             new_count = distribution["new_count"]
+            content = get_user_content(user_id)
 
             print(f"📊 [INFO] Distribution: {new_count} new, {challenge_count} challenge.", flush=True)
 
