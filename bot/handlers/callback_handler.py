@@ -419,14 +419,16 @@ def register(bot):
                             return
                 
                         consume_quiz(user_id)
+                        if not is_member(user_id):
+                            
                         reward_referral_if_needed(user_id)
                 
                         content = get_user_content(user_id)
                         if content is None:
                             bot send_message(
-                                chat_id,
-                                text=get_message("MIXED_REVISION"),
-                                parse_mode="HTML"
+                            chat_id,
+                            text=get_message("NO_TEXT"),
+                            parse_mode="HTML"
                             )
                         bot send_message(
                             chat_id,
