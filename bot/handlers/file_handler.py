@@ -203,7 +203,7 @@ def register(bot):
                     reply_markup=quiz_keyboard(quiz_code),
                     parse_mode="HTML"
                     )
-                    time.sleep(2)
+                time.sleep(2)
             
 
             
