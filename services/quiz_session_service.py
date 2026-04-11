@@ -134,7 +134,7 @@ class QuizManager:
                     "extended": False,
                     "quiz_code": quiz_code,
                     "wrong_count": 0,
-                    "has_saved_texts": False
+                    "has_saved_texts": False,
                     "is_shared_user": is_shared_user   # ✅ أضف هذا السطر
                 }
         
