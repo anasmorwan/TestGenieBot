@@ -17,7 +17,7 @@ from bot.handlers import chat_shared_handler
 from bot.handlers import admin_commands, bot_commands
 from bot.notifications.trap import send_daily_challenge_message
 
-from bot import temp_code
+
 
 print("main starting...", flush=True)
 
