@@ -220,7 +220,8 @@ class QuizManager:
                     "waiting_for_extension": True,
                     "questions_resumed": False
                 }
-            threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
+            only_generate = True
+            threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id, waitinf_msg.message_id, only_generate)).start()
     
 
     def start_mistakes_review(self, chat_id, mistakes_list, bot, only_mistakes=False):
