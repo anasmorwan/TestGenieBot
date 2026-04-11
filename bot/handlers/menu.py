@@ -6,8 +6,8 @@ from services.user_trap import update_last_active
 
 from bot.bot_instance import mybot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from bot.keyboards.main_menu import main_menu_keyboard
-from bot.keyboards.quiz_buttons import smart_ui_keyboard
+from bot.keyboards.main_menu import main_menu_keyboard, smart_ui_keyboard
+
 
 def send_main_menu(chat_id, message_id=None):
     
@@ -55,7 +55,7 @@ def send_main_menu(chat_id, message_id=None):
     if message_id:
         
         text = new_text
-        smart_ui_keyboard(mistakes)
+        smart_ui_keyboard(recent_mistakes)
         # keyboard = main_menu_keyboard(bot_username)
         
         mybot.edit_message_text(
