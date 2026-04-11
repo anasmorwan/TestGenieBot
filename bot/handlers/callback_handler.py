@@ -25,7 +25,7 @@ from services.usage import get_subscription_full, can_generate, get_usage, build
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
 from storage.session_store import user_selections, user_states, user_poll_selections
-from storage.sqlite_db import get_question_distribution, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
+from storage.sqlite_db import get_question_distribution, get_smart_review_batch, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
 from services.user_trap import update_last_active, get_user_content
 from storage.session_store import user_states, temp_texts
 from services.poll_service import generate_poll, normalize_poll
@@ -418,8 +418,15 @@ def register(bot):
                     challenge_type = parts[1] if len(parts) > 1 else None
                     total_mistakes = parts[2] if len(parts) > 2 else None
 
-                    if challenge_type == "mistakes":
-                        mistakes = get_recent_mistakes(user_id, total_mistakes)
+                    if challenge_type.startswith("mistakes"):
+                        parts = challenge_type.split("_")
+                        mistakes_pool = parts[1] if len(parts) > 1 else None
+                        
+                        if mistakes_pool == "all":
+                            mistakes = get_smart_review_batch(user_id, total_mistakes)
+                        else:
+                            mistakes = get_recent_mistakes(user_id, total_mistakes)
+                            
                         quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=True)
                         
                     elif challenge_type == "user_review":
