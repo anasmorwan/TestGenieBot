@@ -589,53 +589,32 @@ class QuizManager:
                 )
                 return
                 
-            if source in ["generated_quiz", "dynamic_mix"]:     
-                try:    
-                    bot.send_message(
-                        chat_id=chat_id,
-                        text=build_result_message(chat_id, score, total, streak, xp),
-                        reply_markup=keyboard,
-                        parse_mode="HTML"
-                    )
-                    print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")          
-                except Exception as e:
-                    print(f"❌ فشل إرسال النتيجة: {e}")
-                    bot.send_message(chat_id, f"خطأ: {str(e)}")
+        if source in ["generated_quiz", "dynamic_mix"]:     
+            try:    
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=build_result_message(chat_id, score, total, streak, xp),
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
+                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")          
+            except Exception as e:
+                print(f"❌ فشل إرسال النتيجة: {e}")
+                bot.send_message(chat_id, f"خطأ: {str(e)}")
                     
-            elif source == "mistakes":
-                pass
-            else:
-                pass
+        elif source == "mistakes":
+            pass
+        elif source == "user_review":
+            pass
+        else:
+            pass
 
         
         
-        elif is_paid_user_active(chat_id):
-            extra_quiz_msg = get_message("QUIZ_LIMIT")
-                
+        
             
-            if source in ["generated_quiz", "dynamic_mix"]:
-                try:
-                    bot.send_message(
-                        chat_id=chat_id,
-                        text=get_message("TRAP_MSG", total=total, score=score, xp=xp, streak=streak, feedback_line=feedback_line, weakness_line=weakness_line),
-                        reply_markup=keyboard,
-                        parse_mode="HTML"
-                    )
-                    print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")           
-                except Exception as e:
-                    print(f"❌ فشل إرسال النتيجة: {e}")
-                    bot.send_message(chat_id, f"خطأ: {str(e)}")
-                    
-            elif source == "mistakes":
-                pass
-            elif source == "user_review":
-                pass
-            else:
-                pass
-
+        
             
-
-
     
     def send_quiz_poll(self, bot, chat_id, q, only_mistakes=False):
         try:
