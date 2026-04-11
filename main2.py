@@ -64,7 +64,7 @@ scheduler.start()
 
 
 # تسجيل الهاندلرز
-temp_code.register()
+# temp_code.register()
 
 image_handler.register(mybot)
 admin_commands.register(mybot); print("commands.register done", flush=True)
