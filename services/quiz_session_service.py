@@ -34,7 +34,7 @@ class QuizManager:
         # ✅ هذا هو الناقص
         self.poll_map = {}
 
-    def generate_and_store(self, bot=None, chat_id=None, user_id=None, message_id=None):
+    def generate_and_store(self, bot=None, chat_id=None, user_id=None, message_id=None, only_generate=False):
         try:
             print(f"🚀 [START] Starting generation for user_id: {user_id}", flush=True)
 
@@ -186,19 +186,36 @@ class QuizManager:
         except Exception as e:
             print(f"❌ Error in start_mistakes_review: {str(e)}")
 
-    def start_user_review(self, chat_id, bot)
-        content = get_user_content(user_id)
-        if content is None:
-            bot send_message(
-            chat_id,
-            text=get_message("NO_TEXT"),
-            parse_mode="HTML"
+    def start_user_review(self, chat_id, bot):
+        try:
+    
+            content = get_user_content(user_id)
+            if content is None:
+                bot send_message(
+                chat_id,
+                text=get_message("NO_QUIZ_TEXT"),
+                parse_mode="HTML"
+                )
+                return
+            waitinf_msg = bot send_message(
+                chat_id,
+                text=get_message("USER_REVIEW"),
+                parse_mode="HTML"
             )
-        waitinf_msg = bot send_message(
-            chat_id,
-            text=get_message("MIXED_REVISION"),
-            parse_mode="HTML"
-        )
+            with self.lock:
+                self.sessions[chat_id] = {
+                    "questions": questions,
+                    "index": 0,
+                    "score": 0,
+                    "wrong_count": 0,
+                    "source": "dynamic_mix",
+                    "quiz_code": "CHALLENGE_MODE",
+                    "has_saved_texts": has_content, # 👈 ستكون True أو False بدقة
+                    "is_extended": False,
+                    "waiting_for_extension": True,
+                    "questions_resumed": False
+                }
+            threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
     
 
     def start_mistakes_review(self, chat_id, mistakes_list, bot, only_mistakes=False):
