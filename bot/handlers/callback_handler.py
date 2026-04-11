@@ -409,6 +409,9 @@ def register(bot):
                     if challenge_type == "mistakes":
                         mistakes = get_recent_mistakes(user_id, total_mistakes)
                         quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=True)
+                        
+                    elif challenge_type == "random":
+                        
             
                     else:
                         distribution = get_question_distribution(user_id, total_questions=3)
