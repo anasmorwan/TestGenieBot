@@ -69,6 +69,10 @@ def send_main_menu(chat_id, message_id=None):
         if is_user_exist(chat_id):
             text = new_text
             keyboard = smart_ui_keyboard(recent_mistakes)
+        else:
+            text = ux_text
+            keyboard = None
+            
         mybot.send_message(
             chat_id=chat_id,
             text=text,
