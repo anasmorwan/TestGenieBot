@@ -6,6 +6,7 @@ def paid_plans_keyboard():
     upgrade_options_keyboard.add(
         InlineKeyboardButton("🔥 اشتراك Pro", callback_data="buy_subscription1"),
         InlineKeyboardButton("⭐ اشتراك Pro+", callback_data="buy_subscription2"),
+        InlineKeyboardButton("🚨 حزمة الطوارئ", callback_data="buy_subscription3"),
         InlineKeyboardButton("⬅️ رجوع", callback_data="upgrade_account")
     )
     return upgrade_options_keyboard
