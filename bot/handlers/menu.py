@@ -23,14 +23,14 @@ def send_main_menu(chat_id, message_id=None):
     
     total_questions = get_normal_questions_total(chat_id)
     todays_attempts = get_today_attempts(chat_id)
-    todays_score = 0
+    todays_questions = 0
     if todays_attempts:
-        todays_score = todays_attempts[0]["correct_answers"]
+        todays_questions = todays_attempts[0]["total_questions"]
     else:
         print("لا توجد محاولات لهذا اليوم")
 
     
-    smart_ui_text = get_message("MAIN_MENU", total_today=todays_score, mistakes_count=total_mistakes)
+    smart_ui_text = get_message("MAIN_MENU", total_today=todays_questions, mistakes_count=total_mistakes)
     base_text = get_message("BASE_TEXT")
     ux_text = get_message("UX_TEXT")
     
