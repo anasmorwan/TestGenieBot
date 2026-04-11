@@ -5,6 +5,7 @@ import json
 import threading
 from datetime import datetime
 
+
 from models.quiz import QuizQuestion
 from storage.sqlite_db import get_connection, save_quiz_attempt, get_user_major, get_user_difficulty, user_has_quizzes, get_question_distribution
 
@@ -203,16 +204,18 @@ class QuizManager:
                 parse_mode="HTML"
             )
             with self.lock:
+                timestamp = int(time.time()) 
+                quiz_code = f"{chat_id}_{timestamp}"
                 self.sessions[chat_id] = {
-                    "questions": questions,
+                    "questions": [],
                     "index": 0,
                     "score": 0,
                     "wrong_count": 0,
-                    "source": "dynamic_mix",
-                    "quiz_code": "CHALLENGE_MODE",
-                    "has_saved_texts": has_content, # 👈 ستكون True أو False بدقة
+                    "source": "user_review",
+                    "quiz_code": quiz_code,
+                    "has_saved_texts": True,
                     "is_extended": False,
-                    "waiting_for_extension": True,
+                    "waiting_for_extension": False,
                     "questions_resumed": False
                 }
             threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
