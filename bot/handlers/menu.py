@@ -16,8 +16,18 @@ def send_main_menu(chat_id, message_id=None):
     
     base_text = get_message("BASE_TEXT")
     ux_text = get_message("UX_TEXT")
-    new_text = get_message("MAIN_MENU", total_today=total_today, mistakes_count=mistakes_count)
-    mistakes = get_user_mistakes_stats(user_id)
+    
+    mistakes_stat = get_user_mistakes_stats(user_id)
+    total_mistakes = mistakes_stat.get("total_mistakes")
+    recent_mistakes = mistakes_stat.get("recent_mistakes")
+    
+    #return {
+       # "total_mistakes": total_mistakes,
+     #   "recent_mistakes": recent_mistakes,
+     #   "avg_fail_count": round(avg_fail, 2)
+ #   }
+    
+    new_text = get_message("MAIN_MENU", total_today=total_today, mistakes_count=total_mistakes
     
     # النص المتغير (التحية أو مقدمة مخصصة)
     welcome_new_user = "<b>👋 مرحباً بك في Qube</b>\n\n"
@@ -26,7 +36,7 @@ def send_main_menu(chat_id, message_id=None):
     
     if is_user_exist(chat_id):
         text = new_text
-        keyboard = smart_ui_keyboard(mistakes)
+        keyboard = smart_ui_keyboard(recent_mistakes)
         parse_mode = "HTML"
         
 
