@@ -143,7 +143,7 @@ def register(bot):
             
             new_markup = get_poll_customize_keyboard(
                 selected_tone=selected_tone,
-                user_poll_selections[chat_id]['selected_goal']
+                selected_goal=user_poll_selections[chat_id]['selected_goal']
             )
             
             bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
