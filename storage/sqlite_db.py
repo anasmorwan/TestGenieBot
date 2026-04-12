@@ -737,15 +737,14 @@ def calculate_daily_review_limit(user_id):
     stats = get_user_mistakes_stats(user_id)
     total_mistakes = stats["total_mistakes"]
     
-    # القاعدة: 10 أسئلة أساسية + (عدد الأخطاء الكلية ÷ 5)
-    # مثال: 50 خطأ → 10 + (50÷5) = 20 سؤال يومياً
-    # بحد أقصى 30 سؤال يومياً لتجنب الإرهاق
-    
     base_limit = 7
     dynamic_bonus = total_mistakes // 5
     daily_limit = min(base_limit + dynamic_bonus, 30)
     
-    return daily_limit
+    # ✅ لا تتجاوز عدد الأخطاء الفعلي
+    daily_limit = min(daily_limit, total_mistakes)
+    
+    return max(daily_limit, 0)  # ضمان عدم رجوع قيمة سالبة
     
 def get_user_mistakes_stats(user_id):
     """ترجع إحصائيات الأخطاء للمستخدم"""
@@ -899,46 +898,100 @@ def get_recent_mistakes(user_id, limit=10):
 
 
 def get_smart_review_batch(user_id, limit):
-    """ترجع مجموعة ذكية من الأسئلة للمراجعة - نسخة مبسطة"""
+    """ترجع مجموعة ذكية من الأسئلة للمراجعة مع ضمان عدم تجاوز العدد الفعلي"""
     conn = get_connection()
     c = conn.cursor()
     
-    limit = int(limit)
-    high_priority_limit = int(round(limit * 0.6))
+    # أولاً: معرفة العدد الفعلي للأخطاء المتاحة
+    c.execute("""
+        SELECT COUNT(*) FROM user_mistakes 
+        WHERE user_id = ? AND fail_count > 0
+    """, (user_id,))
     
-    # جلب جميع الأخطاء دفعة واحدة مع ترتيب ذكي
+    actual_total = c.fetchone()[0]
+    
+    # ضبط limit ليكون الحد الأدنى بين المطلوب والموجود فعلياً
+    limit = min(int(limit), actual_total)
+    
+    if limit == 0:
+        conn.close()
+        return []
+    
+    # 60% من الأخطاء الأكثر تكراراً
+    high_priority_limit = min(int(round(limit * 0.6)), actual_total)
+    
     c.execute("""
         SELECT id, question_text, options, correct_index, 
-               explanation, fail_count, last_failed, created_at,
-               CASE 
-                   -- نعطي وزناً للأخطاء المتكررة أكثر من القديمة
-                   WHEN fail_count > 2 THEN 1
-                   ELSE 2
-               END as priority_group
+               explanation, fail_count, last_failed, created_at
         FROM user_mistakes 
         WHERE user_id = ? AND fail_count > 0
-        ORDER BY 
-            priority_group ASC,           -- الأكثر تكراراً أولاً
-            fail_count DESC,              -- ثم حسب عدد مرات الخطأ
-            created_at ASC                -- ثم الأقدم
+        ORDER BY fail_count DESC, last_failed DESC
         LIMIT ?
-    """, (user_id, limit))
+    """, (user_id, high_priority_limit))
     
-    all_mistakes = c.fetchall()
+    high_priority = c.fetchall()
+    
+    # حساب المتبقي بدقة
+    old_limit = limit - len(high_priority)
+    
+    old_mistakes = []
+    if old_limit > 0:
+        high_priority_ids = [m[0] for m in high_priority]
+        
+        if high_priority_ids:
+            placeholders = ','.join(['?'] * len(high_priority_ids))
+            query = f"""
+                SELECT id, question_text, options, correct_index, 
+                       explanation, fail_count, last_failed, created_at
+                FROM user_mistakes 
+                WHERE user_id = ? AND fail_count > 0
+                AND id NOT IN ({placeholders})
+                ORDER BY created_at ASC, last_failed ASC
+                LIMIT ?
+            """
+            params = [user_id] + high_priority_ids + [old_limit]
+        else:
+            query = """
+                SELECT id, question_text, options, correct_index, 
+                       explanation, fail_count, last_failed, created_at
+                FROM user_mistakes 
+                WHERE user_id = ? AND fail_count > 0
+                ORDER BY created_at ASC, last_failed ASC
+                LIMIT ?
+            """
+            params = [user_id, old_limit]
+        
+        c.execute(query, params)
+        old_mistakes = c.fetchall()
+    
     conn.close()
     
-    # تحديد الأولوية بناءً على fail_count
-    return [{
-        "id": m[0],
-        "questions": {
-            "question": m[1],
-            "options": json.loads(m[2]),
-            "correct_index": m[3],
-            "explanation": m[4]
-        },
-        "fail_count": m[5],
-        "priority": "high" if m[5] > 2 else "old"  # fail_count > 2 = أولوية عالية
-    } for m in all_mistakes]
+    # دمج النتائج
+    all_mistakes = list(high_priority) + list(old_mistakes)
+    
+    # ✅ تأكيد نهائي: لا نرجع أكثر من الموجود فعلياً
+    all_mistakes = all_mistakes[:limit]
+    
+    high_priority_ids = [m[0] for m in high_priority]
+    
+    result = []
+    for m in all_mistakes:
+        result.append({
+            "id": m[0],
+            "questions": {
+                "question": m[1],
+                "options": json.loads(m[2]),
+                "correct_index": m[3],
+                "explanation": m[4]
+            },
+            "fail_count": m[5],
+            "priority": "high" if m[0] in high_priority_ids else "old"
+        })
+    
+    # ✅ طباعة للتأكد
+    print(f"📊 المطلوب: {limit} | الفعلي: {len(result)} | الإجمالي الكلي: {actual_total}")
+    
+    return result
 
 
 def get_question_distribution(user_id, total_questions=10):
