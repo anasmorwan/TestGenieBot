@@ -56,12 +56,10 @@ def register(bot):
             allowed, info = can_generate(user_id)
 
             if not allowed:
-                if is_user_member(user_id, bot):
-                    show_referral_message(bot, chat_id, user_id)
-                    return
-                else:
-                    show_channel_invitation(bot, chat_id)
-                    return
+                
+                show_referral_message(bot, chat_id, user_id)
+                return
+                
 
             consume_quiz(user_id)
             reward_referral_if_needed(user_id)
