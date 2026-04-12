@@ -194,7 +194,7 @@ class QuizManager:
     def start_user_review(self, msg, chat_id, bot):
         try:
     
-            content = get_user_content(user_id)
+            content = get_user_content(chat_id)
             if content is None:
                 if msg:
                     bot.edit_message_text(
