@@ -48,20 +48,25 @@ def streak_keyboard():
     
 
 
-def invitation_keyboard(invite_link):
+def invitation_keyboard(invite_link, user_id):
     markup = InlineKeyboardMarkup(row_width=1)
     
     # التحقق: هل هو رابط مباشر (يبدأ بـ http أو https أو t.me/)
     if invite_link.startswith(("http://", "https://", "t.me/")):
         # رابط مباشر - استخدم url
+        
         btn_refill = InlineKeyboardButton("🚀 إنضم الآن", url=invite_link)
-        btn_refill = InlineKeyboardButton("🔥 تحدي جديد", callback_data="go_generate")
+        btn_new = InlineKeyboardButton("🔥 تحدي جديد", callback_data="go_generate")
     else:
         # ليس رابطاً مباشراً - اعتبره username واستخدم inline query
         btn_refill = InlineKeyboardButton(
             "🚀 إنضم الآن", 
-            switch_inline_query=invite_link  # أو callback_data حسب ما تريد
+            switch_inline_query=invite_link
         )
-    
-    markup.add(btn_refill)
+        btn_new = InlineKeyboardButton("🔥 تحدي جديد", callback_data="go_generate")
+
+    if not user_has_quizzes(user_id):
+        markup.add(btn_refill, btn_new)
+    else:
+        markup.add(btn_refill)
     return markup
