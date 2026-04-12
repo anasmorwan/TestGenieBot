@@ -195,5 +195,29 @@ def register(bot):
 
 
 
-
-
+    @bot.message_handler(commands=['bot_chats_report'])
+    def send_report(message):
+        try:
+            if not joined_chats:
+                bot.reply_to(message, "📊 لا توجد قنوات أو مجموعات مسجلة بعد.\n\n💡 تأكد من أن البوت تمت إضافته كـ Admin في القنوات/المجموعات وأنك فعّالت خاصية جمع المعلومات.")
+                return
+    
+            total = len(joined_chats)
+            report_text = f"<b>📊 تقرير القنوات والمجموعات</b>\n\n"
+            report_text += f"<b>📌 العدد الإجمالي:</b> {total}\n\n"
+            report_text += "<b>📋 القائمة:</b>\n"
+    
+            for idx, (chat_id, chat_info) in enumerate(list(joined_chats.items())[:20], 1):  # عرض أول 20 فقط
+                chat_type = "📢 قناة" if chat_info.get('type') == 'channel' else "👥 مجموعة"
+                chat_title = chat_info.get('title', 'بدون اسم')
+                report_text += f"{idx}. {chat_type} | <b>{chat_title}</b>\n"
+                report_text += f"   🆔 <code>{chat_id}</code>\n\n"
+    
+            if total > 20:
+                report_text += f"\n... و {total - 20} أخرى"
+    
+            bot.reply_to(message, report_text, parse_mode="HTML")
+    
+        except Exception as e:
+            bot.reply_to(msg, f"❌ حدث خطأ أثناء جلب البيانات: {str(e)}")
+            
