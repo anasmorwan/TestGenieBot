@@ -620,6 +620,15 @@ Input:
 {user_input}
 """
 
+
+    
+def clean_goal(text):
+    return text.replace("📊", "").replace("⚖️", "").replace("🤝", "").strip()
+
+def clean_tone(text):
+    return text.replace("😊", "").replace("🎯", "").replace("🔥", "").strip()
+
+
 def build_tone_instruction(tone, lang="ar"):
     if not tone:
         return "No specific preference — use the most suitable style for the context." if lang == "en" else "لا يوجد تخصيص — استخدم الأسلوب الأنسب للسياق."
@@ -666,14 +675,17 @@ def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
     if isinstance(content, tuple):
         content = content[0]
     content = str(content) if content else ""
+    clean_goal = clean_goal(goal)
+    clean_tone = clean_tone(tone)
     
     target_lang = detect_text_language(content)
     
     if channel_name:
         if target_lang == "Arabic":
             context_clause = f"\nملاحظة: هذا الاستطلاع مخصص لمجتمع/قناة باسم '{channel_name}'. يجب تعديل النبرة والمفردات لتناسب هذا الجمهور.\nمهم: يجب أن يكون السؤال وجميع الخيارات باللغة العربية فقط."
-            goal_instruction = build_goal_instruction(goal)
-            tone_instruction = build_tone_instruction(tone)
+            
+            goal_instruction = build_goal_instruction(clean_goal)
+            tone_instruction = build_tone_instruction(clean_tone)
             
             prompt = Ar_polls_prompt.format(
                 context_clause=context_clause,
@@ -683,8 +695,9 @@ def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
             )
         else:
             context_clause = f"\nNote: This poll is intended for a community/channel named '{channel_name}'. Adjust the tone and vocabulary to suit this audience.\nImportant: The question and all answer options must be in English only."
-            goal_instruction = build_goal_instruction(goal, lang="en")
-            tone_instruction = build_tone_instruction(tone, lang="en")
+            
+            goal_instruction = build_goal_instruction(clean_goal, lang="en")
+            tone_instruction = build_tone_instruction(clean_tone, lang="en")
             
             prompt = en_polls_prompt.format(
                 context_clause=context_clause, 
@@ -695,8 +708,8 @@ def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
     else:
         if target_lang == "Arabic":
             context_clause = "\nمهم: يجب أن يكون السؤال وجميع الخيارات باللغة العربية فقط."
-            goal_instruction = build_goal_instruction(goal)
-            tone_instruction = build_tone_instruction(tone)
+            goal_instruction = build_goal_instruction(clean_goal)
+            tone_instruction = build_tone_instruction(clean_tone)
             
             prompt = Ar_polls_prompt.format(
                 context_clause=context_clause,
@@ -706,8 +719,8 @@ def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
             )
         else:
             context_clause = "\nImportant: The question and all answer options must be in English only."
-            goal_instruction = build_goal_instruction(goal, lang="en")
-            tone_instruction = build_tone_instruction(tone, lang="en")
+            goal_instruction = build_goal_instruction(clean_goal, lang="en")
+            tone_instruction = build_tone_instruction(clean_tone, lang="en")
             
             prompt = en_polls_prompt.format(
                 context_clause=context_clause, 
