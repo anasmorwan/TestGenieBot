@@ -34,6 +34,7 @@ from services.referral import reward_referral_if_needed
 from bot.keyboards.referral_keyboard import referral_keyboard
 from bot.keyboards.customized_poll import get_poll_customize_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
+from bot.keyboards.actions_keyboard import invitation_keyboard
 from bot.handlers.is_member import get_channel_invite_link, is_user_member
 import random
 import json
@@ -57,6 +58,7 @@ def register(bot):
         )
     def show_channel_invitation(bot, chat_id):
         invite_link = get_channel_invite_link(bot)
+        keyboard = invitation_keyboard(invite_link)
         bot.send_message(
         chat_id=chat_id, 
         text=get_message("CHANNEL", invite_link=invite_link),
