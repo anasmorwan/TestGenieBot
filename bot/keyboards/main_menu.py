@@ -27,3 +27,16 @@ def smart_ui_keyboard(mistakes):
     return markup
  
     
+def ui_no_mistakes_keyboard(mistakes):
+    markup = InlineKeyboardMarkup(row_width=1)
+
+
+    btn_random_quiz = InlineKeyboardButton("🧠 اختبرني عشوائياً", callback_data=f"start_challenge:user_review")
+    btn_settings = InlineKeyboardButton("⚙️ الإعدادات", callback_data="more_options")
+    
+
+
+    markup.add(btn_random_quiz, btn_settings)
+    return markup
+ 
+
