@@ -143,14 +143,20 @@ def register(bot):
             bot.answer_callback_query(call.id, f"تم اختيار الطابع: {selected_tone}")
     
         elif data == "poll_advanced":
-            new_markup = get_poll_customize_keyboard(
-                selected_tone=user_poll_selections[chat_id]['selected_tone'],
-                selected_goal=user_poll_selections[chat_id]['selected_goal'], 
-                is_set=True
-            )
+            try:
+                new_markup = get_poll_customize_keyboard(
+                    selected_tone=user_poll_selections[chat_id]['selected_tone'],
+                    selected_goal=user_poll_selections[chat_id]['selected_goal'], 
+                    is_set=True
+                )
+                print(f"DEBUG - selected_tone: {user_poll_selections[chat_id]['selected_tone']}")
+                print(f"DEBUG - selected_goal: {user_poll_selections[chat_id]['selected_goal']}")
             
-            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
-            bot.answer_callback_query(call.id, f"✅ تم حفظ الإعدادات بنجاح")
+                bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=new_markup)
+                bot.answer_callback_query(call.id, f"✅ تم حفظ الإعدادات بنجاح")
+            except Exception as e:
+                print(f"ERROR in poll_advanced: {e}")
+                bot.answer_callback_query(call.id, f"❌ خطأ: {str(e)}")
     
         elif data.startswith("regenerate"):
             try:
