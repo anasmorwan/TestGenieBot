@@ -38,6 +38,9 @@ if GROQ_API_KEY:
     try:
         groq_client = Groq(api_key=GROQ_API_KEY)
         logging.info("✅ 2. Groq configured successfully")
+        models = groq_client.models.list()
+        for m in models.data:
+            print(m.id, flush=True)
     except Exception as e:
         logging.warning(f"❌ Groq failed: {e}")
 
