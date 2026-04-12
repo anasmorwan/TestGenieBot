@@ -174,7 +174,7 @@ def register(bot):
                     time.sleep(2)
                 else:
                     bot.edit_message_text(
-                        chat_id,
+                        chat_id=chat_id,
                         message_id=msg_id,
                         text=get_message("QUIZ_CREATED", count=quiz_len),
                         reply_markup=quiz_keyboard(quiz_code),
