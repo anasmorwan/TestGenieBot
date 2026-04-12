@@ -18,6 +18,7 @@ from services.user_trap import update_last_active
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.sqlite_db import set_user_has_quizzes
 from bot.handlers.is_member import get_channel_invite_link, is_user_member
+from bot.keyboards.actions_keyboard import invitation_keyboard
 
 import random
 import threading
@@ -36,14 +37,13 @@ def register(bot):
     )
     def show_channel_invitation(bot, chat_id):
         invite_link = get_channel_invite_link(bot)
+        keyboard = invitation_keyboard(invite_link)
         bot.send_message(
         chat_id=chat_id, 
         text=get_message("CHANNEL", invite_link=invite_link),
         reply_markup=keyboard,
         parse_mode="HTML"
         )
-
-    
 
     @bot.message_handler(content_types=["document"])
     def handle_file(msg):
