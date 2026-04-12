@@ -475,17 +475,17 @@ def register(bot):
     
                      # طباعة في الـ console
                      
-                     print("❌ CALLBACK ERROR DETECTED")
-                     print("=" * 50)
-                     print(f"Exception Type: {type(e).__name__}")
-                     print(f"Exception Message: {str(e)}")
+                    print("❌ CALLBACK ERROR DETECTED")
+                    print("=" * 50)
+                    print(f"Exception Type: {type(e).__name__}")
+                    print(f"Exception Message: {str(e)}")
                      
-                     print("Full Traceback:")
-                     print(error_traceback)
-                     print("=" * 50)
+                    print("Full Traceback:")
+                    print(error_traceback)
+                    print("=" * 50)
     
-                     # إرسال رسالة مختصرة للمستخدم
-                     bot.send_message(chat_id, f"⚠️ حدث خطأ: {str(e)}")
+                    # إرسال رسالة مختصرة للمستخدم
+                    bot.send_message(chat_id, f"⚠️ حدث خطأ: {str(e)}")
     
                 
                        
