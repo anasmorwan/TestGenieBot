@@ -198,14 +198,14 @@ class QuizManager:
             if content is None:
                 if msg:
                     bot.edit_message_text(
-                    chat_id,
+                    chat_id=chat_id,
                     message_id=msg,
                     text=get_message("NO_SAVED_TEXT"),
                     parse_mode="HTML"
                 )
                 return
             waitinf_msg = bot.edit_message_text(
-                chat_id,
+                chat_id=chat_id,
                 message_id=msg,
                 text=get_message("USER_REVIEW"),
                 parse_mode="HTML"
