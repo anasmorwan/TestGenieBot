@@ -36,7 +36,8 @@ def send_main_menu(chat_id, message_id=None):
     
 
     if total_mistakes == 0:
-        smart_ui_text = get_message("MENU_NO_MISTAKES")
+        smart_ui_text = get_message("NO_MISTAKES_REVIEW")
+        keyboard = 
     
 
     text = ux_text
