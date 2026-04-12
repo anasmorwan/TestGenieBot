@@ -191,6 +191,8 @@ def get_daily_limit(user_id):
         return 25
     elif plan == "pro_plus":
         return 50
+    elif plan == "fast_bunddle":
+        return 15
     else:
         return 3
 
