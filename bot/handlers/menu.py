@@ -6,7 +6,7 @@ from services.user_trap import update_last_active
 
 from bot.bot_instance import mybot
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-from bot.keyboards.main_menu import main_menu_keyboard, smart_ui_keyboard
+from bot.keyboards.main_menu import main_menu_keyboard, smart_ui_keyboard, ui_no_mistakes_keyboard
 
 
 def send_main_menu(chat_id, message_id=None):
@@ -34,16 +34,15 @@ def send_main_menu(chat_id, message_id=None):
     base_text = get_message("BASE_TEXT")
     ux_text = get_message("UX_TEXT")
     
-
-    if total_mistakes == 0:
-        smart_ui_text = get_message("NO_MISTAKES_REVIEW")
-        keyboard = 
-    
-
     text = ux_text
     keyboard = None
     parse_mode = "HTML"
+    
 
+    if total_mistakes == 0:
+        smart_ui_text = get_message("NO_MISTAKES_REVIEW")
+        keyboard = ui_no_mistakes_keyboard()
+    
     
     if is_user_exist(chat_id):
         text = smart_ui_text
