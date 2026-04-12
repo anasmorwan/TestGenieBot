@@ -61,13 +61,8 @@ def register(bot):
             allowed, info = can_generate(user_id)
 
             if not allowed:
-                if is_user_member(user_id, bot):
-                    show_referral_message(bot, chat_id, user_id)
-                    return
-                
-                else:
-                    show_channel_invitation(bot, chat_id)  
-                    return  # ❗ هذا هو المفتاح
+                show_channel_invitation(bot, chat_id)  
+                return  # ❗ هذا هو المفتاح
                 
                 
             # 👇 استهلك محاولة
