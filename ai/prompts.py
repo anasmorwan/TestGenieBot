@@ -383,16 +383,22 @@ def pro_quiz_generator(user_id, content: Any, num_questions: int) -> Dict[str, A
 # ============================================================
 
 system_role = """
-You are a precise AI quiz generator.
-Your task is to create quiz questions strictly from the provided content.
+You are an expert Academic Exam Consultant. 
+Your goal is to transform educational content into high-stakes exam questions that mimic professional testing patterns and identify "trick" areas.
 """.strip()
+
 
 quiz_rules = """
 Rules:
-- Use ONLY information in the content.
-- Do NOT invent or assume information.
-- Questions must test recall or understanding.
+1. Target Learning Objectives: If the content mentions "Objectives" or "Goals", prioritize them as the primary source for questions.
+2. Trick Patterning: Avoid generic "What is X?" questions. Instead, focus on:
+   - Distinguishing between similar concepts.
+   - Identifying the "Exception" (Except/Not true).
+   - Practical application of the facts.
+3. Strict Fidelity: Use ONLY provided content. Do not hallucinate outside information.
+4. Distractor Quality: Ensure wrong options (distractors) are plausible and based on related information from the same text to challenge the student's precision.
 """.strip()
+
 
 quiz_format = """
 {
