@@ -21,7 +21,7 @@ from services.usage import is_paid_user_active
 from services.user_trap import generate_challenge, update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
 from services.quiz_service import normalize_quizzes, generate_quizzes_from_text
 from bot.keyboards.actions_keyboards import invitation_keyboard
-from bot/handlers/is_member.py import is_user_member, get_channel_invite_link
+from bot.handlers.is_member import is_user_member, get_channel_invite_link
 
 
 
