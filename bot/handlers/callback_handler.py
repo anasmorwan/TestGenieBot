@@ -410,38 +410,39 @@ def register(bot):
                     parts = data.split(":")
                     challenge_type = parts[1] if len(parts) > 1 else None
                     total_mistakes = parts[2] if len(parts) > 2 else None
-
-                    if challenge_type.startswith("mistakes"):
-                        parts = challenge_type.split("_")
-                        mistakes_pool = parts[1] if len(parts) > 1 else None
+                    if challenge_type is not None:
                         
-                        if mistakes_pool == "all":
-                            mistakes = get_smart_review_batch(user_id, total_mistakes)
-                        else:
-                            mistakes = get_recent_mistakes(user_id, total_mistakes)
+                        if challenge_type.startswith("mistakes"):
+                            parts = challenge_type.split("_")
+                            mistakes_pool = parts[1] if len(parts) > 1 else None
+                        
+                            if mistakes_pool == "all":
+                                mistakes = get_smart_review_batch(user_id, total_mistakes)
+                            else:
+                                mistakes = get_recent_mistakes(user_id, total_mistakes)
                             
-                        quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=True)
+                            quiz_manager.start_mistakes_review(chat_id, mistakes, bot, only_mistakes=True)
                         
-                    elif challenge_type == "user_review":
-                        allowed, info = can_generate(user_id)
+                        elif challenge_type == "user_review":
+                            allowed, info = can_generate(user_id)
                 
             
-                        if not allowed:
-                            show_referral_message(bot, chat_id, user_id)
-                            return
+                            if not allowed:
+                                show_referral_message(bot, chat_id, user_id)
+                                return
                 
-                        consume_quiz(user_id)
-                        if not is_user_member(user_id, bot):
-                            show_channel_invitation(bot, chat_id)
+                            consume_quiz(user_id)
+                            if not is_user_member(user_id, bot):
+                                show_channel_invitation(bot, chat_id)
                             
                         
-                        reward_referral_if_needed(user_id)
-                        msg = bot.send_message(
-                            chat_id,
-                            text=get_message("START_USER_REVIEW"),
-                            parse_mode="HTML"
-                        )
-                        quiz_manager.start_user_review(msg.message_id, user_id, bot)
+                            reward_referral_if_needed(user_id)
+                            msg = bot.send_message(
+                                chat_id,
+                                text=get_message("START_USER_REVIEW"),
+                                parse_mode="HTML"
+                            )
+                            quiz_manager.start_user_review(msg.message_id, user_id, bot)
                         
                     else:
                         distribution = get_question_distribution(user_id, total_questions=3)
