@@ -206,7 +206,7 @@ def register(bot):
             
     
             quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False)
-            set_user_has_quizzes(user_id)
+            
         
         
         except Exception as e:
