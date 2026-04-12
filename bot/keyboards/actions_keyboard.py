@@ -48,3 +48,19 @@ def streak_keyboard():
     
 
 
+def invitation_keyboard(invite_link):
+    markup = InlineKeyboardMarkup(row_width=1)
+    
+    # التحقق: هل هو رابط مباشر (يبدأ بـ http أو https أو t.me/)
+    if invite_link.startswith(("http://", "https://", "t.me/")):
+        # رابط مباشر - استخدم url
+        btn_refill = InlineKeyboardButton("🚀 إنضم الآن", url=invite_link)
+    else:
+        # ليس رابطاً مباشراً - اعتبره username واستخدم inline query
+        btn_refill = InlineKeyboardButton(
+            "🚀 إنضم الآن", 
+            switch_inline_query=invite_link  # أو callback_data حسب ما تريد
+        )
+    
+    markup.add(btn_refill)
+    return markup
