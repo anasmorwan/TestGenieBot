@@ -7,7 +7,7 @@ from datetime import datetime
 
 
 from models.quiz import QuizQuestion
-from storage.sqlite_db import get_connection, save_quiz_attempt, get_user_major, get_user_difficulty, user_has_quizzes, get_question_distribution
+from storage.sqlite_db import get_connection, set_user_has_quizzes, save_quiz_attempt, get_user_major, get_user_difficulty, user_has_quizzes, get_question_distribution
 
 
 
@@ -611,10 +611,12 @@ class QuizManager:
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
-                print(f"✅ تم إرسال النتيجة للمستخدم {chat_id}")          
+                
+                set_user_has_quizzes(chat_id)
             except Exception as e:
                 print(f"❌ فشل إرسال النتيجة: {e}")
                 bot.send_message(chat_id, f"خطأ: {str(e)}")
+                set_user_has_quizzes(chat_id)
                     
         elif source == "mistakes":
             pass
