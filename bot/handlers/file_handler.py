@@ -63,6 +63,7 @@ def register(bot):
             if not allowed:
                 if is_user_member(user_id, bot):
                     show_referral_message(bot, chat_id, user_id)
+                    return
                 
                 show_channel_invitation(bot, chat_id)  
                 return  # ❗ هذا هو المفتاح
