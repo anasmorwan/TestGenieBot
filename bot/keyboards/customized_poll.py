@@ -1,7 +1,7 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 
-def get_poll_customize_keyboard(selected_tone="ودي", selected_goal="رأي", set=False):
+def get_poll_customize_keyboard(selected_tone="ودي", selected_goal="رأي", is_set=False):
     markup = InlineKeyboardMarkup(row_width=3)
 
     # 🎯 الهدف
