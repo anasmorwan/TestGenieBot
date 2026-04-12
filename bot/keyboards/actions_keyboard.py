@@ -55,6 +55,7 @@ def invitation_keyboard(invite_link):
     if invite_link.startswith(("http://", "https://", "t.me/")):
         # رابط مباشر - استخدم url
         btn_refill = InlineKeyboardButton("🚀 إنضم الآن", url=invite_link)
+        btn_refill = InlineKeyboardButton("🔥 تحدي جديد", callback_data="go_generate")
     else:
         # ليس رابطاً مباشراً - اعتبره username واستخدم inline query
         btn_refill = InlineKeyboardButton(
