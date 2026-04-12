@@ -2,7 +2,7 @@ import os
 from services.usage import activate_subscription_manual, reset_or_set_daily_usage, get_user_full_info
 from analytics.metrics import get_metrics
 from services.backup_service import backup_all
-
+from bot.handlers.is_member import joined_chats
 
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
