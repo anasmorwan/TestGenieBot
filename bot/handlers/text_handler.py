@@ -201,7 +201,7 @@ def register(bot):
                     message_id=waiting_msg.message_id,
                     text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
                     )
-                set_user_has_quizzes(user_id)
+                
                 print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
             
             
