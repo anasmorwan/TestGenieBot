@@ -15,7 +15,7 @@ from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from services.user_trap import update_last_active
 from storage.sqlite_db import set_user_has_quizzes, init_user_quiz_count
 from bot.keyboards.actions_keyboard import invitation_keyboard
-
+from bot.handlers.is_member import is_user_member, get_channel_invite_link
 import time
 import random
 
