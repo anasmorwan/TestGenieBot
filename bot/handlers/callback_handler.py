@@ -46,12 +46,6 @@ def register(bot):
     # ==========================
     # -------- utils -----------
     # ==========================
-    
-    def clean_goal(text):
-        return text.replace("📊", "").replace("⚖️", "").replace("🤝", "").strip()
-
-    def clean_tone(text):
-        return text.replace("😊", "").replace("🎯", "").replace("🔥", "").strip()
 
     def show_referral_message(bot, chat_id, user_id):
         keyboard = referral_keyboard(user_id)
@@ -122,9 +116,7 @@ def register(bot):
 
         if data.startswith("goal_"):
             selected_goal = data.split("_", 1)[1]
-            selected_goal_clean = clean_goal(selected_goal)
-            
-            user_poll_selections[chat_id]['selected_goal'] = selected_goal_clean
+            user_poll_selections[chat_id]['selected_goal'] = selected_goal
             
 
             new_markup = get_poll_customize_keyboard(
@@ -137,8 +129,7 @@ def register(bot):
     
         elif data.startswith("tone_"):
             selected_tone = data.split("_", 1)[1]
-            selected_tone_clean = clean_tone(selected_tone)
-            user_poll_selections[chat_id]['selected_tone'] = selected_tone_clean
+            user_poll_selections[chat_id]['selected_tone'] = selected_tone
             
             
             new_markup = get_poll_customize_keyboard(
