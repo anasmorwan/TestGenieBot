@@ -200,7 +200,7 @@ class QuizManager:
                     bot.edit_message_text(
                     chat_id,
                     message_id=msg,
-                    text=get_message("NO_QUIZ_TEXT"),
+                    text=get_message("NO_SAVED_TEXT"),
                     parse_mode="HTML"
                 )
                 return
