@@ -30,13 +30,13 @@ def get_poll_customize_keyboard(selected_tone="ودي", selected_goal="رأي", 
     markup.row(*tone_buttons)
 
     # ⚙️ خيارات إضافية
-    text = "✅ تم حفظ الإعدادات" if set else "⚙️ حفظ"   
+    text = "✅ تم حفظ الإعدادات" if is_set else "⚙️ حفظ"   
     markup.row(
         InlineKeyboardButton(text, callback_data="poll_advanced")
     )
 
     # 🚀 توليد
-    text_1 = "🚀 إعادة توليد الآن" if set else "🚀 إعادة توليد الاستطلاع"
+    text_1 = "🚀 إعادة توليد الآن" if is_set else "🚀 إعادة توليد الاستطلاع"
     markup.row(
         InlineKeyboardButton(text_1, callback_data="regenerate")
     )
