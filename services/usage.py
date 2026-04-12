@@ -458,7 +458,7 @@ def is_paid_user_active(user_id):
     plan, expires_at, daily_limit = sub
 
     # 2️⃣ التأكد أنه خطة مدفوعة
-    if plan not in ("pro", "pro_plus", "fast_bundlle"):
+    if plan not in ("pro", "pro_plus", "fast_bunddle"):
         conn.close()
         return False
 
