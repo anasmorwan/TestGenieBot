@@ -1,5 +1,5 @@
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
-
+from storage.sqlite_db import user_has_quizzes
 
 def send_poll_keyboard(poll_code):
     markup = InlineKeyboardMarkup(row_width=1)
