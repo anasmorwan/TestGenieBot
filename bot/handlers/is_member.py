@@ -41,3 +41,31 @@ def get_channel_invite_link(bot):
         return CHANNEL_USERNAME if CHANNEL_USERNAME else "رابط القناة"
 
 
+
+from telebot import TeleBot
+from telebot.types import ChatMemberUpdated
+
+
+# تخزين معلومات القنوات والمجموعات
+joined_chats = {}
+
+
+def register(bot):
+    @bot.chat_member_handler()
+    def handle_chat_member(chat_member: ChatMemberUpdated):
+        # التحقق من أن البوت هو العضو المضاف
+        if chat_member.new_chat_member.user.id == bot.get_me().id:
+            chat = chat_member.chat
+            chat_id = chat.id
+            chat_title = chat.title or chat.username or "بدون اسم"
+            chat_type = chat.type  # 'group', 'supergroup', 'channel'
+        
+            joined_chats[chat_id] = {
+                'title': chat_title,
+                'type': chat_type,
+                'username': chat.username
+            }
+        
+            # طباعة في الكونسول للتأكيد
+            print(f"✅ تم الانضمام إلى {chat_type}: {chat_title} (ID: {chat_id})")
+
