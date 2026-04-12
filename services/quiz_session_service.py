@@ -20,8 +20,8 @@ from bot.keyboards.quiz_buttons import share_quiz_button, too_mistakes_keyboard,
 from services.usage import is_paid_user_active
 from services.user_trap import generate_challenge, update_progress, get_weakness_line, get_feedback_line, build_result_message, get_user_content
 from services.quiz_service import normalize_quizzes, generate_quizzes_from_text
-
-
+from bot.keyboards.actions_keyboards import invitation_keyboard
+from bot/handlers/is_member.py import is_user_member, get_channel_invite_link
 
 
 
@@ -571,6 +571,16 @@ class QuizManager:
                 
         if source == "dynamic_mix" and not has_text:
             bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
+            return
+        if not is_user_member(chat_id, bot):
+            invite_link = get_channel_invite_link(bot)
+            keyboard = invitation_keyboard(invite_link)
+            bot.send_message(
+                chat_id=chat_id,
+                text=get_message("CHANNEL_CONV_2"),
+                reply_markup=keyboard,
+                parse_mode="HTML"
+            )
             return
                 
     
