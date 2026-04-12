@@ -391,12 +391,13 @@ Your goal is to transform educational content into high-stakes exam questions th
 quiz_rules = """
 Rules:
 1. Target Learning Objectives: If the content mentions "Objectives" or "Goals", prioritize them as the primary source for questions.
-2. Trick Patterning: Avoid generic "What is X?" questions. Instead, focus on:
+2. Anti-Surface Retrieval: DO NOT generate questions that rely on simple phrase extraction, sentence rephrasing, or basic definition-matching. 
+3. Trick Patterning: Avoid generic "What is X?" questions. Instead, focus on:
    - Distinguishing between similar concepts.
    - Identifying the "Exception" (Except/Not true).
    - Practical application of the facts.
-3. Strict Fidelity: Use ONLY provided content. Do not hallucinate outside information.
-4. Distractor Quality: Ensure wrong options (distractors) are plausible and based on related information from the same text to challenge the student's precision.
+4. Strict Fidelity: Use ONLY provided content. Do not hallucinate outside information.
+5. Distractor Quality: Ensure wrong options (distractors) are plausible and based on related information from the same text to challenge the student's precision.
 """.strip()
 
 
@@ -452,7 +453,6 @@ def build_quiz_prompt(user_id, content: Any, num_questions: int, user_instructio
 
 {language_rule}
 
-{surface_level_rule}
 
 Generate {num_questions} quiz questions.
 
