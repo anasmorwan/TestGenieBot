@@ -509,6 +509,10 @@ class QuizManager:
                 self.finish_quiz(chat_id, bot, shared, only_mistakes)
                 print("⚡ finishing quiz.", flush=True)
                 return
+                
+            if state["index"] >= len(state["questions"]):
+                self.send_current_question(chat_id, bot)
+                return
 
             self.send_current_question(chat_id, bot)
 
