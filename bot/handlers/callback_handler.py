@@ -432,8 +432,7 @@ def register(bot):
                                 return
                 
                             consume_quiz(user_id)
-                            if not is_user_member(user_id, bot):
-                                show_channel_invitation(bot, chat_id)
+                            
                             
                         
                             reward_referral_if_needed(user_id)
