@@ -27,7 +27,7 @@ def smart_ui_keyboard(mistakes):
     return markup
  
     
-def ui_no_mistakes_keyboard(mistakes):
+def ui_no_mistakes_keyboard():
     markup = InlineKeyboardMarkup(row_width=1)
 
 
