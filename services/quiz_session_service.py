@@ -572,16 +572,7 @@ class QuizManager:
         if source == "dynamic_mix" and not has_text:
             bot.send_message(chat_id, text=get_message("NO_QUIZ_TEXT"), parse_mode="HTML")
             return
-        if not is_user_member(chat_id, bot):
-            invite_link = get_channel_invite_link(bot)
-            keyboard = invitation_keyboard(invite_link, chat_id)
-            bot.send_message(
-                chat_id=chat_id,
-                text=get_message("CHANNEL_CONV_2"),
-                reply_markup=keyboard,
-                parse_mode="HTML"
-            )
-            return
+        
                 
     
         if not is_paid_user_active(chat_id):
@@ -598,6 +589,16 @@ class QuizManager:
                 bot.send_message(
                     chat_id,
                     text=text,
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
+                return
+            if not is_user_member(chat_id, bot):
+                invite_link = get_channel_invite_link(bot)
+                keyboard = invitation_keyboard(invite_link, chat_id)
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=get_message("CHANNEL_CONV_2"),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
