@@ -1,9 +1,14 @@
 import telebot
 import os
 from dotenv import load_dotenv
+from telebot import TeleBot
+from telebot.types import ChatMemberUpdated
 
 # تحميل المتغيرات من ملف .env
 load_dotenv()
+
+# تخزين معلومات القنوات والمجموعات
+joined_chats = {}
 
 
 CHANNEL_ID = os.getenv("CHANNEL_ID")  # مثال: -1001234567890
@@ -40,14 +45,6 @@ def get_channel_invite_link(bot):
     except:
         return CHANNEL_USERNAME if CHANNEL_USERNAME else "رابط القناة"
 
-
-
-from telebot import TeleBot
-from telebot.types import ChatMemberUpdated
-
-
-# تخزين معلومات القنوات والمجموعات
-joined_chats = {}
 
 
 def register(bot):
