@@ -14,6 +14,8 @@ from services.poll_service import generate_poll, normalize_poll
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from services.user_trap import update_last_active
 from storage.sqlite_db import set_user_has_quizzes, init_user_quiz_count
+from bot.keyboards.actions_keyboard import invitation_keyboard
+
 import time
 import random
 
@@ -26,6 +28,15 @@ def register(bot):
             text=get_message("REFERRAL_1"),
             reply_markup=keyboard,
             parse_mode="HTML"
+        )
+    def show_channel_invitation(bot, chat_id):
+        invite_link = get_channel_invite_link(bot)
+        keyboard = invitation_keyboard(invite_link)
+        bot.send_message(
+        chat_id=chat_id, 
+        text=get_message("CHANNEL", invite_link=invite_link),
+        reply_markup=keyboard,
+        parse_mode="HTML"
         )
 
     @bot.message_handler(func=lambda msg: msg.chat.type == "private", content_types=["text"])
@@ -45,8 +56,12 @@ def register(bot):
             allowed, info = can_generate(user_id)
 
             if not allowed:
-                show_referral_message(bot, chat_id, user_id)
-                return
+                if is_user_member(user_id, bot):
+                    show_referral_message(bot, chat_id, user_id)
+                    return
+                else:
+                    show_channel_invitation(bot, chat_id)
+                    return
 
             consume_quiz(user_id)
             reward_referral_if_needed(user_id)
