@@ -574,7 +574,7 @@ class QuizManager:
             return
         if not is_user_member(chat_id, bot):
             invite_link = get_channel_invite_link(bot)
-            keyboard = invitation_keyboard(invite_link)
+            keyboard = invitation_keyboard(invite_link, chat_id)
             bot.send_message(
                 chat_id=chat_id,
                 text=get_message("CHANNEL_CONV_2"),
