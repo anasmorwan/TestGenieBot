@@ -444,7 +444,7 @@ def register(bot):
                             )
                             quiz_manager.start_user_review(msg.message_id, user_id, bot)
                         
-                    else:
+                    elif challenge_type is None:
                         distribution = get_question_distribution(user_id, total_questions=3)
                         review_count = distribution["review_count"]
                 
@@ -468,10 +468,25 @@ def register(bot):
                         )
                         
                 except Exception as e:
-                    bot.send_message(chat_id, f"CALLBACK ERROR: {str(e)}")
-                    print(f"CALLBACK ERROR: {str(e)}")
-                
-                
+                    import traceback
+    
+                    # الحصول على تفاصيل الخطأ الكاملة
+                    error_traceback = traceback.format_exc()
+    
+                     # طباعة في الـ console
+                     
+                     print("❌ CALLBACK ERROR DETECTED")
+                     print("=" * 50)
+                     print(f"Exception Type: {type(e).__name__}")
+                     print(f"Exception Message: {str(e)}")
+                     
+                     print("Full Traceback:")
+                     print(error_traceback)
+                     print("=" * 50)
+    
+                     # إرسال رسالة مختصرة للمستخدم
+                     bot.send_message(chat_id, f"⚠️ حدث خطأ: {str(e)}")
+    
                 
                        
 
