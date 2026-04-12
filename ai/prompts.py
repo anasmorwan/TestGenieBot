@@ -675,8 +675,9 @@ def build_poll_prompt(content, tone=None, goal=None, channel_name=None):
     if isinstance(content, tuple):
         content = content[0]
     content = str(content) if content else ""
-    cleaned_goal = clean_goal(goal)
-    cleaned_tone = clean_tone(tone)
+    
+    cleaned_goal = clean_goal(goal) if goal is not None else None
+    cleaned_tone = clean_tone(tone) if tone is not None else None
     
     target_lang = detect_text_language(content)
     
