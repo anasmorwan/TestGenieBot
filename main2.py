@@ -8,7 +8,7 @@ import threading
 from bot.bot_instance import mybot, set_webhook
 from bot.handlers import start, text_handler, file_handler, image_handler, group_messages_handler, callback_handler, pre_checkout_query_handler, payment_handler
 from storage.sqlite_db import init_db, migrate_users_to_trap
-from bot.handlers import poll_answer_handler
+from bot.handlers import poll_answer_handler, is_member
 from bot import flask
 from services.backup_service import restore_if_needed, start_auto_backup
 from services.backup_service import is_db_valid, smart_restore
@@ -65,7 +65,7 @@ scheduler.start()
 
 # تسجيل الهاندلرز
 # temp_code.register()
-
+is_member.regiser(bot)
 image_handler.register(mybot)
 admin_commands.register(mybot); print("commands.register done", flush=True)
 bot_commands.register(mybot)
@@ -78,6 +78,8 @@ pre_checkout_query_handler.register_payment(mybot); print("pre_checkout_query_ha
 payment_handler.register(mybot); print("payment_handler.register done", flush=True)
 poll_answer_handler.register(mybot)
 chat_shared_handler.register(mybot)
+
+
 
 migrate_users_to_trap()
 send_daily_challenge_message()
