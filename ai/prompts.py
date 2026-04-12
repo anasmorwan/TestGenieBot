@@ -325,7 +325,7 @@ def pro_quiz_generator(user_id, content: Any, num_questions: int) -> Dict[str, A
         if not question_structure_is_valid(full_data) or has_language_mismatch(full_data, target_lang):
             print("⚠️ Invalid structure or language mismatch. Triggering Repair...")
             repair_prompt = build_repair_prompt(raw_response, target_lang, num_questions)
-            repaired_raw = safe_generate(repair_prompt) # استخدام الدالة الآمنة
+            repaired_raw = safe_generate(user_id, repair_prompt) # استخدام الدالة الآمنة
             repaired_data = normalize_llm_output(parse_llm_json(repaired_raw))
 
             if question_structure_is_valid(repaired_data) and not has_language_mismatch(repaired_data, target_lang):
