@@ -9,7 +9,11 @@ def get_poll_customize_keyboard(selected_tone="ودي", selected_goal="رأي", 
     goal_buttons = []
     
     for g in goals:
-        text = f"✅ {g}" if g == goals else g
+        # ✅ قارن العنصر مع selected_goal مباشرة (بدون المسافات الزائدة)
+        if g == selected_goal:  # التصحيح هنا
+            text = f"✅ {g}"
+        else:
+            text = g
         goal_buttons.append(InlineKeyboardButton(text, callback_data=f"goal_{g}"))
     markup.row(*goal_buttons)
 
@@ -17,7 +21,11 @@ def get_poll_customize_keyboard(selected_tone="ودي", selected_goal="رأي", 
     tones = ["😊 ودي", "🔥 حماسي", "🎯 رسمي"]
     tone_buttons = []
     for t in tones:
-        text = f"✅ {t}" if t == tones else t
+        # ✅ قارن العنصر مع selected_tone مباشرة
+        if t == selected_tone:  # التصحيح هنا
+            text = f"✅ {t}"
+        else:
+            text = t
         tone_buttons.append(InlineKeyboardButton(text, callback_data=f"tone_{t}"))
     markup.row(*tone_buttons)
 
