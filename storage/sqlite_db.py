@@ -999,7 +999,7 @@ def get_question_distribution(user_id, total_questions=10):
     stats = get_user_mistakes_stats(user_id)
     
     mistakes_count = stats["total_mistakes"]
-    recent_count = stats["recent_mistakes"]
+    recent_count = stats["recent_mistakes_count"]
     
     # تحديد الحالة
     if mistakes_count >= 5:  # أخطاء كثيرة
