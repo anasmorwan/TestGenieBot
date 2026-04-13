@@ -12,6 +12,32 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS chats (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        chat_id TEXT UNIQUE NOT NULL,       -- Telegram chat ID
+        title TEXT,                         -- اسم القناة أو المجموعة
+        username TEXT,                      -- @channelusername (إن وجد)   
+        type TEXT NOT NULL,                 -- channel | group | supergroup   
+        owner_user_id INTEGER,              -- من أضاف البوت (اختياري)
+        messages_count INTEGER DEFAULT 0,
+        active_users INTEGER DEFAULT 0,
+        is_active BOOLEAN DEFAULT 1,        -- هل البوت لا يزال موجود  
+        created_at TEXT NOT NULL,
+        updated_at TEXT
+    )
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_chats (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,   
+        user_id INTEGER NOT NULL,
+        chat_id TEXT NOT NULL,   
+        role TEXT,                 -- admin | member | owner (اختياري)   
+        added_at TEXT NOT NULL    
+        UNIQUE(user_id, chat_id)
+    )
+    """)
     
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS quizzes (
@@ -19,8 +45,8 @@ def init_db():
         content_hash TEXT UNIQUE NOT NULL,
         quiz_data TEXT NOT NULL,
         created_at TEXT NOT NULL
-)
-""")
+    )
+    """)
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_knowledge (
