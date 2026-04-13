@@ -754,6 +754,7 @@ def normalize_structure(raw: Union[dict, list], original_text: str) -> Optional[
 # Main Parser
 # =========================================================
 
+
 def parse_llm_response(text: str, target_schema: str = "simple_quiz") -> Optional[dict]:
     """
     يقرأ رد النموذج ويحاول:
@@ -775,6 +776,59 @@ def parse_llm_response(text: str, target_schema: str = "simple_quiz") -> Optiona
                         questions=[SimpleQuestion(**q) for q in salvaged],
                     )
                     return dump_model(validated)
-                except Validation
+                except ValidationError:
+                    return None
+            return None
 
-                
+        if target_schema == "complex_quiz":
+            salvaged = salvage_questions_from_text(text)
+            if salvaged:
+                domain = extract_string_field(text, ["domain"]) or "Medicine"
+                meta = ComplexMetadata(
+                    domain=domain,
+                    topics=extract_list_field(text, ["topics"]),
+                    difficulty=extract_string_field(text, ["difficulty"]) or "Medium",
+                    discipline=extract_string_field(text, ["discipline"]) or "",
+                )
+                try:
+                    validated = ComplexQuizOutput(
+                        metadata=meta,
+                        questions=[ComplexQuestion(**q) for q in salvaged],
+                    )
+                    return dump_model(validated)
+                except ValidationError:
+                    return None
+            return None
+
+        if target_schema == "structure":
+            subject = extract_string_field(text, ["subject"]) or ""
+            if not subject:
+                return None
+            try:
+                validated = StructureOutput(
+                    domain=extract_string_field(text, ["domain"]) or "medicine",
+                    subject=subject,
+                    concepts=extract_list_field(text, ["concepts"]),
+                    estimated_difficulty=extract_string_field(text, ["estimated_difficulty"]) or "mid",
+                    cognitive_level=extract_string_field(text, ["cognitive_level"]) or "application",
+                    source_mode=extract_string_field(text, ["source_mode"]) or "textbook",
+                    confidence=coerce_float(extract_string_field(text, ["confidence"]) or 1.0, 1.0),
+                )
+                return dump_model(validated)
+            except ValidationError:
+                return None
+
+        return None
+
+    # normalization by schema
+    if target_schema == "simple_quiz":
+        return normalize_simple_quiz(raw, text)
+
+    if target_schema == "complex_quiz":
+        return normalize_complex_quiz(raw, text)
+
+    if target_schema == "structure":
+        return normalize_structure(raw, text)
+
+    raise ValueError("Unknown target schema.")
+
