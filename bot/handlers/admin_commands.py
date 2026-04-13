@@ -2,9 +2,9 @@ import os
 from services.usage import activate_subscription_manual, reset_or_set_daily_usage, get_user_full_info
 from analytics.metrics import get_metrics
 from services.backup_service import backup_all
-from bot.handlers.is_member import joined_chats
+
 from storage.sqlite_db import flush_to_db, get_chats_stats, get_all_chats
-from import buffer_lock
+from bot.handlers.group_messages_handler import buffer_lock
 from storage.session_store import message_buffer
 
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
@@ -128,8 +128,7 @@ def register(bot):
         user_id = msg.from_user.id
         
     
-        # التحقق من صلاحيات الأدمن
-        if user_id not in admin_ids:
+        if user_id != ADMIN_ID:
             bot.reply_to(msg, "⛔ هذا الأمر مخصص للأدمن فقط.")
             return
     
