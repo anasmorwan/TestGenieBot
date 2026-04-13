@@ -53,8 +53,11 @@ def handle_file_upload(msg):
     
     # ✅ التحقق من الحجم
     if not is_file_size_allowed(mybot, uid, file_id):
+        if is_paid_user_active(uid):
+            return "large_file", 12
+        return "large_file", 5
         
-        return "large_file", None
+        
     
     # ✅ تحميل الملف
     try:
