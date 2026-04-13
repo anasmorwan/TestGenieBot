@@ -24,6 +24,8 @@ user_messages_remaining = {}
 message_buffer = {}  # {chat_id: message_count}
 chats_buffer = {}    # {chat_id: {'title': ..., 'username': ..., 'type': ...}}
 
+buffer_lock = threading.Lock()
+
 
 # إضافة رسالة إلى البافر
 def add_to_buffer(chat_id: int, title: str, username: str, chat_type: str):
