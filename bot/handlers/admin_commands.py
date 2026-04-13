@@ -253,16 +253,16 @@ def register(bot):
         
         bot.reply_to(message, response, parse_mode='Markdown')
 
-# أمر يدوي لحفظ البافر
-@bot.message_handler(commands=['flush'])
-def force_flush(message: Message):
+    # أمر يدوي لحفظ البافر
+    @bot.message_handler(commands=['flush'])
+    def force_flush(message: Message):
     
     
-    if message.from_user.id != ADMIN_ID:
-        bot.reply_to(message, "⛔ غير مصرح")
-        return
+        if message.from_user.id != ADMIN_ID:
+            bot.reply_to(message, "⛔ غير مصرح")
+            return
     
-    flush_to_db()
-    bot.reply_to(message, "✅ تم حفظ البافر في قاعدة البيانات")
+        flush_to_db()
+        bot.reply_to(message, "✅ تم حفظ البافر في قاعدة البيانات")
 
 
