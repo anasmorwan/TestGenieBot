@@ -7,7 +7,7 @@ from services.usage import consume_quiz, can_generate, check_subscription_valid
 from bot.keyboards.referral_keyboard import referral_keyboard
 from services.backup_service import safe_backup, backup_all
 from services.backup_service import smart_restore, is_db_valid
-from bot.keyboards.quiz_buttons import quiz_keyboard
+from bot.keyboards.quiz_buttons import quiz_keyboard, scheduled_quiz_keyboard
 from storage.session_store import user_states, get_state_safe, get_chat_title, temp_texts
 from bot.keyboards.actions_keyboard import send_poll_keyboard, escape_action_keyboard
 from services.poll_service import generate_poll, normalize_poll
