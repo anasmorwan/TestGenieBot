@@ -3,6 +3,8 @@ from services.usage import activate_subscription_manual, reset_or_set_daily_usag
 from analytics.metrics import get_metrics
 from services.backup_service import backup_all
 from bot.handlers.is_member import joined_chats
+from storage.sqlite_db import flush_to_db, get_chats_stats, get_all_chats
+
 
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 
@@ -195,29 +197,72 @@ def register(bot):
 
 
 
-    @bot.message_handler(commands=['bot_chats_report'])
-    def send_report(message):
-        try:
-            if not joined_chats:
-                bot.reply_to(message, "📊 لا توجد قنوات أو مجموعات مسجلة بعد.\n\n💡 تأكد من أن البوت تمت إضافته كـ Admin في القنوات/المجموعات وأنك فعّالت خاصية جمع المعلومات.")
-                return
+    @bot.message_handler(commands=['list_chats'])
+    def list_chats(message: Message):
+        
+        if message.from_user.id != ADMIN_ID:
+            bot.reply_to(message, "⛔ غير مصرح لك بهذا الأمر")
+            return
+        
+        # حفظ البافر أولاً للحصول على أحدث البيانات
+        flush_to_db()
+        
+        chats = get_all_chats()
+        stats = get_chats_stats()
+        
+        if not chats:
+            bot.reply_to(message, "📭 لا توجد شاتات مسجلة حتى الآن")
+            return
+        
+        response = f"📊 **إحصائيات عامة:**\n"
+        response += f"• إجمالي الشاتات: {stats['total']}\n"
+        response += f"• قنوات: {stats['channels']}\n"
+        response += f"• مجموعات: {stats['groups']}\n"
+        response += f"• إجمالي الرسائل: {stats['messages']}\n\n"
+        
+        response += f"📋 **قائمة الشاتات (آخر {min(10, len(chats))}):**\n"
+        
+        for chat in chats[:10]:
+            response += f"\n• **{chat[2]}** ({chat[4]})\n"
+            response += f"  🆔 ID: `{chat[1]}`\n"
+            if chat[3]:
+                response += f"  📢 Username: @{chat[3]}\n"
+            response += f"  💬 الرسائل: {chat[6]}\n"
+            response += f"  📅 تاريخ الإضافة: {chat[8][:10]}\n"
+        
+        bot.reply_to(message, response, parse_mode='Markdown')
     
-            total = len(joined_chats)
-            report_text = f"<b>📊 تقرير القنوات والمجموعات</b>\n\n"
-            report_text += f"<b>📌 العدد الإجمالي:</b> {total}\n\n"
-            report_text += "<b>📋 القائمة:</b>\n"
-    
-            for idx, (chat_id, chat_info) in enumerate(list(joined_chats.items())[:20], 1):  # عرض أول 20 فقط
-                chat_type = "📢 قناة" if chat_info.get('type') == 'channel' else "👥 مجموعة"
-                chat_title = chat_info.get('title', 'بدون اسم')
-                report_text += f"{idx}. {chat_type} | <b>{chat_title}</b>\n"
-                report_text += f"   🆔 <code>{chat_id}</code>\n\n"
-    
-            if total > 20:
-                report_text += f"\n... و {total - 20} أخرى"
-    
-            bot.reply_to(message, report_text, parse_mode="HTML")
-    
-        except Exception as e:
-            bot.reply_to(msg, f"❌ حدث خطأ أثناء جلب البيانات: {str(e)}")
+    # أمر لإظهار إحصائيات البافر (للمطور)
+    @bot.message_handler(commands=['buffer_stats'])
+    def buffer_stats(message: Message):
+        
+        if message.from_user.id != ADMIN_ID:
+            return
+        
+        with buffer_lock:
+            response = f"📊 **حالة البافر الحالية:**\n\n"
+            response += f"📝 رسائل في البافر: {len(message_buffer)} شات\n"
+            response += f"💾 شاتات جديدة: {len(chats_buffer)}\n"
+            response += f"📈 إجمالي الرسائل المعلقة: {sum(message_buffer.values())}\n"
             
+            if message_buffer:
+                response += f"\n**أكثر 5 شاتات نشاطاً:**\n"
+                sorted_chats = sorted(message_buffer.items(), key=lambda x: x[1], reverse=True)[:5]
+                for chat_id, count in sorted_chats:
+                    response += f"• شات {chat_id}: {count} رسالة\n"
+        
+        bot.reply_to(message, response, parse_mode='Markdown')
+
+# أمر يدوي لحفظ البافر
+@bot.message_handler(commands=['flush'])
+def force_flush(message: Message):
+    
+    
+    if message.from_user.id != ADMIN_ID:
+        bot.reply_to(message, "⛔ غير مصرح")
+        return
+    
+    flush_to_db()
+    bot.reply_to(message, "✅ تم حفظ البافر في قاعدة البيانات")
+
+
