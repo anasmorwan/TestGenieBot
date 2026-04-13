@@ -436,7 +436,7 @@ def get_detailed_weakness(user_id, limit=1):
 
     return "\n".join(lines)
 
-def build_result_message(user_id, score, total, streak, xp, ad_compaign=False):
+def build_result_message(user_id, score, total, pain_point, streak, xp, ad_compaign=False):
     feedback = get_feedback_line(score, total)
     weakness = get_weakness_line(user_id, total - score)
     details = get_detailed_weakness(user_id)
@@ -453,7 +453,7 @@ def build_result_message(user_id, score, total, streak, xp, ad_compaign=False):
 """
 
     if details:
-        text += f"\n💡 ركّز على:\n{details}"
+        text += f"\n💡 ركّز على الـ:\n{pain_point}"
 
     text += "\n\n👇 لا تفقد تقدمك:"
 
