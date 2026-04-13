@@ -19,7 +19,7 @@ from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.sqlite_db import set_user_has_quizzes
 from bot.handlers.is_member import get_channel_invite_link, is_user_member
 from bot.keyboards.actions_keyboard import invitation_keyboard
-from storage.session_store import user_states, temp_texts
+from storage.session_store import user_states, temp_texts, get_state_safe
 import random
 import threading
     
@@ -55,7 +55,7 @@ def register(bot):
         chat_id = msg.chat.id
         message_id = msg.message_id
         update_last_active(user_id)
-        state = user_states.get(user_id)
+        state = get_state_safe(user_id)
 
         try:
             plan = check_subscription_valid(user_id)
