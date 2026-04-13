@@ -172,6 +172,7 @@ def register(bot):
                         parse_mode="HTML"
                     )
                     user_states[user_id] = "scheduled_quiz"
+                    temp_texts[user_id] = text
                     return
 
                 
