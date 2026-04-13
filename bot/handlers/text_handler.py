@@ -176,12 +176,12 @@ def register(bot):
                 quiz_len = len(quizzes)
 
                 action = random.choice(["delete", "edit"])
+                reply_markup = quiz_keyboard(quiz_code)
                 if action == "delete":
                     bot.delete_message(chat_id, message_id=waiting_msg.message_id)
                     bot.send_message(
                         chat_id=chat_id,
                         text=get_message("QUIZ_CREATED", count=quiz_len),
-                        reply_markup=quiz_keyboard(quiz_code),
                         parse_mode="HTML"
                     )
                     time.sleep(2)
@@ -190,7 +190,6 @@ def register(bot):
                         chat_id=chat_id,
                         message_id=msg_id,
                         text=get_message("QUIZ_CREATED", count=quiz_len),
-                        reply_markup=quiz_keyboard(quiz_code),
                         parse_mode="HTML"
                        )
                     time.sleep(2)
