@@ -110,6 +110,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 
 
             raw_response = safe_generate(user_id, prompt) # استخدم هذه الدالة دائماً!
+            print(raw_response[:1000], flush=True)  # أول 1000 حرف
             
         
         
@@ -129,11 +130,14 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             return normalize_quizzes(quizzes)
         else:
             pro_response = pro_quiz_generator(user_id, content, num_questions=question_count)
+            print(pro_response[:1000], flush=True)  # أول 1000 حرف
+            
             
            #  يمكنك لاحقاً استخدام pro_response["metadata"] لحفظها في قاعدة البيانات للتتبع (Tracking)
            # db.save_metadata(user_id, pro_response["metadata"])
         
             quizzes = pro_response.get("questions", [])
+            
             
             domain = pro_response["metadata"]["domain"]
             update_user_major(user_id, domain)
@@ -168,6 +172,8 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             print(f"✉️ second message sent 📤", flush=True)
         
             raw_response = safe_generate(user_id, prompt) # استخدم هذه الدالة دائماً!
+            print(raw_response[:1000], flush=True)  # أول 1000 حرف
+            
             print(f"✉️ raw response message obtained", flush=True)        
 
         
