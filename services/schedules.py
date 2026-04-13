@@ -4,22 +4,16 @@ from services/backup_service.py import backup_all
 
 scheduler = BackgroundScheduler()
 
-# جدولة التحديث الدوري
+
 def schedule_flush(interval_seconds=30):
-    def run():
-        while True:
-            time.sleep(interval_seconds)
-            flush_to_db()
+    scheduler.add_job(
+        func=flush_to_db,
+        trigger='interval',
+        seconds=interval_seconds,
+        id='chat_collection',
+        replace_existing=True
+    )
     
-    thread = threading.Thread(target=run, daemon=True)
-    thread.start()
-
-
-
-
-
-
-
 def start_auto_backup():
     scheduler.add_job(
         func=backup_all,
