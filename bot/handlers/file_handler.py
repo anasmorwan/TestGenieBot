@@ -6,7 +6,7 @@ from storage.quiz_repository import store_quiz, maybe_cleanup
 from services.quiz_session_service import quiz_manager
 from services.file_upload import handle_file_upload
 # from services.poll_service import send_quiz_message
-from bot.keyboards.quiz_buttons import quiz_keyboard
+from bot.keyboards.quiz_buttons import quiz_keyboard, scheduled_quiz_keyboard
 from storage.messages import get_message
 from services.referral import reward_referral_if_needed
 from services.usage import consume_quiz, can_generate, check_subscription_valid
