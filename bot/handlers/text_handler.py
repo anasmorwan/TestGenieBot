@@ -161,9 +161,17 @@ def register(bot):
             
             
 
-            elif state is None or state == "" or state == "scheduled_quiz":
-                # الحالة الافتراضية توليد اختبار عادي
-                print(f"DEBUG: [User: {user_id}] No specific state found. Starting standard Quiz generation.", flush=True)
+            elif state is None or state == "" or state in ["scheduled_quiz", "awaiting_schedule"]:
+                
+                if state == "awaiting_schedule":
+                    bot.send_message(
+                        chat_id,
+                        text=get_message("AWAITING_SCHEDULE_CONTENT")
+                    )
+                    user_states[user_id] = "scheduled_quiz"
+                    return
+
+                
                 waiting_msg = bot.send_message(chat_id, get_message("Generating_quiz"))
                 msg_id = waiting_msg.message_id
 
