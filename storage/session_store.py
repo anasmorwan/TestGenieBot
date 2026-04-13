@@ -1,3 +1,4 @@
+
 # session_store.py
 user_states = {}
 
@@ -24,11 +25,10 @@ user_messages_remaining = {}
 message_buffer = {}  # {chat_id: message_count}
 chats_buffer = {}    # {chat_id: {'title': ..., 'username': ..., 'type': ...}}
 
-buffer_lock = threading.Lock()
 
 
 # إضافة رسالة إلى البافر
-def add_to_buffer(chat_id: int, title: str, username: str, chat_type: str):
+def add_to_buffer(buffer_lock, chat_id: int, title: str, username: str, chat_type: str):
     with buffer_lock:
         chat_id_str = str(chat_id)
         
