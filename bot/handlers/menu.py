@@ -40,7 +40,7 @@ def send_main_menu(chat_id, message_id=None):
     
 
     if total_mistakes == 0:
-        smart_ui_text = get_message("NO_MISTAKES_REVIEW")
+        smart_ui_text = get_message("NO_MISTAKES_REVIEW", total_today=todays_questions)
         keyboard = ui_no_mistakes_keyboard()
     
     
