@@ -3,6 +3,8 @@
 import sqlite3
 import json
 from datetime import datetime, timedelta
+from storage.session_store import chats_buffer, message_buffer
+
 DB_PATH = "quiz_users.db"
 
 def get_connection():
@@ -1070,7 +1072,7 @@ def flush_to_db():
         if not message_buffer and not chats_buffer:
             return
         
-        conn = sqlite3.connect('chats.db')
+        conn = get_connection()
         c = conn.cursor()
         now = datetime.now().isoformat()
         
@@ -1112,7 +1114,7 @@ def flush_to_db():
 
 # جلب كل الشاتات (من قاعدة البيانات)
 def get_all_chats():
-    conn = sqlite3.connect('chats.db')
+    conn = get_connection()
     c = conn.cursor()
     c.execute("SELECT * FROM chats ORDER BY created_at DESC")
     chats = c.fetchall()
@@ -1121,7 +1123,7 @@ def get_all_chats():
 
 # جلب إحصائيات
 def get_chats_stats():
-    conn = sqlite3.connect('chats.db')
+    conn = get_connection()
     c = conn.cursor()
     
     c.execute("SELECT COUNT(*) FROM chats")
