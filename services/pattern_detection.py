@@ -668,7 +668,133 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
     # core structure
     if mode == "explicit":
         add("structure", 0.30, "explicit_option_prefixes_found")
-    elif mode 
+    elif mode == "inline":
+        add("structure", 0.30, "inline_options_found")
+    else:
+        add("structure", 0.24, "unlabeled_option_block_found")
+
+    # question signal
+    if QUESTION_PREFIX_RE.match(first_line) or is_question_heading_line(first_line):
+        add("question_header", 0.10, "question_heading_detected")
+
+    if has_question_signal(question):
+        add("question_signal", 0.18, "question_like_language_or_punctuation")
+
+    # option count
+    if len(options) >= 4:
+        add("option_count", 0.12, "four_or_more_options")
+    elif len(options) == 3:
+        add("option_count", 0.09, "three_options")
+    elif len(options) == 2 and binary_context:
+        add("option_count", 0.12, "binary_context_with_two_options")
+
+    # prefix consistency
+    if prefix_info:
+        if prefix_info["sequence_ok"]:
+            add("prefix_consistency", 0.12, f"sequential_prefixes_{prefix_info['style']}")
+        elif prefix_info["style"] == "bullet":
+            add("prefix_consistency", prefix_info["score"] * 0.10, "bullet_style_consistency")
+        elif prefix_info["score"] >= 0.7:
+            add("prefix_consistency", 0.08, f"strong_same_style_prefixes_{prefix_info['style']}")
+        elif prefix_info["score"] >= 0.5:
+            add("prefix_consistency", 0.05, f"partial_prefix_consistency_{prefix_info['style']}")
+
+    # similarity
+    sim = structural_similarity_score(options)
+    if sim["score"] >= 0.80:
+        add("structural_similarity", 0.12, "very_similar_option_lengths_and_shapes")
+    elif sim["score"] >= 0.60:
+        add("structural_similarity", 0.08, "similar_option_lengths_and_shapes")
+    elif sim["score"] >= 0.40:
+        add("structural_similarity", 0.04, "moderate_similarity")
+    else:
+        add("structural_similarity", -0.08, "weak_similarity")
+
+    # language
+    lang = language_bundle(question, options)
+    if lang["mixed_language"]:
+        add("language_support", 0.03, "mixed_language_detected_but_accepted")
+    else:
+        add("language_support", 0.02, "single_language_detected")
+
+    # multiline bonus
+    if len(block_lines) >= 4 and first_option_idx is not None and first_option_idx >= 2:
+        add("multiline_question", 0.05, "question_spans_multiple_lines_before_options")
+
+    # structural stability
+    lengths = [len(o) for o in options]
+    word_counts = [option_word_count(o) for o in options]
+    cv_words = coefficient_of_variation(word_counts)
+    cv_chars = coefficient_of_variation(lengths)
+
+    if cv_words <= 0.20:
+        add("option_shape_cv", 0.10, "very_low_word_count_variation")
+    elif cv_words <= 0.40:
+        add("option_shape_cv", 0.06, "low_word_count_variation")
+    elif cv_words <= 0.60:
+        add("option_shape_cv", 0.03, "moderate_word_count_variation")
+    else:
+        add("option_shape_cv", -0.06, "high_word_count_variation")
+
+    if cv_chars <= 0.20:
+        add("char_count_cv", 0.05, "very_low_char_variation")
+    elif cv_chars <= 0.40:
+        add("char_count_cv", 0.03, "low_char_variation")
+    elif cv_chars <= 0.60:
+        add("char_count_cv", 0.01, "moderate_char_variation")
+    else:
+        add("char_count_cv", -0.04, "high_char_variation")
+
+    # negative signals
+    neg = negative_signal_score(block_text, block_lines)
+    if neg["penalty"] > 0:
+        add("negative_signals", -neg["penalty"], ",".join(neg["reasons"]) or "negative_signals")
+
+    if max(lengths) > 180:
+        add("length_penalty", -0.05, "one_or_more_options_are_too_long")
+
+    if not has_question_signal(question) and mode == "unlabeled":
+        add("question_signal_penalty", -0.12, "unlabeled_options_without_question_signal")
+
+    confidence = max(0.0, min(1.0, score))
+
+    if confidence >= CONFIDENCE_HIGH:
+        decision = "accept"
+    elif confidence >= CONFIDENCE_LOW:
+        decision = "review"
+    else:
+        decision = "reject"
+
+    if decision == "reject":
+        return None
+
+    return {
+        "decision": decision,
+        "tier": "high" if decision == "accept" else "gray",
+        "api_recommended": decision == "review",
+        "is_quiz": True,
+        "confidence": round(confidence, 2),
+        "score": round(confidence, 2),  # backward compatibility
+        "question": question,
+        "options": options,
+        "count": len(options),
+        "question_language": lang["question_language"],
+        "option_language": lang["option_language"],
+        "mixed_language": lang["mixed_language"],
+        "prefix_consistency": prefix_info,
+        "structural_similarity": {
+            "cv_words": round(cv_words, 3),
+            "cv_chars": round(cv_chars, 3),
+            "same_category_ratio": sim["same_category_ratio"],
+            "score": sim["score"],
+        },
+        "validation_layers": layers,
+        "negative_signals": neg["reasons"],
+        "binary_context": binary_context,
+        "mode": mode,
+    }
+
+    
 
 def detect_quiz_pattern(text: str) -> Optional[Dict]:
     """
