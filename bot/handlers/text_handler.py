@@ -164,9 +164,12 @@ def register(bot):
             elif state is None or state == "" or state in ["scheduled_quiz", "awaiting_schedule"]:
                 
                 if state == "awaiting_schedule":
+                    keyboard = scheduled_quiz_keyboard()
                     bot.send_message(
-                        chat_id,
-                        text=get_message("AWAITING_SCHEDULE_CONTENT")
+                        chat_id=chat_id,
+                        text=get_message("AWAITING_SCHEDULE_CONTENT"),
+                        reply_markup=keyboard,
+                        parse_mode="HTML"
                     )
                     user_states[user_id] = "scheduled_quiz"
                     return
@@ -185,8 +188,9 @@ def register(bot):
                 if state == "scheduled_quiz":
                     quiz_code = store_quiz(user_id, quizzes, schedule=True)
                     bot.send_message(
-                        chat_id,
-                        text=get_message("SCHEDULED_QUIZ_READY")
+                        chat_id=chat_id,
+                        text=get_message("SCHEDULED_QUIZ_READY"),
+                        parse_mode="HTML"
                     )
                     return
                 quiz_code = store_quiz(user_id, quizzes)
