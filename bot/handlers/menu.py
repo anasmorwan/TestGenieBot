@@ -50,8 +50,6 @@ def send_main_menu(chat_id, message_id=None):
     
     
     if message_id:
-        text = smart_ui_text
-        
         
         mybot.edit_message_text(
             text=text,
