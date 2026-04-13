@@ -551,7 +551,7 @@ class QuizManager:
         user_major = get_user_major(chat_id)
         keyboard = share_quiz_button(quiz_code)
         
-        if wrongs_ratio <= 0.4:
+        if wrongs_ratio >= 0.4:
             keyboard = too_mistakes_keyboard(wrong)
         else:
             keyboard = few_mistakes_keyboard(wrong)
