@@ -1,6 +1,6 @@
 from storage.sqlite_db import flush_to_db
 from apscheduler.schedulers.background import BackgroundScheduler
-from services/backup_service.py import backup_all
+from services.backup_service import backup_all
 
 scheduler = BackgroundScheduler()
 
