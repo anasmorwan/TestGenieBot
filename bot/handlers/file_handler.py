@@ -19,7 +19,7 @@ from bot.keyboards.upsell_keyboard import saved_quiz_upsell
 from storage.sqlite_db import set_user_has_quizzes
 from bot.handlers.is_member import get_channel_invite_link, is_user_member
 from bot.keyboards.actions_keyboard import invitation_keyboard
-
+from storage.session_store import user_states, temp_texts
 import random
 import threading
     
@@ -55,6 +55,7 @@ def register(bot):
         chat_id = msg.chat.id
         message_id = msg.message_id
         update_last_active(user_id)
+        state = user_states.get(user_id)
 
         try:
             plan = check_subscription_valid(user_id)
@@ -129,6 +130,8 @@ def register(bot):
                         parse_mode="HTML"
                     )
                     return
+                    
+                
             
                 
                 try:
@@ -158,6 +161,18 @@ def register(bot):
                 bot.send_message(chat_id, "لم أستطع قراءة الملف.")
                 return
 
+            if state == "awaiting_schedule":
+                keyboard = scheduled_quiz_keyboard()
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=get_message("AWAITING_SCHEDULE_CONTENT"),
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
+                user_states[user_id] = "scheduled_quiz"
+                temp_texts[user_id] = content
+                return
+
             user_instruction = getattr(msg, "caption", None)
             if user_instruction:
                 user_instruction = user_instruction.strip()
@@ -178,8 +193,17 @@ def register(bot):
                 bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
                 return
 
-            quiz_code = store_quiz(user_id, quizzes)
-            # backup_all()
+            if state == "scheduled_quiz":
+                quiz_code = store_quiz(user_id, quizzes, schedule=True)
+                bot.send_message(
+                    chat_id=chat_id,
+                    text=get_message("SCHEDULED_QUIZ_READY"),
+                    parse_mode="HTML"
+                )
+                return
+            else:
+                quiz_code = store_quiz(user_id, quizzes)
+
             quiz_len = len(quizzes)
             reply_markup = quiz_keyboard(quiz_code)
             
