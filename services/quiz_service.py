@@ -1,7 +1,7 @@
 # quiz_service.py
 from ai.llm_client import generate_smart_response
 from ai.prompts import build_quiz_prompt, pro_quiz_generator, safe_generate, build_adaptive_quiz_prompt
-from utils.json_utils import extract_json_objects_safely, parse_llm_json
+from utils.json_utils import extract_json_objects_safely, parse_llm_json, parse_llm_response
 from services.usage import is_paid_user_active, get_current_pro_quota
 from ai.beta_prompts import generate_smart_batch_prompt
 from storage.messages import get_message
@@ -113,9 +113,13 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             
         
         
-            response = parse_llm_json(raw_response)
-            quizzes = response.get("questions")
-            detected_domain = response.get("domain")
+            # response = parse_llm_json(raw_response)
+            response = parse_llm_response(raw_response, target_schema="simple_quiz")
+            if not response:
+                return None
+            
+            quizzes = response["questions"]
+            detected_domain = response["domain"]
             update_user_major(user_id, detected_domain)
         
         
@@ -220,3 +224,4 @@ def generate_challenge_quiz(content, user_id, num_questions, is_pro):
         print(f"❌ Critical Error in generator: {str(e)}", flush=True)
         return []
         
+
