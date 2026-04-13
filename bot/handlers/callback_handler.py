@@ -702,7 +702,7 @@ def register(bot):
                 reply_markup=keyboard)
 
             
-            elif data == "manual_quiz_schedule":
+            elif data == "adjusted_quiz":
                 
                 user_sessions[chat_id] = {
                     'number': '',
