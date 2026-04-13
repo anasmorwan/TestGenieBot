@@ -20,7 +20,26 @@ last_active = {}
 user_messages_remaining = {}
 
 
+# Buffer للتخزين المؤقت
+message_buffer = {}  # {chat_id: message_count}
+chats_buffer = {}    # {chat_id: {'title': ..., 'username': ..., 'type': ...}}
 
+
+# إضافة رسالة إلى البافر
+def add_to_buffer(chat_id: int, title: str, username: str, chat_type: str):
+    with buffer_lock:
+        chat_id_str = str(chat_id)
+        
+        # زيادة عداد الرسائل
+        message_buffer[chat_id_str] = message_buffer.get(chat_id_str, 0) + 1
+        
+        # تخزين معلومات الشات (إذا لم تكن موجودة)
+        if chat_id_str not in chats_buffer:
+            chats_buffer[chat_id_str] = {
+                'title': title,
+                'username': username,
+                'type': chat_type
+            }
 
 
 
