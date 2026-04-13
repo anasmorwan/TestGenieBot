@@ -83,8 +83,11 @@ def scheduled_quiz_keyboard():
 
 
 
+
+
+
 def manual_selection_keyboard():
-    
+    """لوحة الأرقام"""
     keyboard = InlineKeyboardMarkup(row_width=3)
     
     keyboard.add(
@@ -92,31 +95,33 @@ def manual_selection_keyboard():
         InlineKeyboardButton("2️⃣", callback_data="num_2"),
         InlineKeyboardButton("3️⃣", callback_data="num_3")
     )
-
+    
     keyboard.add(
         InlineKeyboardButton("4️⃣", callback_data="num_4"),
         InlineKeyboardButton("5️⃣", callback_data="num_5"),
         InlineKeyboardButton("6️⃣", callback_data="num_6")
     )
-
+    
     keyboard.add(
         InlineKeyboardButton("7️⃣", callback_data="num_7"),
         InlineKeyboardButton("8️⃣", callback_data="num_8"),
         InlineKeyboardButton("9️⃣", callback_data="num_9")
     )
     
-
     keyboard.add(
         InlineKeyboardButton("0️⃣", callback_data="num_0")
     )
     
-
     keyboard.add(
         InlineKeyboardButton("🗑️ مسح الكل", callback_data="num_clear_all"),
         InlineKeyboardButton("⌫ حذف", callback_data="num_delete"),
         InlineKeyboardButton("✅ تأكيد", callback_data="num_confirm")
     )
     
+    keyboard.add(
+        InlineKeyboardButton("❌ إلغاء", callback_data="num_cancel")
+    )
+    
     return keyboard
 
-    
+
