@@ -342,27 +342,3 @@ def restore_if_needed():
     else:
         print(f"✅ قاعدة البيانات موجودة وصالحة (الحجم: {os.path.getsize(DB_PATH)} بايت)")
 
-
-
-from apscheduler.schedulers.background import BackgroundScheduler
-
-scheduler = BackgroundScheduler()
-
-def start_auto_backup():
-    scheduler.add_job(
-        func=backup_all,
-        trigger='interval',
-        minutes=30,
-        id='auto_backup',
-        replace_existing=True
-        )
-
-def start_daily_challenge():
-    from bot.notifications.trap import send_daily_challenge_message  # استيراد محلي
-    scheduler.add_job(
-        send_daily_challenge_message,
-        'interval',
-        hours=1,
-        id='daily_challenge',
-        replace_existing=True
-    )
