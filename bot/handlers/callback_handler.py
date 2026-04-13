@@ -596,7 +596,7 @@ def register(bot):
 
             elif data.startswith("scheduled_quiz"):
                 bot.send_message(chat_id, get_message("AWAITING_SCHEDULING"))
-                user_states[user_id] = "scheduled_quiz"
+                user_states[user_id] = "awaiting_schedule"
                 
             elif data == "input_text":
                 bot.answer_callback_query(call.id)
