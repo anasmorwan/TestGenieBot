@@ -561,9 +561,9 @@ class QuizManager:
         else:
             keyboard = few_mistakes_keyboard(wrong)
         
-        wrong_qs = state.get("wrong_questions")
-        pain_point = wrong_qs.         
         
+        branches = [q.branch for q in state.get("wrong_questions", []) if q.branch]         
+        pain_point = min(branches, key=len)
         # --------------------------------
         #          Logics
         # --------------------------------
