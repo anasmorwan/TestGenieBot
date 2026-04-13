@@ -1060,7 +1060,90 @@ def get_question_distribution(user_id, total_questions=10):
         "recent_mistakes": recent_count
     }
 
+# تحديث قاعدة البيانات دفعة واحدة
 
+#--------------------------
+#    🔹 دوال تخزين بيانات الشاتات
+#--------------------------
+def flush_to_db():
+    with buffer_lock:
+        if not message_buffer and not chats_buffer:
+            return
+        
+        conn = sqlite3.connect('chats.db')
+        c = conn.cursor()
+        now = datetime.now().isoformat()
+        
+        # 1. تحديث الرسائل للشاتات الموجودة
+        for chat_id_str, count in message_buffer.items():
+            c.execute("""
+                UPDATE chats 
+                SET messages_count = messages_count + ?,
+                    updated_at = ?
+                WHERE chat_id = ?
+            """, (count, now, chat_id_str))
+            
+            # إذا لم يتم تحديث أي صف، فهذا يعني أن الشات غير موجود في القاعدة
+            if c.rowcount == 0 and chat_id_str in chats_buffer:
+                # إضافة شات جديد
+                chat_info = chats_buffer[chat_id_str]
+                c.execute("""
+                    INSERT INTO chats (chat_id, title, username, type, created_at, updated_at, messages_count)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (chat_id_str, chat_info['title'], chat_info['username'], 
+                      chat_info['type'], now, now, count))
+        
+        # 2. إضافة أي شاتات جديدة لم تظهر في message_buffer
+        for chat_id_str, chat_info in chats_buffer.items():
+            if chat_id_str not in message_buffer:
+                c.execute("""
+                    INSERT OR IGNORE INTO chats (chat_id, title, username, type, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (chat_id_str, chat_info['title'], chat_info['username'], 
+                      chat_info['type'], now, now))
+        
+        conn.commit()
+        conn.close()
+        
+        # مسح البافرات بعد الحفظ
+        message_buffer.clear()
+        chats_buffer.clear()
+
+
+# جلب كل الشاتات (من قاعدة البيانات)
+def get_all_chats():
+    conn = sqlite3.connect('chats.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM chats ORDER BY created_at DESC")
+    chats = c.fetchall()
+    conn.close()
+    return chats
+
+# جلب إحصائيات
+def get_chats_stats():
+    conn = sqlite3.connect('chats.db')
+    c = conn.cursor()
+    
+    c.execute("SELECT COUNT(*) FROM chats")
+    total = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM chats WHERE type = 'channel'")
+    channels = c.fetchone()[0]
+    
+    c.execute("SELECT COUNT(*) FROM chats WHERE type IN ('group', 'supergroup')")
+    groups = c.fetchone()[0]
+    
+    c.execute("SELECT SUM(messages_count) FROM chats")
+    total_messages = c.fetchone()[0] or 0
+    
+    conn.close()
+    
+    return {
+        'total': total,
+        'channels': channels,
+        'groups': groups,
+        'messages': total_messages
+    }
 # --------------------------
 #----------          -------
 #    <🔹 دوال تعديل sqlite >
@@ -1180,4 +1263,149 @@ def safe_add_table():
     
 
 
+
+
+from datetime import datetime
+from telebot import TeleBot
+from telebot.types import Message, ChatMemberUpdated
+import threading
+import time
+
+# Buffer للتخزين المؤقت
+message_buffer = {}  # {chat_id: message_count}
+chats_buffer = {}    # {chat_id: {'title': ..., 'username': ..., 'type': ...}}
+buffer_lock = threading.Lock()
+
+
+# جدولة التحديث الدوري
+def schedule_flush(interval_seconds=30):
+    def run():
+        while True:
+            time.sleep(interval_seconds)
+            flush_to_db()
+    
+    thread = threading.Thread(target=run, daemon=True)
+    thread.start()
+
+# إضافة رسالة إلى البافر
+def add_to_buffer(chat_id: int, title: str, username: str, chat_type: str):
+    with buffer_lock:
+        chat_id_str = str(chat_id)
+        
+        # زيادة عداد الرسائل
+        message_buffer[chat_id_str] = message_buffer.get(chat_id_str, 0) + 1
+        
+        # تخزين معلومات الشات (إذا لم تكن موجودة)
+        if chat_id_str not in chats_buffer:
+            chats_buffer[chat_id_str] = {
+                'title': title,
+                'username': username,
+                'type': chat_type
+            }
+
+
+
+
+    
+    # بدء جدولة التحديث كل 30 ثانية
+    schedule_flush(interval_seconds=30)
+    
+    # معالج كل الرسائل (يضيف إلى البافر فقط)
+    @bot.message_handler(func=lambda message: True)
+    def track_message(message: Message):
+        chat = message.chat
+        
+        # تخزين فقط القنوات والمجموعات
+        if chat.type in ['group', 'supergroup', 'channel']:
+            add_to_buffer(
+                chat_id=chat.id,
+                title=chat.title or chat.username or "بدون اسم",
+                username=chat.username,
+                chat_type=chat.type
+            )
+            print(f"📝 تم إضافة رسالة إلى البافر: {chat.title} (المجموع: {message_buffer.get(str(chat.id), 0)})")
+    
+    # معالج عند إضافة البوت إلى شات جديد
+    @bot.chat_member_handler()
+    def handle_chat_member(chat_member: ChatMemberUpdated):
+        if chat_member.new_chat_member.user.id == bot.get_me().id:
+            chat = chat_member.chat
+            add_to_buffer(
+                chat_id=chat.id,
+                title=chat.title or chat.username or "بدون اسم",
+                username=chat.username,
+                chat_type=chat.type
+            )
+            print(f"✅ تم إضافة البوت إلى: {chat.title} ({chat.type})")
+    
+    # أمر لعرض قائمة الشاتات (للمشرفين فقط)
+    @bot.message_handler(commands=['list_chats'])
+    def list_chats(message: Message):
+        ADMIN_ID = 123456789  # ضع معرفك هنا
+        
+        if message.from_user.id != ADMIN_ID:
+            bot.reply_to(message, "⛔ غير مصرح لك بهذا الأمر")
+            return
+        
+        # حفظ البافر أولاً للحصول على أحدث البيانات
+        flush_to_db()
+        
+        chats = get_all_chats()
+        stats = get_chats_stats()
+        
+        if not chats:
+            bot.reply_to(message, "📭 لا توجد شاتات مسجلة حتى الآن")
+            return
+        
+        response = f"📊 **إحصائيات عامة:**\n"
+        response += f"• إجمالي الشاتات: {stats['total']}\n"
+        response += f"• قنوات: {stats['channels']}\n"
+        response += f"• مجموعات: {stats['groups']}\n"
+        response += f"• إجمالي الرسائل: {stats['messages']}\n\n"
+        
+        response += f"📋 **قائمة الشاتات (آخر {min(10, len(chats))}):**\n"
+        
+        for chat in chats[:10]:
+            response += f"\n• **{chat[2]}** ({chat[4]})\n"
+            response += f"  🆔 ID: `{chat[1]}`\n"
+            if chat[3]:
+                response += f"  📢 Username: @{chat[3]}\n"
+            response += f"  💬 الرسائل: {chat[6]}\n"
+            response += f"  📅 تاريخ الإضافة: {chat[8][:10]}\n"
+        
+        bot.reply_to(message, response, parse_mode='Markdown')
+    
+    # أمر لإظهار إحصائيات البافر (للمطور)
+    @bot.message_handler(commands=['buffer_stats'])
+    def buffer_stats(message: Message):
+        ADMIN_ID = 123456789
+        
+        if message.from_user.id != ADMIN_ID:
+            return
+        
+        with buffer_lock:
+            response = f"📊 **حالة البافر الحالية:**\n\n"
+            response += f"📝 رسائل في البافر: {len(message_buffer)} شات\n"
+            response += f"💾 شاتات جديدة: {len(chats_buffer)}\n"
+            response += f"📈 إجمالي الرسائل المعلقة: {sum(message_buffer.values())}\n"
+            
+            if message_buffer:
+                response += f"\n**أكثر 5 شاتات نشاطاً:**\n"
+                sorted_chats = sorted(message_buffer.items(), key=lambda x: x[1], reverse=True)[:5]
+                for chat_id, count in sorted_chats:
+                    response += f"• شات {chat_id}: {count} رسالة\n"
+        
+        bot.reply_to(message, response, parse_mode='Markdown')
+
+# أمر يدوي لحفظ البافر
+@bot.message_handler(commands=['flush'])
+def force_flush(message: Message):
+    ADMIN_ID = 123456789
+    
+    if message.from_user.id != ADMIN_ID:
+        bot.reply_to(message, "⛔ غير مصرح")
+        return
+    
+    flush_to_db()
+    bot.reply_to(message, "✅ تم حفظ البافر في قاعدة البيانات")
 
