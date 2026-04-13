@@ -67,3 +67,56 @@ def pro_quota_keyboard():
     
     return keyboard
     
+
+
+def scheduled_quiz_keyboard():
+    keyboard = InlineKeyboardMarkup(row_width=3)
+    
+    keyboard.add(
+        InlineKeyboardButton("⏰ كل ساعة", callback_data="hourly_quiz"),
+        InlineKeyboardButton("📆 كل يوم", callback_data="daily_quiz")     
+    )
+    keyboard.add(
+        InlineKeyboardButton("⚙️ مخصص", callback_data="adjusted_quiz")
+    )   
+    return keyboard
+
+
+
+def manual_selection_keyboard():
+    
+    keyboard = InlineKeyboardMarkup(row_width=3)
+    
+    keyboard.add(
+        InlineKeyboardButton("1️⃣", callback_data="num_1"),
+        InlineKeyboardButton("2️⃣", callback_data="num_2"),
+        InlineKeyboardButton("3️⃣", callback_data="num_3")
+    )
+
+    keyboard.add(
+        InlineKeyboardButton("4️⃣", callback_data="num_4"),
+        InlineKeyboardButton("5️⃣", callback_data="num_5"),
+        InlineKeyboardButton("6️⃣", callback_data="num_6")
+    )
+
+    keyboard.add(
+        InlineKeyboardButton("7️⃣", callback_data="num_7"),
+        InlineKeyboardButton("8️⃣", callback_data="num_8"),
+        InlineKeyboardButton("9️⃣", callback_data="num_9")
+    )
+    
+
+    keyboard.add(
+        InlineKeyboardButton("0️⃣", callback_data="num_0")
+    )
+    
+
+    keyboard.add(
+        InlineKeyboardButton("🗑️ مسح الكل", callback_data="num_clear_all"),
+        InlineKeyboardButton("⌫ حذف", callback_data="num_delete"),
+        InlineKeyboardButton("✅ تأكيد", callback_data="num_confirm")
+    )
+    
+    return keyboard
+
+    
