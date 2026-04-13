@@ -563,7 +563,7 @@ class QuizManager:
         
         
         branches = [q.branch for q in state.get("wrong_questions", []) if q.branch]         
-        pain_point = min(branches, key=len)
+        pain_point = min(branches, key=len) if branches else None
         # --------------------------------
         #          Logics
         # --------------------------------
