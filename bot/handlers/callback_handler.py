@@ -594,11 +594,11 @@ def register(bot):
 
                 
 
-            elif data.startswith("quick_quiz"):
-                quiz_manager.start_quiz(chat_id, quiz_code, bot)
+            elif data.startswith("scheduled_quiz"):
+                bot.send_message(chat_id, get_message("AWAITING_SCHEDULING"))
+                user_states[user_id] = "scheduled_quiz"
                 
             elif data == "input_text":
-                backup_all()
                 bot.answer_callback_query(call.id)
                 bot.send_message(chat_id, get_message("AWAITING_TEXT"))
 
