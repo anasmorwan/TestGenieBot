@@ -4,12 +4,14 @@ import threading
 from datetime import datetime
 from telebot import TeleBot
 from telebot.types import Message, ChatMemberUpdated
-from storage.session_store import message_buffer, chats_buffer, add_to_buffer, buffer_lock
+from storage.session_store import message_buffer, chats_buffer, add_to_buffer
 from services.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 from services.user_trap import update_last_active
 
 
-            
+
+buffer_lock = threading.Lock()
+
 
 def register(bot):
     @bot.message_handler(func=lambda msg: msg.chat.type in ['group', 'supergroup', 'channel'], content_types=["text"])
@@ -24,21 +26,19 @@ def register(bot):
         # تخزين فقط القنوات والمجموعات
         if chat.type in ['group', 'supergroup', 'channel']:
             add_to_buffer(
+                buffer_lock=buffer_lock,
                 chat_id=chat.id,
                 title=chat.title or chat.username or "بدون اسم",
                 username=chat.username,
                 chat_type=chat.type
             )
-        elif chat.type in ['group', 'supergroup']:
+        elif chat.type != "channel":
             
             text = message.text or message.caption
                 if not text:
                     print("❌ [Skip] Message has no text or caption.", flush=True)
                     return
-
-            print(f"📝 [Processing] Text Length: {len(text)} characters.", flush=True)
-
-            # محاولة تشغيل المحرك
+            
             try:
                 # تنبيه: إذا كان النص يحتوي على أسئلة كثيرة، يفضل معالجته سطراً بسطر 
                 # أو إرساله كما هو للمحرك وتخفيض العتبة مؤقتاً للفحص
@@ -115,6 +115,7 @@ def register(bot):
         if chat_member.new_chat_member.user.id == bot.get_me().id:
             chat = chat_member.chat
             add_to_buffer(
+                buffer_lock=buffer_lock,
                 chat_id=chat.id,
                 title=chat.title or chat.username or "بدون اسم",
                 username=chat.username,
