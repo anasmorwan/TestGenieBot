@@ -103,7 +103,7 @@ def generate_smart_response(prompt: str) -> str:
 
             chat_completion = groq_client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
-                model="llama-3.3-70b-instruct",
+                model="meta-llama/llama-4-scout-17b-16e-instruct",
                 temperature=0.7,
                 top_p=0.9,
                 
@@ -207,7 +207,7 @@ def generate_free_response(prompt: str) -> str:
 
             chat_completion = groq_client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
-                model="llama-3.3-70b-instruct",
+                model="meta-llama/llama-4-scout-17b-16e-instruct",
                 temperature=0.7,
                 top_p=0.9,
             )
