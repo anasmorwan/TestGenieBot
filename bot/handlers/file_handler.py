@@ -94,7 +94,7 @@ def register(bot):
                 bot.edit_message_text(
                 chat_id=chat_id,
                 message_id=waiting_msg.message_id,
-                text=get_message("SIZE_LIMIT"),
+                text=get_message("SIZE_LIMIT", filename),
                 reply_markup=keyboard,
                 parse_mode="HTML")
                 return
@@ -236,6 +236,6 @@ def register(bot):
             print("File handler ERROR:", e, flush=True)
             bot.send_message(chat_id, f"❌ Error: {str(e)}")
         finally:
-            if path and os.path.exists(path):
+             if path and path != "large_file" and os.path.exists(path):
                 os.remove(path)
                 print(f"تم حذف الملف المؤقت: {path}")
