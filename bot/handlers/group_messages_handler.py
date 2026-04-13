@@ -4,11 +4,9 @@ import threading
 from datetime import datetime
 from telebot import TeleBot
 from telebot.types import Message, ChatMemberUpdated
-from storage.session_store import message_buffer, chats_buffer, add_to_buffer
+from storage.session_store import message_buffer, chats_buffer, add_to_buffer, buffer_lock
 from services.pattern_detection import detect_quiz_pattern # استيراد الدالة الأساسية من كودك
 from services.user_trap import update_last_active
-
-buffer_lock = threading.Lock()
 
 
             
