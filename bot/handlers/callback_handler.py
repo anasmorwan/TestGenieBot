@@ -24,7 +24,7 @@ from services.user_trap import generate_challenge
 from services.usage import get_subscription_full, consume_quiz, can_generate, get_usage, build_status_message, activate_subscription, is_paid_user_active, downgrade_to_free
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
-from storage.session_store import user_selections, user_states, user_poll_selections
+from storage.session_store import user_selections, user_states, user_poll_selections, user_sessions
 from storage.sqlite_db import get_question_distribution, get_smart_review_batch, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
 from services.user_trap import update_last_active, get_user_content
 from storage.session_store import user_states, temp_texts
@@ -65,10 +65,170 @@ def register(bot):
         reply_markup=keyboard,
         parse_mode="HTML"
         )
+        
+    def format_time_readable(minutes):
+        """تحويل الدقائق إلى نص مقروء (دقائق/ساعات/أيام)"""
+        if minutes <= 0:
+            return ""
+    
+        if minutes < 60:
+            return f"≈ {minutes} دقيقة"
+        elif minutes < 1440:  # أقل من 24 ساعة
+            hours = minutes / 60
+            if hours == int(hours):
+                return f"≈ {int(hours)} ساعة"
+            else:
+                return f"≈ {hours:.1f} ساعة"
+        else:
+            days = minutes / 1440
+            if days == int(days):
+                return f"≈ {int(days)} يوم"
+            else:
+                return f"≈ {days:.1f} يوم"
+
+    def get_display_text(number):
+        """توليد النص المنسق مع تحويل الوقت"""
+        if not number:
+            return "🚀 سيتم إرسال اختبار الى القناة كل ___ دقيقة"
+    
+        minutes = int(number)
+        time_text = format_time_readable(minutes)
+    
+        if minutes < 60:
+            return f"🚀 سيتم إرسال اختبار الى القناة كل **{minutes}** دقيقة {time_text}"
+        elif minutes < 1440:
+            hours = minutes / 60
+            if hours == int(hours):
+                return f"🚀 سيتم إرسال اختبار الى القناة كل **{int(hours)}** ساعة ({minutes} دقيقة)"
+            else:
+                return f"🚀 سيتم إرسال اختبار الى القناة كل **{minutes}** دقيقة {time_text}"
+        else:
+            days = minutes / 1440
+            if days == int(days):
+                return f"🚀 سيتم إرسال اختبار الى القناة كل **{int(days)}** يوم ({minutes} دقيقة)"
+            else:
+                return f"🚀 سيتم إرسال اختبار الى القناة كل **{minutes}** دقيقة {time_text}"
+        
     
     # ==========================
     # -------- Main code -----------
     # ==========================
+    @bot.callback_query_handler(func=lambda call: call.data.startswith('num_'))
+    def handle_number_pad(call: CallbackQuery):
+        """معالج لوحة الأرقام"""
+        chat_id = call.message.chat.id
+        session = user_sessions.get(chat_id)
+    
+        # التحقق من وجود جلسة نشطة
+        if not session:
+            bot.answer_callback_query(call.id, "❌ انتهت صلاحية الجلسة، الرجاء إعادة إرسال الأمر")
+            # إزالة الكيبورد من الرسالة القديمة
+            bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=None)
+            return
+    
+        # تحديث وقت آخر نشاط
+        session['last_active'] = time.time()
+        current_number = session['number']
+        new_number = current_number
+    
+        # معالجة الأزرار
+        if call.data == "num_confirm":
+            if not current_number:
+                bot.answer_callback_query(call.id, "⚠️ الرجاء إدخال رقم أولاً!", show_alert=True)
+                return
+        
+            minutes = int(current_number)
+        
+            # التحقق من صحة الرقم (حد أقصى 30 يوم)
+            if minutes < 1:
+                bot.answer_callback_query(call.id, "⚠️ الرجاء إدخال رقم أكبر من 0", show_alert=True)
+                return
+            if minutes > 43200:  # 30 يوم كحد أقصى
+                bot.answer_callback_query(call.id, "⚠️ الحد الأقصى 30 يوم (43200 دقيقة)", show_alert=True)
+                return
+        
+            # تأكيد العملية
+            time_text = format_time_readable(minutes)
+            success_msg = f"✅ تم تعيين الفاصل الزمني إلى:\n"
+            success_msg += f"📊 {minutes} دقيقة\n"
+            success_msg += f"⏱️ {time_text}"
+        
+            bot.edit_message_text(
+                success_msg,
+                chat_id,
+                call.message.message_id,
+                parse_mode="Markdown"
+            )
+        
+            # حفظ الإعداد (يمكنك تعديل هذا الجزء حسب احتياجك)
+            save_interval_setting(chat_id, minutes)
+        
+            # حذف الجلسة
+            del user_sessions[chat_id]
+            bot.answer_callback_query(call.id, "✓ تم التأكيد بنجاح")
+            return
+    
+        elif call.data == "num_cancel":
+            bot.edit_message_text(
+                "❌ تم إلغاء العملية",
+                chat_id,
+                call.message.message_id
+            )
+            del user_sessions[chat_id]
+            bot.answer_callback_query(call.id, "تم الإلغاء")
+            return
+    
+        elif call.data == "num_delete":
+            if current_number:
+                new_number = current_number[:-1]
+            else:
+                bot.answer_callback_query(call.id, "⚠️ لا يوجد أرقام للحذف")
+                return
+    
+        elif call.data == "num_clear_all":
+            new_number = ""
+            bot.answer_callback_query(call.id, "🗑️ تم مسح جميع الأرقام")
+    
+        elif call.data.startswith("num_"):
+            digit = call.data.split("_")[1]
+            if digit.isdigit():
+                # الحد الأقصى 5 أرقام (43200 دقيقة = 30 يوم)
+                if len(current_number) >= 5:
+                    bot.answer_callback_query(call.id, "⚠️ الحد الأقصى 30 يوم (43200 دقيقة)", show_alert=True)
+                    return
+            
+                # منع الأصفار البادئة غير الضرورية
+                if current_number == "0" and digit == "0":
+                    bot.answer_callback_query(call.id, "⚠️ الرقم لا يمكن أن يبدأ بصفر", show_alert=True)
+                    return
+            
+                new_number = current_number + digit
+            
+                # التحقق من القيمة القصوى
+                if int(new_number) > 43200:
+                    bot.answer_callback_query(call.id, "⚠️ الحد الأقصى 30 يوم (43200 دقيقة)", show_alert=True)
+                    return
+    
+        # تحديث الجلسة
+        session['number'] = new_number
+    
+        # تحديث الرسالة
+        try:
+            bot.edit_message_text(
+                get_display_text(new_number),
+                chat_id,
+                call.message.message_id,
+                reply_markup=manual_selection_keyboard(),
+                parse_mode="Markdown"
+            )
+            bot.answer_callback_query(call.id)
+        except Exception as e:
+            print(f"خطأ في تحديث الرسالة: {e}")
+            bot.answer_callback_query(call.id, "حدث خطأ، حاول مرة أخرى")
+
+
+    
+    
     @bot.callback_query_handler(
         func=lambda call: any([
             call.data.startswith("post_poll:"),
@@ -540,6 +700,24 @@ def register(bot):
                 bot.send_message(chat_id=chat_id, 
                 text="​📍 إختر القناة او المجموعة التي تريد مشاركة الإختبار إليها",
                 reply_markup=keyboard)
+
+            
+            elif data == "manual_quiz_schedule":
+                
+                user_sessions[chat_id] = {
+                    'number': '',
+                    'message_id': message.message_id,
+                    'last_active': time.time()
+                }
+    
+                # تحديث الرسالة مع إضافة الكيبورد
+                bot.edit_message_text(
+                    get_display_text(''),
+                    chat_id,
+                    message.message_id,
+                    reply_markup=manual_selection_keyboard(),
+                    parse_mode="Markdown"
+                )
                 
                 
                     
@@ -808,4 +986,5 @@ def register(bot):
             
         except Exception as e:
             print("CALLBACK ERROR:", e, flush=True)
+
 
