@@ -669,3 +669,78 @@ def parse_quiz_block(block_lines: List[str]) -> Optional[Dict]:
     if mode == "explicit":
         add("structure", 0.30, "explicit_option_prefixes_found")
     elif mode 
+
+def detect_quiz_pattern(text: str) -> Optional[Dict]:
+    """
+    Detects:
+    - a single question with options
+    - or a multi-question quiz in one message
+    Returns:
+        None        -> reject immediately
+        dict(review)-> gray zone, send to API later
+        dict(accept)-> high confidence, accept now
+    """
+    if not text or len(text.strip()) < MIN_TEXT_LEN:
+        return None
+
+    text = normalize_text(text)
+    if is_bad_message(text):
+        return None
+
+    lines = split_lines(text)
+    if len(lines) < 1:
+        return None
+
+    # If there are multiple question headings, prefer multi-block parsing.
+    heading_count = sum(1 for l in lines if is_question_heading_line(l))
+
+    if heading_count < 2:
+        single = parse_quiz_block(lines)
+        if single:
+            return single
+
+    blocks = split_quiz_blocks(lines)
+    if len(blocks) >= 2:
+        parsed_blocks = []
+        for block in blocks:
+            parsed = parse_quiz_block(block)
+            if parsed:
+                parsed_blocks.append(parsed)
+
+        if parsed_blocks:
+            avg_conf = sum(b["confidence"] for b in parsed_blocks) / len(parsed_blocks)
+            strong_count = sum(1 for b in parsed_blocks if b["decision"] == "accept")
+
+            decision = (
+                "accept" if (avg_conf >= CONFIDENCE_HIGH and strong_count >= 2)
+                else "review" if avg_conf >= CONFIDENCE_LOW
+                else "reject"
+            )
+
+            if decision != "reject":
+                strongest = max(parsed_blocks, key=lambda x: x["confidence"])
+                return {
+                    "decision": decision,
+                    "tier": "high" if decision == "accept" else "gray",
+                    "api_recommended": decision == "review",
+                    "is_quiz": True,
+                    "quiz_type": "multi_question",
+                    "confidence": round(avg_conf, 2),
+                    "score": round(avg_conf, 2),  # backward compatibility
+                    "questions_count": len(parsed_blocks),
+                    "strong_blocks": strong_count,
+                    "blocks": parsed_blocks,
+                    "question": strongest["question"],
+                    "options": strongest["options"],
+                    "count": strongest["count"],
+                    "question_language": strongest["question_language"],
+                    "option_language": strongest["option_language"],
+                    "mixed_language": strongest["mixed_language"],
+                }
+
+    # fallback: try as a single block if multi split did not help
+    single = parse_quiz_block(lines)
+    if single:
+        return single
+
+    return None
