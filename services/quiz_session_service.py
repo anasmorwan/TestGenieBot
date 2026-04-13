@@ -134,6 +134,7 @@ class QuizManager:
                     "extended": False,
                     "quiz_code": quiz_code,
                     "wrong_count": 0,
+                    "wrong_questions": [],
                     "has_saved_texts": False,
                     "is_shared_user": is_shared_user   # ✅ أضف هذا السطر
                 }
@@ -167,6 +168,7 @@ class QuizManager:
                     "index": 0,
                     "score": 0,
                     "wrong_count": 0,
+                    "wrong_questions": [],
                     "source": "dynamic_mix",
                     "quiz_code": "CHALLENGE_MODE",
                     "has_saved_texts": has_content, # 👈 ستكون True أو False بدقة
@@ -218,6 +220,7 @@ class QuizManager:
                     "index": 0,
                     "score": 0,
                     "wrong_count": 0,
+                    "wrong_questions": [],
                     "source": "user_review",
                     "quiz_code": quiz_code,
                     "has_saved_texts": True,
@@ -252,6 +255,7 @@ class QuizManager:
                     "index": 0,
                     "score": 0,
                     "wrong_count": 0,
+                    "wrong_questions": [],
                     "source": "mistakes",
                     "quiz_code": "CHALLENGE_MODE",
                     "has_saved_texts": has_content, # 👈 ستكون True أو False بدقة
@@ -467,6 +471,7 @@ class QuizManager:
                     if source not in ("dynamic_mix", "mistakes"):
                         try:
                             self.save_mistake(chat_id, q)
+                            state.setdefault("wrong_questions", []).append(q)
                         except Exception as db_e:
                             print(f"⚠️ تجاهل خطأ قاعدة البيانات (save_mistake): {db_e}")
                     else:
@@ -555,7 +560,9 @@ class QuizManager:
             keyboard = too_mistakes_keyboard(wrong)
         else:
             keyboard = few_mistakes_keyboard(wrong)
-                    
+        
+        wrong_qs = state.get("wrong_questions")
+        pain_point = wrong_qs.         
         
         # --------------------------------
         #          Logics
@@ -608,7 +615,7 @@ class QuizManager:
             try:    
                 bot.send_message(
                     chat_id=chat_id,
-                    text=build_result_message(chat_id, score, total, streak, xp),
+                    text=build_result_message(chat_id, score, total, pain_point, streak, xp),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
