@@ -84,18 +84,22 @@ def register(bot):
             
             if decision == "accept":
                 admins = bot.get_chat_administrators(chat_id)
-                sent_count = 0
-                for admin in admins:
-                    if not admin.user.is_bot:
-                        bot.send_message(chat_id=admin.user.id, text="تم اعتماد السؤال", parse_mode="Markdown")
+               # sent_count = 0
+                # for admin in admins:
+                 #   if not admin.user.is_bot:
+                   #     bot.send_message(chat_id=admin.user.id, text="تم اعتماد السؤال", parse_mode="Markdown")
+                bot.send_message(chat_id=admin_id, text="تم اعتماد السؤال", parse_mode="Markdown")
+                            
 
             
             elif decision == "review":
                 admins = bot.get_chat_administrators(chat_id)
                 sent_count = 0
-                for admin in admins:
-                    if not admin.user.is_bot:
-                        bot.send_message(chat_id=admin.user.id, text="السؤال يحتاج مراجعة", parse_mode="Markdown")
+                # for admin in admins:
+                  #  if not admin.user.is_bot:
+                       # bot.send_message(chat_id=admin.user.id, text="السؤال يحتاج مراجعة", parse_mode="Markdown")
+                bot.send_message(chat_id=admin_id, text="السؤال يحتاج مراجعة", parse_mode="Markdown")
+                
 
         
         except Exception as e:
