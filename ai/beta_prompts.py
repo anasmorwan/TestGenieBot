@@ -459,7 +459,11 @@ SOURCE TEXT:
 {text_content}
 
 OUTPUT FORMAT: 
-{output_format}
+Return ONLY valid JSON.
+Do NOT include any explanation, reasoning, or thinking.
+Do NOT include text before or after JSON.
+The response must start with { or and end with } just as in example.
+example: {output_format}
 """
     return final_prompt
             
