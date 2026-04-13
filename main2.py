@@ -16,6 +16,8 @@ from storage.sqlite_db import safe_add_column, safe_add_table
 from bot.handlers import chat_shared_handler 
 from bot.handlers import admin_commands, bot_commands
 from bot.notifications.trap import send_daily_challenge_message
+from services.schedules import start_auto_backup, scheduler, start_daily_challenge
+
 
 
 
@@ -48,8 +50,6 @@ print("✅ قاعدة البيانات جاهزة ومحدثة", flush=True)
 
 # 4. بدء النسخ الاحتياطي التلقائي بعد استقرار الحالة
 # start_auto_backup()
-
-from services.backup_service import start_auto_backup, scheduler, start_daily_challenge
 
 
 start_daily_challenge()
