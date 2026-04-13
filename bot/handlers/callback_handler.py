@@ -511,7 +511,7 @@ def register(bot):
                     parse_mode="HTML"
                     )
                     return
-
+            
                 result = quiz_manager.start_quiz(chat_id, quiz_code, bot)
                 print("START QUIZ RESULT:", result)
             
@@ -584,7 +584,15 @@ def register(bot):
             elif data == "go_generate":
                 user_states[user_id] = "awating_test"
                 bot.answer_callback_query(call.id)
-                bot.send_message(chat_id, "📄 أرسل الملف الآن لإنشاء الاختبار")
+                bot.send_message(chat_id, text=get_message("AWAITING_FILE"))
+                
+            elif data == "pro_quota":
+                user_states[user_id] = "awating_test"
+                bot.answer_callback_query(call.id)
+                bot.send_message(chat_id, get_message("AWAITING_CONTENT"))
+        
+
+                
 
             elif data.startswith("quick_quiz"):
                 quiz_manager.start_quiz(chat_id, quiz_code, bot)
@@ -592,7 +600,7 @@ def register(bot):
             elif data == "input_text":
                 backup_all()
                 bot.answer_callback_query(call.id)
-                bot.send_message(chat_id, "📄 أرسل نص الآن لإنشاء الاختبار")
+                bot.send_message(chat_id, get_message("AWAITING_TEXT"))
 
             elif data == "copylink":
                 bot_username = "testprog123bot"
