@@ -158,10 +158,13 @@ def register(bot):
                 user_states.pop(user_id, None)
                 return
 
-            elif state is None or state == "" or state == "idle":
+            
+            
+
+            elif state is None or state == "" or state == "scheduled_quiz":
                 # الحالة الافتراضية توليد اختبار عادي
                 print(f"DEBUG: [User: {user_id}] No specific state found. Starting standard Quiz generation.", flush=True)
-                waiting_msg = bot.send_message(chat_id, get_message("Generating quiz"))
+                waiting_msg = bot.send_message(chat_id, get_message("Generating_quiz"))
                 msg_id = waiting_msg.message_id
 
                 quizzes = generate_quizzes_from_text(text, user_id, bot, msg_id=msg_id)
@@ -171,7 +174,15 @@ def register(bot):
                     bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
                     return
 
+                if state == "scheduled_quiz":
+                    quiz_code = store_quiz(user_id, quizzes, schedule=True)
+                    bot.send_message(
+                        chat_id,
+                        text=get_message("SCHEDULED_QUIZ_READY")
+                    )
+                    return
                 quiz_code = store_quiz(user_id, quizzes)
+                    
                 maybe_cleanup()
                 quiz_len = len(quizzes)
 
