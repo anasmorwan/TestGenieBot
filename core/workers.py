@@ -75,3 +75,4 @@ def process_task(task):
         delay = task["delay"]
         time.sleep(delay)
         bot.send_message(task["user_id"], task["text"])
+
