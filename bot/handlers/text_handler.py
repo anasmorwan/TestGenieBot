@@ -17,6 +17,8 @@ from storage.sqlite_db import set_user_has_quizzes, init_user_quiz_count
 from bot.keyboards.actions_keyboard import invitation_keyboard
 from bot.handlers.is_member import is_user_member, get_channel_invite_link
 from services.usage import is_paid_user_active
+
+from core.queue_manager import add_task
 import time
 import random
 
@@ -180,7 +182,13 @@ def register(bot):
                 waiting_msg = bot.send_message(chat_id, get_message("Generating_quiz"))
                 msg_id = waiting_msg.message_id
 
-                quizzes = generate_quizzes_from_text(text, user_id, bot, msg_id=msg_id)
+                # quizzes = generate_quizzes_from_text(text, user_id, bot, msg_id=msg_id)
+                add_task(1, {
+                    "type": "text_generate_quiz",
+                    "user_id": user_id,
+                    "text": text,
+                    "msg_id": msg_id
+                })
 
                 if not quizzes or len(quizzes) == 0:
                     print(f"DEBUG: [User: {user_id}] Quiz generation returned EMPTY result.", flush=True)
