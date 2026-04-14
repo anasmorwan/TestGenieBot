@@ -77,7 +77,7 @@ def scheduled_quiz_keyboard():
         InlineKeyboardButton("📆 كل يوم", callback_data="daily_quiz")     
     )
     keyboard.add(
-        InlineKeyboardButton("⚙️ مخصص", callback_data="adjusted_quiz")
+        InlineKeyboardButton("🔒 مخصص", callback_data="adjusted_quiz")
     )   
     return keyboard
 
