@@ -46,11 +46,9 @@ def process_task(task):
     elif task_type == "text_generate_quiz": 
         generate_quizzes_from_text(task)
 
-    elif task_type == "ai_request":
-        handlers.ai_request(task)
+    elif task_type == "file_generate_quiz":
+        generate_quizzes_from_text(content=text, user_id=user_id, bot=mybot, msg_id=msg_id)
 
     elif task_type == "send_message":
         handlers.send_message(task)
-
-     
 
