@@ -196,6 +196,7 @@ def register(bot):
             })
             
             maybe_cleanup()
+            
 
             if not quizzes:
                 bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
