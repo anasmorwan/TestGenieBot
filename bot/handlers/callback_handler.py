@@ -16,7 +16,7 @@ from bot.keyboards.account_status_keyboard import account_status_keyboard, plan_
 from bot.keyboards.more_options_keyboard import more_options_keyboard
 from bot.keyboards.get_chat_keyboard import get_chat_request_keyboard
 from bot.keyboards.upsell_keyboard import saved_quiz_upsell
-from bot.keyboards.quiz_buttons import manual_selection_keyboard
+from bot.keyboards.quiz_buttons import manual_selection_keyboard, scheduled_quiz_keyboard
 from storage.quiz_repository import update_user_current_quiz, send_quiz_to_chat, log_quiz_share, is_quiz_expired
 from bot.handlers.chat_shared_handler import publish_interactive_link
 from bot.keyboards.constumize_quiz_keyboard import get_testgenie_keyboard
@@ -908,7 +908,16 @@ def register(bot):
                 
 
             elif data.startswith("scheduled_quiz"):
-                bot.send_message(chat_id, get_message("AWAITING_SCHEDULING"))
+                keyboard = scheduled_quiz_keyboard()
+                bot.edit_message_text(
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    text=get_message("AWAITING_SCHEDULING"),
+                    reply_markup=keyboard,
+                    parse_mode="HTML"
+                )
+                
+                
                 user_states[user_id] = "awaiting_schedule"
                 
             elif data == "input_text":
