@@ -52,9 +52,14 @@ def process_task(task):
         text_handler.register(mybot)
         file_hanlder.register(mybot)
         image_handler.register(mybot)
-        maybe_cleanup()
-            
+        
+        
 
+    elif task_type == "text_generate_quiz": 
+        generate_quizzes_from_text(task)
+
+    elif task_type == "file_generate_quiz":
+        maybe_cleanup() 
         if not quizzes:
             bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
             return
@@ -92,13 +97,6 @@ def process_task(task):
             time.sleep(2)
         quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False)
             
-        
-
-    elif task_type == "text_generate_quiz": 
-        generate_quizzes_from_text(task)
-
-    elif task_type == "file_generate_quiz":
-        generate_quizzes_from_text(content=text, user_id=user_id, bot=mybot, msg_id=msg_id)
 
     elif task_type == "extend_generate_quiz":
         quiz_manager.generate_and_store(user_id=user_id, msg_id=msg_id, chat_id=user_id, only_generate=only_generate, bot=mybot)
@@ -109,3 +107,11 @@ def process_task(task):
         time.sleep(delay)
         bot.send_message(task["user_id"], task["text"])
 
+
+
+add_task(1, {
+                "type": "file_generate_quiz",
+                "user_id": user_id,
+                "text": content,
+                "msg_id": msg_id
+            })
