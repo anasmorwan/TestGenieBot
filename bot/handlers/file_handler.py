@@ -193,7 +193,7 @@ def register(bot):
            # msg_id=msg_id
         #    )
             add_task(1, {
-                "type": "file_generate_quiz",
+                "type": "generate_quiz",
                 "user_id": user_id,
                 "text": content,
                 "msg_id": msg_id
