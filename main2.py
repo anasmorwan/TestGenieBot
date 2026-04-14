@@ -18,6 +18,7 @@ from bot.handlers import admin_commands, bot_commands
 from bot.notifications.trap import send_daily_challenge_message
 from services.schedules import start_auto_backup, scheduler, start_daily_challenge
 
+from core.workers import start_workers 
 
 
 
@@ -62,17 +63,19 @@ scheduler.start()
 
 
 
+start_workers()
+
 
 # تسجيل الهاندلرز
 # temp_code.register()
 is_member.register(mybot)
-image_handler.register(mybot)
+# image_handler.register(mybot)
 admin_commands.register(mybot); print("commands.register done", flush=True)
 bot_commands.register(mybot)
 start.register(mybot); print("start.register done", flush=True)
-text_handler.register(mybot); print("text_handler.register done", flush=True)
+# text_handler.register(mybot); print("text_handler.register done", flush=True)
 group_messages_handler.register(mybot); print("group_messages_handler.register done", flush=True)
-file_handler.register(mybot); print("file_handler.register done", flush=True)
+# file_handler.register(mybot); print("file_handler.register done", flush=True)
 callback_handler.register(mybot); print("callback_handler.register done", flush=True)
 pre_checkout_query_handler.register_payment(mybot); print("pre_checkout_query_handler.register done", flush=True)
 payment_handler.register(mybot); print("payment_handler.register done", flush=True)
