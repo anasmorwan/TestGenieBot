@@ -15,6 +15,21 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS knowledge_chunks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        knowledge_id TEXT NOT NULL,
+        chunk_id TEXT NOT NULL,
+        summary TEXT,
+        key_points TEXT,
+        difficulty TEXT,
+        source TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, knowledge_id, chunk_id)
+        )
+    """)
+
 
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS user_learning_sessions (
@@ -1344,6 +1359,12 @@ def safe_add_column():
         cursor.execute("""
             ALTER TABLE user_quizzes 
             ADD COLUMN quiz_title TEXT DEFAULT 'اختبار بدون عنوان'
+        """)
+    if not column_exists("user_knowledge", "title"):
+        # إضافة عمود quiz_title إلى الجدول الموجود
+        cursor.execute("""
+            ALTER TABLE user_quizzes 
+            ADD COLUMN title TEXT DEFAULT 'بدون عنوان'
         """)
         
     
