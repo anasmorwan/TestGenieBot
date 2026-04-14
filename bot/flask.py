@@ -24,8 +24,12 @@ def register():
 
             # حوّل القاموس إلى كائن Update ثم أرسله لمكتبة telebot
             update = telebot.types.Update.de_json(update_dict)
-            threading.Thread(target=mybot.process_new_updates, args=([update],)).start()
-
+            user_id = 
+            # threading.Thread(target=mybot.process_new_updates, args=([update],)).start()
+            add_task(1, {
+                "type": "new_updates",
+                "update": update_dict   # أو update.to_dict()
+            })
             return "OK", 200
 
             
@@ -34,3 +38,6 @@ def register():
             # طباعة الخطأ للإطلاع
             print("Webhook error:", e, flush=True)
             return "ERROR", 500
+
+
+from core.task_queue import add_task
