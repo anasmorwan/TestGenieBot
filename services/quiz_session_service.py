@@ -180,7 +180,12 @@ class QuizManager:
             if questions:
                 self.send_current_question(chat_id, bot)
                 if has_content:
-                    threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
+                   # threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id)).start()
+                    add_task(1, {
+                        "type": "extend_generate_quiz",
+                        "user_id": chat_id,
+                        "msg_id": msg_id
+                    })
             else:
                 if has_content:
                     bot.send_message(chat_id, "🔍 جاري توليد أسئلة تحدي جديدة بناءً على تخصصك...")
@@ -229,7 +234,13 @@ class QuizManager:
                     "questions_resumed": False
                 }
             only_generate = True
-            threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id, waitinf_msg.message_id, only_generate)).start()
+           # threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id, waitinf_msg.message_id, only_generate)).start()
+             add_task(1, {
+                "type": "extend_generate_quiz",
+                "user_id": chat_id,
+                "msg_id": waitinf_msg.message_id,
+                "only_generate": True
+            })
         except Exception as e:
             print(f"❌ Error in start_user_review: {str(e)}")
             
