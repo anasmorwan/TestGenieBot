@@ -19,12 +19,18 @@ def generate_quiz_code():
     return "QC_" + uuid.uuid4().hex[:6]
 
 
-def store_quiz(user_id, quizzes):
+def store_quiz(user_id, quizzes, quiz_title=None):
     conn = get_connection()
     c = conn.cursor()
 
     code = generate_quiz_code()
     is_paid = 1 if is_paid_user_active(user_id) else 0
+    
+    # معالجة العنوان: إذا لم يتم تمرير عنوان، استخدم عنوان افتراضي
+    if quiz_title is None or quiz_title.strip() == "":
+        quiz_title = f"اختبار {code}"
+    else:
+        quiz_title = quiz_title.strip()
 
     # 1. تجهيز البيانات خارج الـ execute لضمان نظافة الكود
     # نحول كل كائن QuizQuestion إلى قاموس (Dict) ليقبله الـ JSON
@@ -34,18 +40,19 @@ def store_quiz(user_id, quizzes):
     try:
         c.execute("""
         INSERT INTO user_quizzes
-        (user_id, quiz_data, quiz_code, created_at, is_paid)
-        VALUES (?, ?, ?, ?, ?)
+        (user_id, quiz_data, quiz_code, quiz_title, created_at, is_paid)
+        VALUES (?, ?, ?, ?, ?, ?)
         """, (
             user_id,
-            json_data,  # تمرير المتغير الجاهز هنا
+            json_data,
             code,
+            quiz_title,  # إضافة العنوان هنا
             datetime.now().isoformat(),
             is_paid
         ))
         
         conn.commit()
-        print(f"✅ Quiz stored successfully with code: {code}", flush=True)
+        print(f"✅ Quiz stored successfully with code: {code} - Title: {quiz_title}", flush=True)
 
     except Exception as e:
         print(f"❌ Error storing quiz: {e}", flush=True)
@@ -55,30 +62,45 @@ def store_quiz(user_id, quizzes):
         conn.close()
 
     return code
-    
 
-def store_content(user_id, content_data, content_type):
+def store_content(user_id, content_data, content_type, quiz_title=None):
     conn = get_connection()
     c = conn.cursor()
 
     code = generate_quiz_code()
     is_paid = 1 if is_paid_user_active(user_id) else 0
-
-    c.execute("""
-    INSERT INTO user_quizzes 
-    (user_id, quiz_data, quiz_code, quiz_type, created_at, is_paid) 
-    VALUES (?, ?, ?, ?, ?, ?)
-    """, (
-        user_id, 
-        json.dumps(content_data), 
-        code, 
-        content_type, # هنا نحدد هل هو poll أم quiz
-        datetime.now().isoformat(), 
-        is_paid
-    ))
     
-    conn.commit()
-    conn.close()
+    # معالجة العنوان: إذا لم يتم تمرير عنوان، استخدم عنوان افتراضي
+    if quiz_title is None or quiz_title.strip() == "":
+        quiz_title = f"{content_type} {code}"
+    else:
+        quiz_title = quiz_title.strip()
+
+    try:
+        c.execute("""
+        INSERT INTO user_quizzes 
+        (user_id, quiz_data, quiz_code, quiz_title, quiz_type, created_at, is_paid) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+        """, (
+            user_id, 
+            json.dumps(content_data), 
+            code, 
+            quiz_title,  # إضافة العنوان هنا
+            content_type,
+            datetime.now().isoformat(), 
+            is_paid
+        ))
+        
+        conn.commit()
+        print(f"✅ Content stored successfully with code: {code} - Title: {quiz_title} - Type: {content_type}", flush=True)
+
+    except Exception as e:
+        print(f"❌ Error storing content: {e}", flush=True)
+        conn.rollback()
+        raise e
+    finally:
+        conn.close()
+    
     return code
 
 def load_quiz(quiz_code):
