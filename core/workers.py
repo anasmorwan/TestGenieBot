@@ -11,3 +11,8 @@ def worker():
             process_task(task)
         finally:
             task_queue.task_done()
+
+def start_workers(n=10):
+    for _ in range(n):
+        t = threading.Thread(target=worker, daemon=True)
+        t.start()
