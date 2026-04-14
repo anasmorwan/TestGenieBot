@@ -19,14 +19,12 @@ def init_db():
     CREATE TABLE IF NOT EXISTS knowledge_chunks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
-        knowledge_id TEXT NOT NULL,
         chunk_id TEXT NOT NULL,
         summary TEXT,
-        key_points TEXT,
         difficulty TEXT,
         source TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, knowledge_id, chunk_id)
+        UNIQUE(user_id, chunk_id)
         )
     """)
 
