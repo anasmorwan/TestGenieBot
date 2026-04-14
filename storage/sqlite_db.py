@@ -16,6 +16,49 @@ def init_db():
     cursor = conn.cursor()
 
     cursor.execute("""
+    CREATE TABLE IF NOT EXISTS schedules (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, 
+        user_id INTEGER NOT NULL,    
+        task_type TEXT NOT NULL,            -- 'daily_question' | 'quiz'   
+        quiz_code TEXT,                     -- يستخدم فقط إذا task_type = 'quiz' 
+        topic TEXT,                       -- يستخدم في daily_question (مثلاً: anatomy) 
+        difficulty TEXT,                 -- easy / medium / hard 
+        time_of_day TEXT NOT NULL,             -- "14:00" 
+        schedule_type TEXT NOT NULL,            -- 'daily' (حالياً خليها daily فقط لتبسيط MVP)
+        is_active BOOLEAN DEFAULT 1,
+        last_run_at TEXT,
+        next_run_at TEXT,  
+        created_at TEXT DEFAULT CURRENT_TIMESTAM
+    )
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS schedule_runs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        schedule_id INTEGER NOT NULL,
+        user_id INTEGER NOT NULL,   
+        task_type TEXT,   
+        quiz_code TEXT,
+        question_id INTEGER,  
+        sent_at TEXT,   
+        status TEXT,              -- 'sent' | 'answered' | 'skipped'  
+        is_correct BOOLEAN,    
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP  
+    )
+    """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS questions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,   
+        question_text TEXT,
+        options TEXT, -- JSON   
+        correct_index INTEGER,  
+        topic TEXT,
+        difficulty TEXT, 
+        explanation TEXT,  
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    cursor.execute("""
     CREATE TABLE IF NOT EXISTS chats (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
         chat_id TEXT UNIQUE NOT NULL,       -- Telegram chat ID
