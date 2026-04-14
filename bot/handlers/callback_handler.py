@@ -922,14 +922,12 @@ def register(bot):
 
             elif data.startswith("scheduled_quiz"):
                 keyboard = scheduled_quiz_keyboard()
-                bot.edit_message_text(
+                bot.send_message(
                     chat_id=chat_id,
-                    message_id=message_id,
                     text=get_message("AWAITING_SCHEDULING"),
                     reply_markup=keyboard,
                     parse_mode="HTML"
                 )
-                
                 
                 user_states[user_id] = "awaiting_schedule"
                 
