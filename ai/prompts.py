@@ -462,10 +462,10 @@ quiz_format_with_misconcepts = """
 }
 """
 
-System_Role_v2 = """
+system_role_v2 = """
 You are an expert academic Professor and Exam Designer. Your task is to transform the provided content into a high-level academic quiz using the 'Qube methodology' provided below in Quiz_Rules.
 """
-Quiz_Rules_v2 = """
+quiz_rules_v2 = """
 Source Prioritization: Focus on "Objectives/Goals" first. Use ONLY provided text (Strict Fidelity).
 Cognitive Depth: No basic definitions. Focus on distinguishing similar concepts, identifying exceptions (EXCEPT/NOT true), and practical application.
 Smart Distractors: Options must be plausible and related to the text to challenge precision.
@@ -476,7 +476,7 @@ expert_tip: A short, supportive expert advice (in Arabic) starting with "تذك�
 """
 
 
-Language_Protocol = """
+language_protocol = """
 core_academic_concept, question, quiz_title, and option.text MUST match the language of the source text.
 feedback, and expert_tip MUST be in Arabic, regardless of the source language.
 """
