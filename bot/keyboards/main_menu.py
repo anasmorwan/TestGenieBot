@@ -18,7 +18,7 @@ def smart_ui_keyboard(mistakes):
     # start_challenge:user_review
     btn_settings = InlineKeyboardButton("⫶ المزيد", callback_data="more_options")
     btn_random_quiz = InlineKeyboardButton("📤 مشاركة إختبار", callback_data=f"share_quizzes")
-    btn_mistakes = InlineKeyboardButton(f"📖 مراجعة أخطائي: {mistakes}", callback_data=f"start_challenge:mistakes_all:{mistakes}")
+    btn_mistakes = InlineKeyboardButton(f"📖 مراجعة أخطائي: {mistakes} (خليط ذكي)", callback_data=f"start_challenge:mistakes_all:{mistakes}")
 
 
     markup.add(btn_mistakes, btn_random_quiz, btn_settings)
