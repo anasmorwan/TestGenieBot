@@ -30,13 +30,13 @@ def process_task(task):
             return
 
         if "text" in msg:
-            handle_text(user_id, msg["text"], msg)
+            text_handler.register(bot)
 
         elif "document" in msg:
-            handle_file(user_id, msg["document"], msg)
+            file_hanlder.register(bot)
 
         elif "photo" in msg:
-            handle_photo(user_id, msg["photo"], msg)
+            image_handler.register(bot)
         
 
     elif task_type == "generate_exam":
