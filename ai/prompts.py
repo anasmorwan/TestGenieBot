@@ -99,7 +99,7 @@ Return valid JSON only, no markdown, no extra text.
     """.strip()
 
 
-def build_pro_quiz_prompt(content: str, num_questions: int, lang: str) -> str:
+def build_pro_quiz_prompt(user_id, content: str, num_questions: int, lang: str) -> str:
     """
     Clean prompt for pro mode.
     Keeps the schema minimal to reduce language drift.
@@ -322,7 +322,7 @@ def pro_quiz_generator(user_id, content: Any, num_questions: int) -> Dict[str, A
         target_lang = detect_text_language(content)
 
         # المحاولة الأولى
-        prompt = build_pro_quiz_prompt(content, num_questions, target_lang)
+        prompt = build_pro_quiz_prompt(user_id, content, num_questions, target_lang)
         raw_response = safe_generate(user_id, prompt) # استخدام الدالة الآمنة
         
         full_data = normalize_llm_output(parse_llm_json(raw_response))
@@ -361,7 +361,7 @@ def pro_quiz_generator(user_id, content: Any, num_questions: int) -> Dict[str, A
         # Language-safe fallback: still use the same target language
         try:
             target_lang = detect_text_language(content)
-            fallback_prompt = build_pro_quiz_prompt(content, num_questions, target_lang)
+            fallback_prompt = build_pro_quiz_prompt(user_id, content, num_questions, target_lang)
             fallback_raw = generate_smart_response(fallback_prompt)
             fallback_data = normalize_llm_output(parse_llm_json(fallback_raw))
 
