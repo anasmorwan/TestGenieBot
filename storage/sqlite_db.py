@@ -14,6 +14,19 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
+
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS user_learning_sessions (
+        user_id INTEGER NOT NULL,
+        title TEXT,
+        status TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP, 
+        completed_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        quiz_code TEXT
+      )
+    """)
+
     
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS quiz_sessions (
