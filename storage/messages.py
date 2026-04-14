@@ -7,7 +7,7 @@ MESSAGES = {
         "AWAITING_SCHEDULING": (
             "📆 أرسل نصك أو ملفك الآن\n\n"
             "لبدء جدولة إختبارك 👇"
-        )
+        ),
         
         "FILE_READ_ERROR": "خطأ اثناء قراءة الملف",
         "QUIZ_FAILED": "فشل توليد الاختبار",
