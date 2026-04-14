@@ -159,6 +159,7 @@ Format:
 output_format = """
 {
   "domain": "e.g: Medicine",
+  "quiz_title": "..",
   "questions": [
     {
       "question": "...",
@@ -169,6 +170,13 @@ output_format = """
     }
   ]
 }
+"""
+
+
+quiz_title_prompt = """
+Generate quiz_title: short (3-8 words), descriptive, relevant to content.
+Format: "Type: Main Topic"
+Example: "Quiz: Python Basics" or "Test: General Knowledge"
 """
 def analyze_text_metadata(text_content, config):
     
@@ -439,6 +447,7 @@ CONSTRAINTS:
 - Exactly 4 options per question.
 - No facts outside the provided source.
 - Return ONLY a JSON object like OUTPUT FORMAT
+
 
 QUESTION TYPES TO GENERATE:
 {chr(10).join([f"- {item['slot']}. {item['type']}" for item in question_plan])}
