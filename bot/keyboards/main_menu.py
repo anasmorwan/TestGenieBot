@@ -15,15 +15,13 @@ def main_menu_keyboard(bot_username):
 
 def smart_ui_keyboard(mistakes):
     markup = InlineKeyboardMarkup(row_width=1)
-
-    
+    # start_challenge:user_review
+    btn_settings = InlineKeyboardButton("⫶ المزيد", callback_data="more_options")
+    btn_random_quiz = InlineKeyboardButton("📤 مشاركة إختبار", callback_data=f"share_quizzes")
     btn_mistakes = InlineKeyboardButton(f"📖 مراجعة أخطائي: {mistakes}", callback_data=f"start_challenge:mistakes_all:{mistakes}")
-    btn_random_quiz = InlineKeyboardButton("🧠 اختبرني عشوائياً", callback_data=f"start_challenge:user_review")
-    btn_settings = InlineKeyboardButton("⚙️ الإعدادات", callback_data="more_options")
-    
 
 
-    markup.add(btn_mistakes, btn_random_quiz, btn_settings)
+    markup.add(btn_settings, btn_random_quiz, btn_mistakes)
     return markup
  
     
