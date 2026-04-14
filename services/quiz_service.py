@@ -175,8 +175,10 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
                     # raw_response = safe_generate(user_id, prompt)
                     pass
                 pass
+
+
                 
-            prompt = build_quiz_prompt(user_id, content, question_count, user_instruction=user_instruction)
+            prompt = build_quiz_prompt(user_id, content, question_count, advance=True, user_instruction=user_instruction)
             add_task(0, {
                 "type": "delayed_message",
                 "user_id": user_id,
