@@ -19,7 +19,9 @@ def init_db():
     CREATE TABLE IF NOT EXISTS knowledge_chunks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         user_id INTEGER NOT NULL,
+        knowledge_id TEXT NOT NULL,
         chunk_id TEXT NOT NULL,
+        chunks_count INTEGER,
         summary TEXT,
         difficulty TEXT,
         source TEXT,
@@ -1364,6 +1366,13 @@ def safe_add_column():
             ALTER TABLE user_quizzes 
             ADD COLUMN title TEXT DEFAULT 'بدون عنوان'
         """)
+    if not column_exists("user_knowledge", "knowledge_id"):
+        # إضافة عمود quiz_title إلى الجدول الموجود
+        cursor.execute("""
+            ALTER TABLE user_quizzes 
+            ADD COLUMN knowledge_id TEXT
+        """)
+        
         
     
 
