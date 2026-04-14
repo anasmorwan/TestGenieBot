@@ -1,5 +1,5 @@
 import threading
-from core.task_queue import task_queue
+from core.task_queue import task_queue, delayed_queue
 from bot.bot_instance import mybot
 from bot.handlers import file_hanlder, text_handler, image_handler  # أو أي functions عندك
 from services.quiz_service import generate_quizzes_from_text
