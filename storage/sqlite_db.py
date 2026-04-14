@@ -457,7 +457,27 @@ def get_today_attempts(user_id):
     
     return attempts
 
-
+def get_user_quiz_codes(user_id):
+    """
+    ترجع كل quiz_code لمستخدم محدد
+    
+    Args:
+        user_id (int): معرف المستخدم
+    
+    Returns:
+        list: قائمة تحتوي على جميع أكواد الاختبارات للمستخدم
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT quiz_code 
+        FROM user_quizzes 
+        WHERE user_id = ?
+    """, (user_id,))
+    
+    results = cursor.fetchall()
+    return [row[0] for row in results]
 #--------------------------
 #    🔹 دوال الادمن المساعدة
 #--------------------------
