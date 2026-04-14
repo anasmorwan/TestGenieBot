@@ -46,19 +46,12 @@ def process_task(task):
 
     if task["type"] == "new_updates":
         update = task["update"]
+        mybot.process_new_updates([update])
 
-        msg = update.get("message")
-        if not msg:
-            return
-
-        if "text" in msg:
-            text_handler.register(bot)
-
-        elif "document" in msg:
-            file_hanlder.register(bot)
-
-        elif "photo" in msg:
-            image_handler.register(bot)
+      
+        text_handler.register(bot)
+        file_hanlder.register(bot, msg)
+        image_handler.register(bot, msg)
         
 
     elif task_type == "text_generate_quiz": 
