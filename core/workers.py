@@ -68,4 +68,7 @@ def process_task(task):
         quiz_manager.generate_and_store(user_id=user_id, msg_id=msg_id, chat_id=user_id, only_generate=only_generate, bot=mybot)
 
 
-
+    elif task["type"] == "delayed_message":
+        delay = task["delay"]
+        time.sleep(delay)
+        bot.send_message(task["user_id"], task["text"])
