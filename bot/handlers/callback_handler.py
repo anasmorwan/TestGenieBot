@@ -26,7 +26,7 @@ from services.usage import get_subscription_full, consume_quiz, can_generate, ge
 from services.referral import get_referral_count
 from services.backup_service import safe_backup, backup_all
 from storage.session_store import user_selections, user_states, user_poll_selections, user_sessions
-from storage.sqlite_db import get_question_distribution, get_smart_review_batch, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
+from storage.sqlite_db import get_question_distribution, get_user_quizzes_list, get_user_quiz_codes, get_smart_review_batch, get_recent_mistakes, init_user_quiz_count, update_user_difficulty
 from services.user_trap import update_last_active, get_user_content
 from storage.session_store import user_states, temp_texts
 from services.poll_service import generate_poll, normalize_poll
@@ -110,6 +110,77 @@ def register(bot):
             else:
                 return f"🚀 سيتم إرسال اختبار الى القناة كل **{minutes}** دقيقة {time_text}"
         
+
+    def paginate_list(items, page, items_per_page=5):
+        """
+        تقسيم القائمة إلى صفحات
+    
+        Args:
+            items (list): قائمة العناصر
+            page (int): رقم الصفحة الحالية (يبدأ من 0)
+            items_per_page (int): عدد العناصر في كل صفحة
+    
+        Returns:
+            tuple: (عناصر الصفحة الحالية, إجمالي الصفحات)
+        """
+        total_pages = (len(items) + items_per_page - 1) // items_per_page
+    
+        start_idx = page * items_per_page
+        end_idx = start_idx + items_per_page
+    
+        page_items = items[start_idx:end_idx]
+    
+        return page_items, total_pages
+
+    def build_quizzes_keyboard(quizzes_list, page=0, items_per_page=5):
+        """
+        بناء لوحة مفاتيح مع أزرار الاختبارات وأزرار التنقل
+    
+        Args:
+            quizzes_list (list): قائمة الـ tuples (quiz_title, quiz_code)
+            page (int): رقم الصفحة الحالية
+            items_per_page (int): عدد الأزرار في كل صفحة
+    
+        Returns:
+            dict: لوحة المفاتيح بتنسيق inline keyboard
+        """
+        # حساب إجمالي الصفحات
+        total_pages = (len(quizzes_list) + items_per_page - 1) // items_per_page
+    
+        # الحصول على عناصر الصفحة الحالية
+        page_items, _ = paginate_list(quizzes_list, page, items_per_page)
+    
+        # بناء أزرار الاختبارات
+        keyboard = []
+        for title, code in page_items:
+            # تحديد طول العنوان (لا يتجاوز 35 حرفاً)
+            display_title = title[:32] + "..." if len(title) > 35 else title
+            button = [{"text": f"📝 {display_title}", "callback_data": f"share_{code}"}]
+            keyboard.append(button)
+    
+        # إضافة أزرار التنقل (التالي/السابق) في صف واحد
+        nav_buttons = []
+    
+        # زر السابق (يظهر فقط إذا لم نكن في الصفحة الأولى)
+        if page > 0:
+            nav_buttons.append({"text": "⬅️ السابق", "callback_data": f"quizzes_page_{page-1}"})
+    
+        # عرض رقم الصفحة الحالية (اختياري)
+        if total_pages > 1:
+            nav_buttons.append({"text": f"📄 {page+1}/{total_pages}", "callback_data": "noop"})
+    
+        # زر التالي (يظهر فقط إذا لم نكن في الصفحة الأخيرة)
+        if page < total_pages - 1:
+            nav_buttons.append({"text": "التالي ➡️", "callback_data": f"quizzes_page_{page+1}"})
+    
+        # إضافة صف التنقل إذا كان هناك أزرار
+        if nav_buttons:
+            keyboard.append(nav_buttons)
+    
+        # إضافة زر الرجوع
+        keyboard.append([{"text": "🔙 رجوع للقائمة الرئيسية", "callback_data": "back_to_menu"}])
+    
+        return {"inline_keyboard": keyboard}
     
     # ==========================
     # -------- Main code -----------
@@ -676,8 +747,57 @@ def register(bot):
                 result = quiz_manager.start_quiz(chat_id, quiz_code, bot)
                 print("START QUIZ RESULT:", result)
                 
-            elif data == "share_quizzes":
+            # في معالج الـ callback_query
+            elif call.data.startswith("quizzes_page_"):
+                # استخراج رقم الصفحة
+                page = int(call.data.replace("quizzes_page_", ""))
+    
+                # جلب قائمة الاختبارات مرة أخرى
+                quizzes_list = get_user_quizzes_list(user_id)
+    
+                if quizzes_list:
+                    # بناء لوحة المفاتيح للصفحة المطلوبة
+                    reply_markup = build_quizzes_keyboard(quizzes_list, page=page)
+        
+                    # تحديث الرسالة بدلاً من إرسال جديدة
+                    total_quizzes = len(quizzes_list)
+                    text = f"📋 اختر الاختبار الذي تريد مشاركته:\n\n"
+                    text += f"✨ لديك {total_quizzes} اختبار"
+                    text += f"\n📌 صفحة {page+1} من {((total_quizzes-1)//5)+1}"
+        
+                    # تحرير الرسالة الحالية
+                    bot.edit_message_text(
+                        text=text,
+                        chat_id=call.message.chat.id,
+                        message_id=call.message.message_id,
+                        reply_markup=reply_markup
+                    )
+    
+                await bot.answer_callback_query(call.id)
                 
+            elif data == "share_quizzes":
+                quizzes_list = get_user_quizzes_list(user_id)
+    
+                if not quizzes_list:
+                    text = "📭 لا يوجد لديك أي اختبارات حالياً."
+                    reply_markup = {"inline_keyboard": [[{"text": "🔙 رجوع", "callback_data": "back_to_menu"}]]}
+                else:
+                    # الصفحة الأولى (تبدأ من 0)
+                    current_page = 0
+        
+                    # حساب عدد الاختبارات
+                    total_quizzes = len(quizzes_list)
+        
+                    text = f"📋 اختر الاختبار الذي تريد مشاركته:\n\n"
+                    text += f"✨ لديك {total_quizzes} اختبار"
+                    text += f"\n📌 استخدم الأزرار للتنقل بين الصفحات\n"
+        
+                    # بناء لوحة المفاتيح
+                    reply_markup = build_quizzes_keyboard(quizzes_list, page=current_page)
+    
+                # إرسال الرسالة
+                bot.send_message(chat_id, text, reply_markup=reply_markup)
+                    
             
             elif data.startswith("post_quiz"):
                 parts = data.split(":")
