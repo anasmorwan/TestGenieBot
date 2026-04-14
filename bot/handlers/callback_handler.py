@@ -921,11 +921,9 @@ def register(bot):
                 
 
             elif data.startswith("scheduled_quiz"):
-                keyboard = scheduled_quiz_keyboard()
                 bot.send_message(
                     chat_id=chat_id,
                     text=get_message("AWAITING_SCHEDULING"),
-                    reply_markup=keyboard,
                     parse_mode="HTML"
                 )
                 
