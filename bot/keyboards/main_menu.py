@@ -21,7 +21,7 @@ def smart_ui_keyboard(mistakes):
     btn_mistakes = InlineKeyboardButton(f"📖 مراجعة أخطائي: {mistakes}", callback_data=f"start_challenge:mistakes_all:{mistakes}")
 
 
-    markup.add(btn_settings, btn_random_quiz, btn_mistakes)
+    markup.add(btn_mistakes, btn_random_quiz, btn_settings)
     return markup
  
     
