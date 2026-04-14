@@ -56,6 +56,12 @@ def process_task(task):
         
 
     elif task_type == "text_generate_quiz": 
+        quizzes = generate_quizzes_from_text(
+            user_id=user_id,
+            content=text,
+            msg_id=msg_id,
+            bot=mybot
+        )
         if not quizzes or len(quizzes) == 0:
             print(f"DEBUG: [User: {user_id}] Quiz generation returned EMPTY result.", flush=True)
             bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
@@ -101,6 +107,12 @@ def process_task(task):
         )
 
     elif task_type == "file_generate_quiz":
+        quizzes = generate_quizzes_from_text(
+            user_id=user_id,
+            content=text,
+            msg_id=msg_id,
+            bot=mybot
+        )
         maybe_cleanup() 
         if not quizzes:
             bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
@@ -151,9 +163,3 @@ def process_task(task):
 
 
 
-add_task(1, {
-                "type": "file_generate_quiz",
-                "user_id": user_id,
-                "text": content,
-                "msg_id": msg_id
-            })
