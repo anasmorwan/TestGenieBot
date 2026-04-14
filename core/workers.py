@@ -49,9 +49,9 @@ def process_task(task):
         mybot.process_new_updates([update])
 
       
-        text_handler.register(bot)
-        file_hanlder.register(bot, msg)
-        image_handler.register(bot, msg)
+        text_handler.register(mybot)
+        file_hanlder.register(mybot)
+        image_handler.register(mybot)
         
 
     elif task_type == "text_generate_quiz": 
