@@ -462,11 +462,38 @@ quiz_format_with_misconcepts = """
 }
 """
 
+System_Role_v2 = """
+You are an expert academic Professor and Exam Designer. Your task is to transform the provided content into a high-level academic quiz using the 'Qube methodology' provided below in Quiz_Rules.
+"""
+Quiz_Rules_v2 = """
+Source Prioritization: Focus on "Objectives/Goals" first. Use ONLY provided text (Strict Fidelity).
+Cognitive Depth: No basic definitions. Focus on distinguishing similar concepts, identifying exceptions (EXCEPT/NOT true), and practical application.
+Smart Distractors: Options must be plausible and related to the text to challenge precision.
+core_academic_concept: Extract the single most important high-yield fact.
+The "Qube" Extras (Arabic Only):
+feedback: For each option, explain why it's correct or address the specific misconception/trap (in Arabic).
+expert_tip: A short, supportive expert advice (in Arabic) starting with "تذكر دائماً..." or "هذا الجزء...".
+"""
+
+
+Language_Protocol = """
+core_academic_concept, question, quiz_title, and option.text MUST match the language of the source text.
+feedback, and expert_tip MUST be in Arabic, regardless of the source language.
+"""
+
+strict_limits = """
+quiz_title: 3–8 words. Prefix: (Quiz:, Test:, Survey:, or Poll:).
+question: Max 250 chars.
+option.text: Max 95 chars (Condense if necessary).
+Output Format:
+Return ONLY valid JSON. No markdown
+"""
+
 surface_level_rule = "Avoid shallow, text-bound, surface-level retrieval, and definition-reliant questions. Do not generate questions that simply extract phrases from the text, ask for formulaic ratios, rephrase introductory sentences, or mimic definition patterns. Instead, generate inference-based, analytical, and applied questions that test real understanding of the CONTENT, not memorization or copying."
 
 
 
-def build_quiz_prompt(user_id, content: Any, num_questions: int, user_instruction: str = None) -> str:
+def build_quiz_prompt(user_id, content: Any, num_questions: int, advance=False, user_instruction: str = None) -> str:
     # --- إضافة الحماية ---
     if isinstance(content, tuple):
         content = content[0]
@@ -492,7 +519,31 @@ def build_quiz_prompt(user_id, content: Any, num_questions: int, user_instructio
 - Do not use Arabic in the output.
         """.strip()
 
-    prompt = f"""
+    
+    if advance:
+        prompt = f"""
+SYSTEM_ROLE:
+{system_role_v2}
+
+Generate {num_questions} quiz questions.
+Difficulty level: {difficulty}
+
+QUIZ_RULES:
+{quiz_rules_v2}
+
+STRICT_LIMITS:
+{strict_limits}
+
+QUIZ_FORMAT:
+{quiz_format_with_misconcepts}
+
+CONTENT:
+{content}
+    """.strip()
+
+    
+    else:
+        prompt = f"""
 {system_role}
 
 {quiz_rules}
