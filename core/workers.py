@@ -31,7 +31,7 @@ def delayed_worker():
 
 def start_workers(n=30):
     for _ in range(n):
-        t1 = threading.Thread(target=delayed_worker, daemon=True).start()
+        t1 = threading.Thread(target=delayed_worker, daemon=True)
         t2 = threading.Thread(target=worker, daemon=True)
         t1.start()
         t2.start()
