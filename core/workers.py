@@ -29,10 +29,13 @@ def delayed_worker():
         process_task(task)
 
 
-def start_workers(n=10):
+def start_workers(n=30):
     for _ in range(n):
-        t = threading.Thread(target=worker, daemon=True)
-        t.start()
+        t1 = threading.Thread(target=delayed_worker, daemon=True).start()
+        t2 = threading.Thread(target=worker, daemon=True)
+        t1.start()
+        t2.start()
+        
 
 def process_task(task):
     task_type = task["type"]
