@@ -3,6 +3,9 @@ from core.task_queue import task_queue
 from bot.bot_instance import mybot
 from bot.handlers import file_hanlder, text_handler, image_handler  # أو أي functions عندك
 from services.quiz_service import generate_quizzes_from_text
+from services.quiz_session_service import quiz_manager
+
+
 
 
 def worker():
@@ -24,7 +27,7 @@ def process_task(task):
     user_id = task["user_id"] if user_id else None
     text = task["text"] if text else None
     msg_id = task["msg_id"] if msg_id else None
-    
+    only_generate = task["only_generate"] if only_generate else None 
 
     if task["type"] == "new_updates":
         update = task["update"]
@@ -49,6 +52,8 @@ def process_task(task):
     elif task_type == "file_generate_quiz":
         generate_quizzes_from_text(content=text, user_id=user_id, bot=mybot, msg_id=msg_id)
 
-    elif task_type == "send_message":
-        handlers.send_message(task)
+    elif task_type == "extend_generate_quiz":
+        quiz_manager.generate_and_store(user_id=user_id, msg_id=msg_id, chat_id=user_id, only_generate=only_generate, bot=mybot)
+
+
 
