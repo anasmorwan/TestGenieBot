@@ -17,6 +17,18 @@ def worker():
         finally:
             task_queue.task_done()
 
+
+def delayed_worker():
+    while True:
+        run_at, task = delayed_queue.get()
+
+        now = time.time()
+        if now < run_at:
+            time.sleep(run_at - now)
+
+        process_task(task)
+
+
 def start_workers(n=10):
     for _ in range(n):
         t = threading.Thread(target=worker, daemon=True)
