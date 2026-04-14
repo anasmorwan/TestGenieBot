@@ -190,53 +190,7 @@ def register(bot):
                     "msg_id": msg_id
                 })
 
-                if not quizzes or len(quizzes) == 0:
-                    print(f"DEBUG: [User: {user_id}] Quiz generation returned EMPTY result.", flush=True)
-                    bot.send_message(chat_id, "❌ فشل توليد الاختبار. تأكد أن النص يحتوي على معلومات كافية.")
-                    return
-
-                if state == "scheduled_quiz":
-                    quiz_code = store_quiz(user_id, quizzes, schedule=True)
-                    bot.send_message(
-                        chat_id=chat_id,
-                        text=get_message("SCHEDULED_QUIZ_READY"),
-                        parse_mode="HTML"
-                    )
-                    return
-                quiz_code = store_quiz(user_id, quizzes)
-                    
-                maybe_cleanup()
-                quiz_len = len(quizzes)
-
-                action = random.choice(["delete", "edit"])
-                reply_markup = quiz_keyboard(quiz_code)
-                if action == "delete":
-                    bot.delete_message(chat_id, message_id=waiting_msg.message_id)
-                    bot.send_message(
-                        chat_id=chat_id,
-                        text=get_message("QUIZ_CREATED", count=quiz_len),
-                        parse_mode="HTML"
-                    )
-                    time.sleep(2)
-                else:
-                    bot.edit_message_text(
-                        chat_id=chat_id,
-                        message_id=msg_id,
-                        text=get_message("QUIZ_CREATED", count=quiz_len),
-                        parse_mode="HTML"
-                       )
-                    time.sleep(2)
-            
-                if not quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False):
-                    bot.edit_message_text(
-                    chat_id=chat_id,
-                    message_id=waiting_msg.message_id,
-                    text="😵 لم يتم العثور على هذا الاختبار أو انتهت صلاحيته."
-                    )
                 
-                print(f"DEBUG: [User: {user_id}] Standard Quiz {quiz_code} generated and sent.", flush=True)
-            
-            
                 
                 
         except Exception as e:
