@@ -448,6 +448,7 @@ CONSTRAINTS:
 - No facts outside the provided source.
 - Return ONLY a JSON object like OUTPUT FORMAT
 
+{quiz_title_prompt}
 
 QUESTION TYPES TO GENERATE:
 {chr(10).join([f"- {item['slot']}. {item['type']}" for item in question_plan])}
