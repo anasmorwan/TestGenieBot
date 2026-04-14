@@ -20,6 +20,8 @@ from storage.sqlite_db import set_user_has_quizzes
 from bot.handlers.is_member import get_channel_invite_link, is_user_member
 from bot.keyboards.actions_keyboard import invitation_keyboard
 from storage.session_store import user_states, temp_texts, get_state_safe
+
+from core.queue_manager import add_task
 import random
 import threading
     
@@ -179,13 +181,19 @@ def register(bot):
 
             msg_id = waiting_msg.message_id
 
-            quizzes = generate_quizzes_from_text(
-            content=content,
-            user_id=user_id,
-            bot=bot,
-            user_instruction=user_instruction,
-            msg_id=msg_id
-            )
+            # quizzes = generate_quizzes_from_text(
+            #content=content,
+         #   user_id=user_id,
+       #     bot=bot,
+         #   user_instruction=user_instruction,
+           # msg_id=msg_id
+        #    )
+            add_task(1, {
+                "type": "file_generate_quiz",
+                "user_id": user_id,
+                "text": content,
+                "msg_id": msg_id
+            })
             
             maybe_cleanup()
 
