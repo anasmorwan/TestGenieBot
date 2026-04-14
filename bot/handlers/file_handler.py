@@ -63,6 +63,10 @@ def register(bot):
             plan = check_subscription_valid(user_id)
             allowed, info = can_generate(user_id)
 
+            if not is_user_member(user_id, bot):
+                show_channel_invitation(bot, chat_id)
+                return 
+
             if not allowed:
                 show_referral_message(bot, chat_id, user_id)  
                 return  # ❗ هذا هو المفتاح
@@ -195,51 +199,7 @@ def register(bot):
                 "msg_id": msg_id
             })
             
-            maybe_cleanup()
             
-
-            if not quizzes:
-                bot.edit_message_text(chat_id=chat_id, message_id=waiting_msg.message_id, text="❌ فشل تحليل النص أو توليد الأسئلة.")
-                return
-
-            if state == "scheduled_quiz":
-                quiz_code = store_quiz(user_id, quizzes, schedule=True)
-                bot.send_message(
-                    chat_id=chat_id,
-                    text=get_message("SCHEDULED_QUIZ_READY"),
-                    parse_mode="HTML"
-                )
-                return
-            else:
-                quiz_code = store_quiz(user_id, quizzes)
-
-            quiz_len = len(quizzes)
-            reply_markup = quiz_keyboard(quiz_code)
-            
-            action = random.choice(["delete", "edit"])
-            if action == "delete":
-                bot.delete_message(chat_id, message_id=waiting_msg.message_id)
-                bot.send_message(
-                    chat_id=chat_id,
-                    text=get_message("QUIZ_CREATED", count=quiz_len),
-                    parse_mode="HTML"
-                )
-                time.sleep(2)
-            else:
-                bot.edit_message_text(
-                    chat_id=chat_id,
-                    message_id=waiting_msg.message_id,
-                    text=get_message("QUIZ_CREATED", count=quiz_len),
-                    parse_mode="HTML"
-                    )
-                time.sleep(2)
-            
-
-            
-    
-            quiz_manager.start_quiz(chat_id, quiz_code, bot, is_shared_user=False)
-            
-        
         
         except Exception as e:
             print("File handler ERROR:", e, flush=True)
