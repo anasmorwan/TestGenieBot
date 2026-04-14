@@ -478,6 +478,28 @@ def get_user_quiz_codes(user_id):
     
     results = cursor.fetchall()
     return [row[0] for row in results]
+
+def get_user_quizzes_list(user_id):
+    """
+    ترجع قائمة بالاختبارات للمستخدم (العنوان + الكود)
+    
+    Args:
+        user_id (int): معرف المستخدم
+    
+    Returns:
+        list: قائمة من tuples (quiz_title, quiz_code)
+    """
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT quiz_title, quiz_code 
+        FROM user_quizzes 
+        WHERE user_id = ? AND is_active = 1
+        ORDER BY created_at DESC
+    """, (user_id,))
+    
+    return cursor.fetchall()  # يعيد [(title1, code1), (title2, code2), ...]
 #--------------------------
 #    🔹 دوال الادمن المساعدة
 #--------------------------
@@ -1248,6 +1270,12 @@ def safe_add_column():
     if not column_exists("users", "has_quizzes"):
         c.execute("""
         ALTER TABLE users ADD COLUMN has_quizzes BOOLEAN DEFAULT 0 
+        """)
+    if not column_exists("user_quizzes", "quiz_title"):
+        # إضافة عمود quiz_title إلى الجدول الموجود
+        cursor.execute("""
+            ALTER TABLE user_quizzes 
+            ADD COLUMN quiz_title TEXT DEFAULT 'اختبار بدون عنوان'
         """)
         
     
