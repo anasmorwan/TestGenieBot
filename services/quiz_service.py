@@ -199,6 +199,10 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             print(f"🎒 detected_domain {detected_domain}", flush=True)
             update_user_major(user_id, detected_domain)
             print(f"user major updated", flush=True)
+            core_concept = response_data["core_academic_concept"]
+            
+
+            
             quizzes = response_data.get("questions", [])
             print(f"✉️ quizzes extracted successfully", flush=True)
         
