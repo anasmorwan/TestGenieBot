@@ -14,7 +14,19 @@ def get_connection():
 def init_db():
     conn = get_connection()
     cursor = conn.cursor()
-
+    
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS quiz_sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,   
+        user_id INTEGER NOT NULL,
+        quiz_code TEXT NOT NULL, 
+        current_index INTEGER DEFAULT 0, 
+        score INTEGER DEFAULT 0, 
+        is_completed BOOLEAN DEFAULT 0,
+        started_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS schedules (
         id INTEGER PRIMARY KEY AUTOINCREMENT, 
@@ -28,7 +40,7 @@ def init_db():
         is_active BOOLEAN DEFAULT 1,
         last_run_at TEXT,
         next_run_at TEXT,  
-        created_at TEXT DEFAULT CURRENT_TIMESTAM
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
     )
     """)
     cursor.execute("""
