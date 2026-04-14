@@ -113,7 +113,6 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 
 
             raw_response = safe_generate(user_id, prompt) # استخدم هذه الدالة دائماً!
-            print(raw_response[:1000], flush=True)  # أول 1000 حرف
             
         
         
@@ -124,6 +123,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             
             quizzes = response["questions"]
             detected_domain = response["domain"]
+            title = response["quiz_title"]
             update_user_major(user_id, detected_domain)
         
         
@@ -151,6 +151,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             
             
             domain = pro_response["metadata"]["domain"]
+            title = pro_response["metadata"]["quiz_title"]
             update_user_major(user_id, domain)
             save_user_knowledge(user_id, content, domain)
 
@@ -194,6 +195,7 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             response_data = parse_llm_json(raw_response)
             print(f"🗣️ response_data generated", flush=True)
             detected_domain = response_data.get("domain", "General")
+            title = response_data["quiz_title"]
             print(f"🎒 detected_domain {detected_domain}", flush=True)
             update_user_major(user_id, detected_domain)
             print(f"user major updated", flush=True)
@@ -202,11 +204,11 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
         
             save_user_knowledge(user_id, content, detected_domain)
             print(f"📖 raw user knowledge saved", flush=True)
-            return normalize_quizzes(quizzes)[:question_count]
+            return normalize_quizzes(quizzes)[:question_count], title
         except Exception as e:
             print(f"ERROR: {str(e)}")
 
-        return normalize_quizzes(quizzes)[:question_count]
+        return normalize_quizzes(quizzes)[:question_count], title
         
 
 
