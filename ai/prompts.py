@@ -117,6 +117,7 @@ Return ONLY a JSON object in this structure:
 {{
   "metadata": {{
     "domain": "e.g: Medicine",
+    "quiz_title": "..",
     "topics": ["..."],
     "difficulty": "Medium",
     "discipline": "..."
@@ -142,6 +143,11 @@ Return ONLY a JSON object in this structure:
 - Difficulty level: {difficulty}
 - Do not include markdown.
 - Do not wrap the JSON in code fences.
+quiz_title:
+- 3–8 words, short and clearly reflects the quiz topic
+- Start with a type prefix: Quiz:, Test:, Survey:, or Poll:
+- Focus on the main subject only
+- Example: "Quiz: Advanced Math", "Test: English Grammar"
 
 CONTENT:
 {content}
@@ -404,6 +410,7 @@ Rules:
 quiz_format = """
 {
   "domain": "Medicine",
+  "quiz_title": "..",
   "questions": [
     {
       "question": "...",
@@ -468,6 +475,12 @@ CONTENT:
 - Question text: Max 250 characters.
 - EACH Option: Strictly max 95 characters.
 - If an option is long, condense it without losing academic meaning.
+quiz_title:
+- 3–8 words, short and clearly reflects the quiz topic
+- Start with a type prefix: Quiz:, Test:, Survey:, or Poll:
+- Focus on the main subject only
+- Example: "Quiz: Advanced Math", "Test: English Grammar"
+
     """.strip()
 
     return prompt
