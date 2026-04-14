@@ -423,6 +423,45 @@ quiz_format = """
 Return ONLY valid JSON. No markdown.
 """.strip()
 
+quiz_format_with_misconcepts = """
+{
+  "domain": "Medicine",
+  "quiz_title": "...",
+  
+  "core_academic_concept": "اكتب هنا أهم فقرة أو مفهوم علمي (High-yield concept) في النص، ليتم حفظه ومراجعته لاحقاً.",
+  
+  "questions": [
+    {
+      "question": "...",
+      "branch": "anatomy",
+      "options": [
+        {
+          "text": "...",
+          "is_correct": true,
+          "feedback": "إجابة صحيحة. لأن ..."
+        },
+        {
+          "text": "...",
+          "is_correct": false,
+          "feedback": "خطأ شائع! ربما التبس عليك الأمر مع [كذا]. تذكر أن الفروق هي..."
+        },
+        {
+          "text": "...",
+          "is_correct": false,
+          "feedback": "هذا الخيار يبدو صحيحاً ولكنه ينقصه [كذا]..."
+        },
+        {
+          "text": "...",
+          "is_correct": false,
+          "feedback": "هذه الحالة تحدث في [مرض آخر] وليس هنا."
+        }
+      ],
+      "expert_tip": "💡 تذكر دائماً: [نصيحة قصيرة ومركزة بنبرة دكتور جامعي خبير]"
+    }
+  ]
+}
+"""
+
 surface_level_rule = "Avoid shallow, text-bound, surface-level retrieval, and definition-reliant questions. Do not generate questions that simply extract phrases from the text, ask for formulaic ratios, rephrase introductory sentences, or mimic definition patterns. Instead, generate inference-based, analytical, and applied questions that test real understanding of the CONTENT, not memorization or copying."
 
 
