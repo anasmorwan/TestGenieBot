@@ -49,7 +49,7 @@ def register(bot):
             
         user_id = msg.from_user.id
         chat_id = msg.chat.id
-        text = msg.text
+        text = msg.text[:3000]
         update_last_active(user_id)
         if text.startswith("/"):
             return
@@ -184,7 +184,7 @@ def register(bot):
 
                 # quizzes = generate_quizzes_from_text(text, user_id, bot, msg_id=msg_id)
                 add_task(1, {
-                    "type": "text_generate_quiz",
+                    "type": "generate_quiz",
                     "user_id": user_id,
                     "text": text,
                     "msg_id": msg_id
