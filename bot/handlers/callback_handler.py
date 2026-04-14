@@ -827,7 +827,10 @@ def register(bot):
 
             
             elif data == "adjusted_quiz":
-                
+                if not is_paid_user_active(user_id):
+                    bot.answer_callback_query(call.id, "🔒 الجدولة المخصصة متاحة للمشتركين فقط - قم بترقية حسابك")
+                    return
+                    
                 user_sessions[chat_id] = {
                     'number': '',
                     'message_id': message.message_id,
@@ -845,14 +848,24 @@ def register(bot):
                 
             elif data == "hourly_quiz":
                 bot.edit_message_text(
-                    get_display_text(''),
-                    chat_id,
-                    message.message_id,
+                    text=get_message("HOURLY_QUIZ"),
+                    chat_id=chat_id,
+                    message_id=message_id,
                     reply_markup=manual_selection_keyboard(),
-                    parse_mode="Markdown"
+                    parse_mode="HTML"
                 )
+                user_states[user_id] = "hourly_quiz"
+                
             elif data == "daily_quiz":
-                pass
+                bot.edit_message_text(
+                    text=get_message("DAILY_QUIZ"),
+                    chat_id=chat_id,
+                    message_id=message_id,
+                    reply_markup=manual_selection_keyboard(),
+                    parse_mode="HTML"
+                )
+                user_states[user_id] = "daily_quiz"
+                
                 
                 
                     
