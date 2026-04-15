@@ -488,6 +488,7 @@ option.text: Max 95 chars (Condense if necessary).
 Output Format:
 Return ONLY valid JSON. No markdown
 """
+Structural_Diversity_Rule = "Use 'Integrated Item Writing'. Avoid simple 'What is/Which is' stems. Instead, construct questions based on 'Contextual Application' or 'Comparative Analysis'. Start with a short premise (a situation, a data point, or a theoretical conflict) then ask for the most appropriate next step, the underlying cause, or the distinguishing factor. Mix 80% 'Application-level' questions with 20% 'Key-fact' questions to ensure a sophisticated, academic flow that mirrors high-level university exams."
 
 surface_level_rule = "Avoid shallow, text-bound, surface-level retrieval, and definition-reliant questions. Do not generate questions that simply extract phrases from the text, ask for formulaic ratios, rephrase introductory sentences, or mimic definition patterns. Instead, generate inference-based, analytical, and applied questions that test real understanding of the CONTENT, not memorization or copying."
 
@@ -530,6 +531,9 @@ Difficulty level: {difficulty}
 
 QUIZ_RULES:
 {quiz_rules_v2}
+
+STRUCTURAL DIVERSITY RULE:
+{Structural_Diversity_Rule}
 
 STRICT_LIMITS:
 {strict_limits}
