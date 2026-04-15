@@ -82,7 +82,7 @@ def delayed_message(bot, user_id, delay, selected_text):
 
 
 
-def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num_quizzes=10, msg_id=None):
+def generate_quizzes_from_text(content, user_id, bot, advance=False, user_instruction=None, num_quizzes=10, msg_id=None):
     from services.user_trap import save_user_knowledge
     number = get_user_question_count(user_id)
     question_count = number if number is not None else 5
@@ -92,7 +92,13 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             selected_text = get_unique_random_message(user_id)
         
             # دالة Pro ترجع قاموساً فيه metadata و questions
-            prompt = generate_smart_batch_prompt(user_id, content, num_questions=question_count)
+            # prompt = generate_smart_batch_prompt(user_id, content, num_questions=question_count)
+            add_task(0, {
+                "type": "generate_smart_prompt",
+                "user_id": user_id,
+                "text": content,
+                "num_questions": question_count
+            })
             if msg_id:
                         
                 bot.edit_message_text(
@@ -132,14 +138,14 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             
             return normalize_quizzes(quizzes)
         else:
-         #   add_task(0, {
-           #     "type": "delayed_message",
-          #      "user_id": user_id,
-           #     "text": selected_text,
-             #   "delay": 3,
-            #    "run_at": time.time() + 3
-         #   })
-            pro_response = pro_quiz_generator(user_id, content, num_questions=question_count)
+
+            # pro_response = pro_quiz_generator(user_id, content, num_questions=question_count)
+            add_task(0, {
+                "type": "pro_quiz_generator",
+                "user_id": user_id,
+                "text": content,
+                "num_questions": question_count
+            })
             
             print(pro_response[:1000], flush=True)  # أول 1000 حرف
             
@@ -178,17 +184,16 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 
 
                 
-            prompt = build_quiz_prompt(user_id, content, question_count, advance=True, user_instruction=user_instruction)
-         #   add_task(0, {
-          #      "type": "delayed_message",
-          #      "user_id": user_id,
-          #      "text": selected_text,
-         #       "delay": 3,
-           #     "run_at": time.time() + 3
-         #   })
+            prompt = build_quiz_prompt(user_id, content, question_count, advance=advance, user_instruction=user_instruction)
+            
             print(f"✉️ second message sent 📤", flush=True)
         
-            raw_response = safe_generate(user_id, prompt) # استخدم هذه الدالة دائماً!
+           # raw_response = safe_generate(user_id, prompt) # استخدم هذه الدالة دائماً!
+            add_task(2, {
+                "type": "safe_generate",
+                "user_id": user_id,
+                "text": prompt
+            })
             print(raw_response[:1000], flush=True)  # أول 1000 حرف
             
             print(f"✉️ raw response message obtained", flush=True)        
