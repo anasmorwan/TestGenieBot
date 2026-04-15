@@ -132,13 +132,13 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
             
             return normalize_quizzes(quizzes)
         else:
-            add_task(0, {
-                "type": "delayed_message",
-                "user_id": user_id,
-                "text": selected_text,
-                "delay": 3,
-                "run_at": time.time() + 3
-            })
+         #   add_task(0, {
+           #     "type": "delayed_message",
+          #      "user_id": user_id,
+           #     "text": selected_text,
+             #   "delay": 3,
+            #    "run_at": time.time() + 3
+         #   })
             pro_response = pro_quiz_generator(user_id, content, num_questions=question_count)
             
             print(pro_response[:1000], flush=True)  # أول 1000 حرف
@@ -179,13 +179,13 @@ def generate_quizzes_from_text(content, user_id, bot, user_instruction=None, num
 
                 
             prompt = build_quiz_prompt(user_id, content, question_count, advance=True, user_instruction=user_instruction)
-            add_task(0, {
-                "type": "delayed_message",
-                "user_id": user_id,
-                "text": selected_text,
-                "delay": 3,
-                "run_at": time.time() + 3
-            })
+         #   add_task(0, {
+          #      "type": "delayed_message",
+          #      "user_id": user_id,
+          #      "text": selected_text,
+         #       "delay": 3,
+           #     "run_at": time.time() + 3
+         #   })
             print(f"✉️ second message sent 📤", flush=True)
         
             raw_response = safe_generate(user_id, prompt) # استخدم هذه الدالة دائماً!
