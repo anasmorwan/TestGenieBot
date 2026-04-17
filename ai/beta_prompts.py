@@ -165,7 +165,6 @@ output_format = """
       "question": "...",
       "options": ["...", "...", "...", "..."],
       "correct_index": 0,
-      "explanation": "...",
       "branch": "e.g: anatomy"
     }
   ]
@@ -458,12 +457,6 @@ STYLE & PATTERN GUIDES:
 
 CONTENT PRIORITIES:
 {priority_block}
-
-DISTRACTOR RULES:
-{chr(10).join(config['generate_distractors'])}
-
-EXPLANATION GUIDELINES:
-{explanation_style_guidelines}
 
 SOURCE TEXT:
 {text_content}
