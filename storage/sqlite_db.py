@@ -29,6 +29,21 @@ def init_db():
         UNIQUE(user_id, chunk_id)
         )
     """)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS medical_qbank (
+       id,
+       question
+       options
+       correct_index
+       topic                -- Cardiology, Anatomy...
+       subtopic             -- ECG, Valves...
+       difficulty           -- easy / medium / hard
+       quality_status       -- verified / pending / rejected
+       source               -- AI / user / curated
+       explanation          -- اختياري
+       created_at
+    )
+    """)
 
 
     cursor.execute("""
