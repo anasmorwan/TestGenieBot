@@ -15,20 +15,7 @@ def init_db():
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS knowledge_chunks (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        knowledge_id TEXT NOT NULL,
-        chunk_id TEXT NOT NULL,
-        chunks_count INTEGER,
-        summary TEXT,
-        difficulty TEXT,
-        source TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, chunk_id)
-        )
-    """)
+    
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS medical_qbank (
        id,
@@ -148,15 +135,6 @@ def init_db():
     )
     """)
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS user_knowledge (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER,
-        last_text TEXT,
-        specialty TEXT,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
     # cursor.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_user_id ON user_knowledge(user_id)")
     # أضف هذا السطر لتصحيح القاعدة (شغله مرة واحدة)
     cursor.execute("DROP INDEX IF EXISTS idx_user_id")
