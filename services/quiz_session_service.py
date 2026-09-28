@@ -235,7 +235,7 @@ class QuizManager:
                 }
             only_generate = True
            # threading.Thread(target=self.generate_and_store, args=(bot, chat_id, chat_id, waitinf_msg.message_id, only_generate)).start()
-             add_task(1, {
+            add_task(1, {
                 "type": "extend_generate_quiz",
                 "user_id": chat_id,
                 "msg_id": waitinf_msg.message_id,
