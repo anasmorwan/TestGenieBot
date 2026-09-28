@@ -10,7 +10,7 @@ temp_texts = {}
 
 # bot/handlers/callback_handler.py
 user_selections = {}
-user_selections = {}
+user_sessions = {}
 # bot/handlers/callback_handler.py
 user_poll_selections = {}
 
