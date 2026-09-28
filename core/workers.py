@@ -1,3 +1,4 @@
+import telebot
 import threading
 from core.queue_manager import task_queue, delayed_queue
 from bot.bot_instance import mybot
