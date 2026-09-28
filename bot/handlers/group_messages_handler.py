@@ -76,8 +76,8 @@ def register(bot):
                 bot.send_message(chat_id=admin_id, text=response_text, parse_mode="Markdown")
                             
                 
-                        except Exception as e:
-                            print(f"❌ [Error] Could not send to admin {admin.user.id}: {e}", flush=True)
+                       # except Exception as e:
+                       #     print(f"❌ [Error] Could not send to admin {admin.user.id}: {e}", flush=True)
                 
                 print(f"✅ [Done] Sent to {sent_count} admins.", flush=True)
 
