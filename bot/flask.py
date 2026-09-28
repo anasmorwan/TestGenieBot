@@ -26,11 +26,13 @@ def register():
 
             # حوّل القاموس إلى كائن Update ثم أرسله لمكتبة telebot
             update = telebot.types.Update.de_json(update_dict)
-            # user_id = 
+            user_id = update.message.from_user.id
+            
             # threading.Thread(target=mybot.process_new_updates, args=([update],)).start()
             add_task({
                 "type": "new_updates",
-                "update": update_dict   # أو update.to_dict()
+                "update": update_dict,    # أو update.to_dict()
+                "user_id": user_id
             })
             return "OK", 200
 
