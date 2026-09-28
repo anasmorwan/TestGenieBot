@@ -1349,19 +1349,19 @@ def safe_add_column():
         """)
     if not column_exists("user_quizzes", "quiz_title"):
         # إضافة عمود quiz_title إلى الجدول الموجود
-        cursor.execute("""
+        c.execute("""
             ALTER TABLE user_quizzes 
             ADD COLUMN quiz_title TEXT DEFAULT 'اختبار بدون عنوان'
         """)
     if not column_exists("user_knowledge", "title"):
         # إضافة عمود quiz_title إلى الجدول الموجود
-        cursor.execute("""
+        c.execute("""
             ALTER TABLE user_quizzes 
             ADD COLUMN title TEXT DEFAULT 'بدون عنوان'
         """)
     if not column_exists("user_knowledge", "knowledge_id"):
         # إضافة عمود quiz_title إلى الجدول الموجود
-        cursor.execute("""
+        c.execute("""
             ALTER TABLE user_quizzes 
             ADD COLUMN knowledge_id TEXT
         """)
