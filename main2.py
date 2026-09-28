@@ -10,7 +10,7 @@ from bot.handlers import start, text_handler, file_handler, image_handler, group
 from storage.sqlite_db import init_db, migrate_users_to_trap
 from bot.handlers import poll_answer_handler, is_member
 from bot import flask
-from services.backup_service import restore_if_needed, start_auto_backup
+from services.backup_service import restore_if_needed
 from services.backup_service import is_db_valid, smart_restore
 from storage.sqlite_db import safe_add_column, safe_add_table
 from bot.handlers import chat_shared_handler 
