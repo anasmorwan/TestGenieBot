@@ -49,7 +49,7 @@ def process_task(task):
     
     if task["type"] == "new_updates":
         update = task["update"]
-        mybot.process_new_updates([update])
+        mybot.process_new_updates(update)
 
       
         text_handler.register(mybot)
