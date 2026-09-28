@@ -34,9 +34,9 @@ def register(bot):
             )
         
         text = message.text or message.caption
-            if not text:
-                print("❌ [Skip] Message has no text or caption.", flush=True)
-                return
+        if not text:
+            print("❌ [Skip] Message has no text or caption.", flush=True)
+            return
             
         try:
             result = detect_quiz_pattern(text)  
