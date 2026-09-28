@@ -28,7 +28,7 @@ def register():
             update = telebot.types.Update.de_json(update_dict)
             # user_id = 
             # threading.Thread(target=mybot.process_new_updates, args=([update],)).start()
-            add_task(0, {
+            add_task({
                 "type": "new_updates",
                 "update": update_dict   # أو update.to_dict()
             })
