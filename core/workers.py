@@ -46,17 +46,20 @@ def process_task(task):
     text = task.get("text")
     msg_id = task.get("msg_id")
     only_generate = task.get("only_generate")
-    
-    if task["type"] == "new_updates":
-        update = task["update"]
-        mybot.process_new_updates(update)
 
+    if task_type == "new_updates":
+        raw_update_dict = task["update"]
+        # حول القاموس تاني لكائن Update حقيقي عشان telebot تفهمو
+        update_obj = telebot.types.Update.de_json(raw_update_dict)
+        
+        mybot.process_new_updates([update_obj]) # ومررو في لستة عادي
       
         text_handler.register(mybot)
         file_hanlder.register(mybot)
         image_handler.register(mybot)
-        
-        
+            
+    
+
 
     elif task_type == "generate_quiz":
         quizzes = generate_quizzes_from_text(
