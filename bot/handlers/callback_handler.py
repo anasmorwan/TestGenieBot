@@ -773,7 +773,7 @@ def register(bot):
                         reply_markup=reply_markup
                     )
     
-                await bot.answer_callback_query(call.id)
+                bot.answer_callback_query(call.id)
                 
             elif data == "share_quizzes":
                 quizzes_list = get_user_quizzes_list(user_id)
