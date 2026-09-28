@@ -4,7 +4,7 @@ import threading
 import telebot
 from flask import Flask, request
 from bot.bot_instance import BOT_TOKEN, mybot
-from core.task_queue import add_task
+from core.queue_manager import add_task
 
 
 app = Flask(__name__)
