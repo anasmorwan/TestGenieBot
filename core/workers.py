@@ -3,7 +3,7 @@ from core.queue_manager import task_queue, delayed_queue
 from bot.bot_instance import mybot
 # from bot.handlers import file_hanlder
 # from bot.handlers import text_handler
-f# rom bot.handlers import image_handler  # أو أي functions عندك
+# from bot.handlers import image_handler  # أو أي functions عندك
 from services.quiz_service import generate_quizzes_from_text
 from services.quiz_session_service import quiz_manager
 from bot.handlers import text_handler, file_handler, image_handler
