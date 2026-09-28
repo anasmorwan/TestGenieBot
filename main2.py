@@ -68,7 +68,7 @@ start_workers()
 
 # تسجيل الهاندلرز
 # temp_code.register()
-is_member.register(mybot)
+# is_member.register(mybot)
 # image_handler.register(mybot)
 admin_commands.register(mybot); print("commands.register done", flush=True)
 bot_commands.register(mybot)
