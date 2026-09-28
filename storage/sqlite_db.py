@@ -121,7 +121,7 @@ def init_db():
         user_id INTEGER NOT NULL,
         chat_id TEXT NOT NULL,   
         role TEXT,                 -- admin | member | owner (اختياري)   
-        added_at TEXT NOT NULL    
+        added_at TEXT NOT NULL,    
         UNIQUE(user_id, chat_id)
     )
     """)
