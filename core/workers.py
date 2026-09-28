@@ -41,12 +41,12 @@ def start_workers(n=30):
         
 
 def process_task(task):
-    task_type = task["type"]
-    user_id = task["user_id"] if user_id else None
-    text = task["text"] if text else None
-    msg_id = task["msg_id"] if msg_id else None
-    only_generate = task["only_generate"] if only_generate else None 
-
+    task_type = task.get("type")
+    user_id = task.get("user_id")
+    text = task.get("text")
+    msg_id = task.get("msg_id")
+    only_generate = task.get("only_generate")
+    
     if task["type"] == "new_updates":
         update = task["update"]
         mybot.process_new_updates([update])
