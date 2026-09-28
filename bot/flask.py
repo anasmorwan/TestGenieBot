@@ -4,6 +4,8 @@ import threading
 import telebot
 from flask import Flask, request
 from bot.bot_instance import BOT_TOKEN, mybot
+from core.task_queue import add_task
+
 
 app = Flask(__name__)
 
@@ -24,7 +26,7 @@ def register():
 
             # حوّل القاموس إلى كائن Update ثم أرسله لمكتبة telebot
             update = telebot.types.Update.de_json(update_dict)
-            user_id = 
+            # user_id = 
             # threading.Thread(target=mybot.process_new_updates, args=([update],)).start()
             add_task(0, {
                 "type": "new_updates",
@@ -40,4 +42,3 @@ def register():
             return "ERROR", 500
 
 
-from core.task_queue import add_task
